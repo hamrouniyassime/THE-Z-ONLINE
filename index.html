@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>THE Z — لعبة ثلاثية الأبعاد</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#000; touch-action:none; }
+    body { position:fixed; inset:0; user-select:none; -webkit-user-select:none; }
+    #game { position:absolute; inset:0; background:#000; overflow:hidden; }
+    #game canvas { width:100%; height:100%; display:block; outline:none; }
+    #start-screen { position:fixed; inset:0; z-index:20; display:grid; place-items:center; background:#000; padding:24px; }
+    #start-button { appearance:none; border:0; border-radius:999px; padding:17px 42px; min-width:190px; background:#fff; color:#090909; font:800 19px/1.2 system-ui, sans-serif; box-shadow:0 8px 34px #ffffff1c; cursor:pointer; }
+    #start-button:active { transform:scale(.97); }
+    #start-note { color:#8b8b8b; position:absolute; bottom:max(24px, env(safe-area-inset-bottom)); font-size:12px; text-align:center; }
+    #hud { position:fixed; inset:0; z-index:5; pointer-events:none; display:none; }
+    .pill { position:absolute; top:max(12px, env(safe-area-inset-top)); padding:9px 13px; border:1px solid #ffffff23; border-radius:999px; background:#1119; color:#fff; font-size:12px; font-weight:700; backdrop-filter:blur(10px); }
+    #online-pill { right:max(12px, env(safe-area-inset-right)); }
+    #connection-pill { left:max(12px, env(safe-area-inset-left)); color:#c8c8c8; }
+    #help { position:absolute; left:50%; top:max(14px, env(safe-area-inset-top)); transform:translateX(-50%); color:#ffffffa8; font-size:11px; white-space:nowrap; text-shadow:0 2px 8px #000; }
+    #mobile-controls { display:none; position:fixed; inset:0; z-index:8; pointer-events:none; }
+    .stick { width:118px; height:118px; border-radius:50%; position:absolute; bottom:max(24px, calc(env(safe-area-inset-bottom) + 14px)); border:1px solid #ffffff48; background:#1018205c; box-shadow:inset 0 0 0 8px #ffffff08; pointer-events:auto; touch-action:none; }
+    #move-stick { left:max(22px, calc(env(safe-area-inset-left) + 16px)); }
+    #look-stick { right:max(22px, calc(env(safe-area-inset-right) + 16px)); }
+    .knob { position:absolute; width:48px; height:48px; left:50%; top:50%; margin:-24px 0 0 -24px; border-radius:50%; background:#ffffffbd; border:2px solid #fff; box-shadow:0 2px 12px #0008; pointer-events:none; }
+    .stick-label { position:absolute; width:100%; text-align:center; bottom:12px; color:#ffffff8a; font-size:10px; pointer-events:none; }
+    #jump-button { pointer-events:auto; touch-action:none; position:absolute; right:max(150px, calc(env(safe-area-inset-right) + 145px)); bottom:max(41px, calc(env(safe-area-inset-bottom) + 31px)); width:62px; height:62px; border-radius:50%; background:#ffffffdf; color:#111; border:2px solid #fff; font-size:13px; font-weight:900; box-shadow:0 5px 18px #0006; }
+    #jump-button:active { transform:scale(.95); }
+    #rotate-hint { position:absolute; right:50%; transform:translateX(50%); bottom:max(8px, env(safe-area-inset-bottom)); color:#ffffff75; font-size:10px; white-space:nowrap; }
+    #fatal { display:none; position:fixed; inset:0; z-index:30; background:#000; color:#fff; padding:25px; align-items:center; justify-content:center; text-align:center; }
+    @media (pointer:coarse), (max-width:800px) {
+      #mobile-controls { display:block; }
+      #help { display:none; }
+      .stick { width:108px; height:108px; }
+      #jump-button { right:max(139px, calc(env(safe-area-inset-right) + 130px)); width:58px; height:58px; }
+    }
+    @media (max-height:420px) and (pointer:coarse) {
+      .stick { width:92px; height:92px; bottom:12px; }
+      .knob { width:40px; height:40px; margin:-20px 0 0 -20px; }
+      #jump-button { bottom:22px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game" aria-label="عالم اللعبة ثلاثي الأبعاد"></div>
+  <div id="start-screen">
+    <button id="start-button" type="button">ابدأ اللعب</button>
+    <div id="start-note">المس الزر للدخول إلى العالم</div>
+  </div>
+  <div id="hud">
+    <div class="pill" id="online-pill">اللاعبون: 1</div>
+    <div class="pill" id="connection-pill">جارٍ الاتصال...</div>
+    <div id="help">W A S D للحركة · اسحب بالفأرة لتدوير الكاميرا · Space للقفز</div>
+  </div>
+  <div id="mobile-controls">
+    <div class="stick" id="move-stick" aria-label="عصا الحركة"><div class="knob" id="move-knob"></div><div class="stick-label">تحرّك</div></div>
+    <div class="stick" id="look-stick" aria-label="عصا تدوير الكاميرا"><div class="knob" id="look-knob"></div><div class="stick-label">حرّك الكاميرا</div></div>
+    <button id="jump-button" type="button">قفز</button>
+    <div id="rotate-hint">حرّك العصا اليمنى لتدوير المنظور</div>
+  </div>
+  <div id="fatal"><div><h2>تعذّر تشغيل اللعبة</h2><p id="fatal-message">تحقّق من اتصال الإنترنت ثم أعد تحميل الصفحة.</p></div></div>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
+
+    const gameElement = document.getElementById('game');
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('start-button');
+    const hud = document.getElementById('hud');
+    const onlinePill = document.getElementById('online-pill');
+    const connectionPill = document.getElementById('connection-pill');
+    const fatalScreen = document.getElementById('fatal');
+    const fatalMessage = document.getElementById('fatal-message');
+    const moveStick = document.getElementById('move-stick');
+    const lookStick = document.getElementById('look-stick');
+    const moveKnob = document.getElementById('move-knob');
+    const lookKnob = document.getElementById('look-knob');
+    const jumpButton = document.getElementById('jump-button');
+
+    let started = false;
+    let scene, camera, renderer, clock;
+    let socket = null;
+    let playerId = null;
+    let reconnectTimer = null;
+    let lastSend = 0;
+    let cameraReady = false;
+    const playerObjects = new Map();
+    const keyboard = new Set();
+    const movement = { x: 0, y: 0 };
+    let yaw = 0;
+    let pitch = 0.27;
+    let localX = 0, localY = 0, localZ = 0;
+    let verticalSpeed = 0;
+    let jumpQueued = false;
+    let localMoving = false;
+    let mouseLooking = false;
+    let lastMouseX = 0, lastMouseY = 0;
+
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const randomColor = () => ['#ff6b6b','#ffd166','#06d6a0','#4cc9f0','#b197fc','#ff8fab','#f4a261','#90be6d'][Math.floor(Math.random()*8)];
+
+    function createMaterial(color, roughness = 0.8) {
+      return new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.02 });
+    }
+
+    function addBox(parent, w, h, d, x, y, z, color, options = {}) {
+      const geometry = new THREE.BoxGeometry(w, h, d);
+      const material = createMaterial(color, options.roughness ?? 0.86);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      parent.add(mesh);
+      return mesh;
+    }
+
+    function makeWorld() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color('#86c9f5');
+      scene.fog = new THREE.Fog('#86c9f5', 45, 115);
+      camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 180);
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.7));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      gameElement.appendChild(renderer.domElement);
+      clock = new THREE.Clock();
+
+      scene.add(new THREE.HemisphereLight('#e2f4ff', '#49633c', 2.15));
+      const sun = new THREE.DirectionalLight('#fff1ce', 2.6);
+      sun.position.set(-22, 35, 18);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.camera.left = -35; sun.shadow.camera.right = 35;
+      sun.shadow.camera.top = 35; sun.shadow.camera.bottom = -35;
+      sun.shadow.bias = -0.00025;
+      scene.add(sun);
+
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), createMaterial('#65a85c'));
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.055;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      const grid = new THREE.GridHelper(100, 50, '#8bc47d', '#78b76a');
+      grid.position.y = -0.045;
+      if (Array.isArray(grid.material)) grid.material.forEach(m => { m.transparent = true; m.opacity = 0.22; });
+      else { grid.material.transparent = true; grid.material.opacity = 0.22; }
+      scene.add(grid);
+
+      // A small colourful plaza makes the 3D world immediately visible on first entry.
+      addBox(scene, 12, 0.28, 8, 0, 0.08, -12, '#c8c5b7');
+      addBox(scene, 4.6, 2.8, 4.6, -9, 1.35, -17, '#f2c078');
+      addBox(scene, 4.7, 3.5, 4.8, 10, 1.7, -18, '#a7c7e7');
+      addBox(scene, 3.8, 2.1, 4, 14, 1.0, -6, '#e8a6a6');
+      addBox(scene, 3.8, 0.28, 3.8, -15, 0.35, -4, '#ddcf97');
+      addBox(scene, 3.8, 0.28, 3.8, 17, 0.35, 8, '#ddcf97');
+
+      // Cubic trees, deliberately lightweight for mobile GPUs.
+      for (const [x,z,s] of [[-13,-12,1],[-18,-17,1.2],[16,-13,1.1],[19,-19,.9],[-19,8,1.1],[19,17,1.25],[-11,18,.9],[8,20,1]]) {
+        addBox(scene, .45, 1.7, .45, x, .85, z, '#75502f');
+        const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(1.05*s, 0), createMaterial('#2f8648'));
+        crown.position.set(x, 2.25*s, z); crown.castShadow = true; crown.receiveShadow = true; scene.add(crown);
+        const crown2 = new THREE.Mesh(new THREE.DodecahedronGeometry(.68*s, 0), createMaterial('#45a85d'));
+        crown2.position.set(x+.32, 2.75*s, z-.12); crown2.castShadow = true; scene.add(crown2);
+      }
+
+      // Pillars and lights give scale cues without expensive detailed assets.
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const x = Math.cos(angle) * 34, z = Math.sin(angle) * 34;
+        addBox(scene, .55, 2.7, .55, x, 1.35, z, '#d5d8d9');
+        addBox(scene, .9, .25, .9, x, 2.8, z, '#ffe6a2');
+      }
+
+      window.addEventListener('resize', onResize, { passive: true });
+    }
+
+    function makeNameSprite(name) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512; canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,512,128);
+      ctx.fillStyle = 'rgba(8,12,18,0.70)';
+      const text = String(name || 'لاعب').slice(0, 22);
+      ctx.font = 'bold 42px system-ui, Tahoma, Arial';
+      const width = Math.min(470, Math.max(150, ctx.measureText(text).width + 54));
+      const left = (512-width)/2;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(left, 19, width, 82, 28); else ctx.rect(left, 19, width, 82);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 256, 62, 440);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+      sprite.scale.set(Math.max(1.15, width/180), .36, 1);
+      sprite.position.y = 2.7;
+      return sprite;
+    }
+
+    function createAvatar(player) {
+      const group = new THREE.Group();
+      const color = player.color || randomColor();
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry(.34, .62, 3, 7), createMaterial(color));
+      body.position.y = 1.05; body.castShadow = true; body.receiveShadow = true; group.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(.29, 12, 10), createMaterial('#f0c5a2'));
+      head.position.y = 1.83; head.castShadow = true; group.add(head);
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(.295, 12, 7, 0, Math.PI*2, 0, Math.PI*.48), createMaterial('#49382c'));
+      hair.position.y = 1.91; hair.castShadow = true; group.add(hair);
+      const eyeMat = new THREE.MeshStandardMaterial({ color: '#252525', roughness: .5 });
+      for (const side of [-1,1]) {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(.035, 6, 5), eyeMat);
+        eye.position.set(side*.105, 1.86, -.255); group.add(eye);
+      }
+      const limbs = [];
+      for (const side of [-1,1]) {
+        const arm = new THREE.Mesh(new THREE.CapsuleGeometry(.105, .38, 2, 5), createMaterial(color));
+        arm.position.set(side*.42, 1.04, 0); arm.rotation.z = side*.12; arm.castShadow = true; group.add(arm);
+        const leg = new THREE.Mesh(new THREE.CapsuleGeometry(.13, .42, 2, 5), createMaterial('#303b53'));
+        leg.position.set(side*.17, .35, 0); leg.castShadow = true; group.add(leg);
+        limbs.push({arm,leg,side});
+      }
+      const nameSprite = makeNameSprite(player.name || 'لاعب');
+      group.add(nameSprite);
+      group.position.set(Number(player.x)||0, Number(player.y)||0, Number(player.z)||0);
+      group.rotation.y = -(Number(player.yaw)||0);
+      scene.add(group);
+      return {
+        id: player.id, name: player.name || 'لاعب', color, group, body, head, limbs, nameSprite,
+        target: new THREE.Vector3(group.position.x, group.position.y, group.position.z),
+        targetYaw: Number(player.yaw)||0, isLocal: false, phase: Math.random()*Math.PI*2,
+      };
+    }
+
+    function updateNameSprite(avatar, newName) {
+      if (!newName || avatar.name === newName) return;
+      avatar.name = newName;
+      avatar.group.remove(avatar.nameSprite);
+      avatar.nameSprite.material.map?.dispose();
+      avatar.nameSprite.material.dispose();
+      avatar.nameSprite = makeNameSprite(newName);
+      avatar.group.add(avatar.nameSprite);
+    }
+
+    function upsertPlayer(player) {
+      if (!player || !player.id || !scene) return;
+      let avatar = playerObjects.get(player.id);
+      if (!avatar) {
+        avatar = createAvatar(player);
+        avatar.isLocal = player.id === playerId;
+        playerObjects.set(player.id, avatar);
+      }
+      avatar.color = player.color || avatar.color;
+      updateNameSprite(avatar, player.name);
+      avatar.target.set(
+        Number.isFinite(Number(player.x)) ? Number(player.x) : avatar.target.x,
+        Number.isFinite(Number(player.y)) ? Number(player.y) : avatar.target.y,
+        Number.isFinite(Number(player.z)) ? Number(player.z) : avatar.target.z
+      );
+      avatar.targetYaw = Number.isFinite(Number(player.yaw)) ? Number(player.yaw) : avatar.targetYaw;
+      if (player.id === playerId) {
+        localX = avatar.target.x; localY = avatar.target.y; localZ = avatar.target.z;
+        yaw = avatar.targetYaw;
+        avatar.group.position.set(localX, localY, localZ);
+      }
+      updateOnlineCount();
+    }
+
+    function removePlayer(id) {
+      const avatar = playerObjects.get(id);
+      if (!avatar) return;
+      scene.remove(avatar.group);
+      avatar.group.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach(material => { if (material.map) material.map.dispose(); material.dispose(); });
+        }
+      });
+      playerObjects.delete(id);
+      updateOnlineCount();
+    }
+
+    function updateOnlineCount() {
+      onlinePill.textContent = `اللاعبون: ${Math.max(1, playerObjects.size)}`;
+    }
+
+    function connect() {
+      if (!started) return;
+      if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+      connectionPill.textContent = 'جارٍ الاتصال...';
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      try { socket = new WebSocket(`${protocol}//${location.host}/ws`); }
+      catch (error) {
+        connectionPill.textContent = 'غير متصل';
+        reconnectTimer = setTimeout(connect, 2200);
+        return;
+      }
+      socket.addEventListener('open', () => {
+        connectionPill.textContent = 'متصل';
+        connectionPill.style.color = '#8df0b5';
+      });
+      socket.addEventListener('message', event => {
+        let message;
+        try { message = JSON.parse(event.data); } catch { return; }
+        if (message.type === 'init') {
+          playerId = message.id;
+          for (const player of (message.players || [])) upsertPlayer(player);
+          for (const avatar of playerObjects.values()) avatar.isLocal = avatar.id === playerId;
+          const self = playerObjects.get(playerId);
+          if (self) {
+            localX = self.group.position.x; localY = self.group.position.y; localZ = self.group.position.z;
+            yaw = self.targetYaw;
+            cameraReady = false;
+          }
+          updateOnlineCount();
+        } else if (message.type === 'join' || message.type === 'state') {
+          upsertPlayer(message.player);
+        } else if (message.type === 'leave') {
+          removePlayer(message.id);
+        }
+      });
+      socket.addEventListener('close', () => {
+        if (playerId) removePlayer(playerId);
+        playerId = null;
+        connectionPill.textContent = 'انقطع الاتصال — إعادة المحاولة';
+        connectionPill.style.color = '#ffd18a';
+        if (started) reconnectTimer = setTimeout(connect, 2200);
+      });
+      socket.addEventListener('error', () => {
+        connectionPill.textContent = 'مشكلة في الاتصال';
+        connectionPill.style.color = '#ff9d9d';
+      });
+    }
+
+    function sendState(now) {
+      if (!socket || socket.readyState !== WebSocket.OPEN || !playerId || now - lastSend < 55) return;
+      lastSend = now;
+      socket.send(JSON.stringify({ type:'state', x:localX, y:localY, z:localZ, yaw }));
+    }
+
+    function setupStick(element, knob, kind) {
+      let pointerId = null;
+      let centerX = 0, centerY = 0, lastX = 0, lastY = 0;
+      const radius = 34;
+      const reset = () => {
+        pointerId = null;
+        knob.style.transform = 'translate(0px, 0px)';
+        if (kind === 'move') { movement.x = 0; movement.y = 0; }
+      };
+      const update = (event, isStart = false) => {
+        const dx = event.clientX - centerX;
+        const dy = event.clientY - centerY;
+        const length = Math.hypot(dx,dy) || 1;
+        const limited = Math.min(radius, length);
+        const nx = dx / length * limited;
+        const ny = dy / length * limited;
+        knob.style.transform = `translate(${nx}px, ${ny}px)`;
+        if (kind === 'move') {
+          movement.x = nx/radius;
+          movement.y = ny/radius;
+        } else if (!isStart) {
+          // Use incremental finger movement for camera rotation, while the knob
+          // remains referenced to the fixed center of the right-hand stick.
+          yaw -= (event.clientX - lastX) * 0.004;
+          pitch = clamp(pitch - (event.clientY - lastY) * 0.0035, 0.06, 0.95);
+        }
+        lastX = event.clientX;
+        lastY = event.clientY;
+      };
+      element.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        if (pointerId !== null) return;
+        pointerId = event.pointerId;
+        const rect = element.getBoundingClientRect();
+        centerX = rect.left + rect.width/2;
+        centerY = rect.top + rect.height/2;
+        lastX = event.clientX; lastY = event.clientY;
+        element.setPointerCapture(pointerId);
+        update(event, true);
+      });
+      element.addEventListener('pointermove', event => {
+        if (event.pointerId !== pointerId) return;
+        event.preventDefault();
+        update(event);
+      });
+      element.addEventListener('pointerup', event => { if (event.pointerId === pointerId) reset(); });
+      element.addEventListener('pointercancel', event => { if (event.pointerId === pointerId) reset(); });
+      element.addEventListener('lostpointercapture', reset);
+    }
+
+    function setupInputs() {
+      setupStick(moveStick, moveKnob, 'move');
+      setupStick(lookStick, lookKnob, 'look');
+      jumpButton.addEventListener('pointerdown', e => { e.preventDefault(); jumpQueued = true; });
+      jumpButton.addEventListener('contextmenu', e => e.preventDefault());
+      window.addEventListener('keydown', e => {
+        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+        keyboard.add(e.code);
+        if (e.code === 'Space' && !e.repeat) jumpQueued = true;
+      }, { passive:false });
+      window.addEventListener('keyup', e => keyboard.delete(e.code));
+      window.addEventListener('blur', () => { keyboard.clear(); movement.x=0; movement.y=0; mouseLooking=false; });
+      renderer.domElement.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button === 0) {
+          mouseLooking = true; lastMouseX = e.clientX; lastMouseY = e.clientY;
+        }
+      });
+      window.addEventListener('pointerup', e => { if (e.pointerType === 'mouse') mouseLooking = false; });
+      window.addEventListener('pointermove', e => {
+        if (!mouseLooking || e.pointerType !== 'mouse') return;
+        const dx = e.clientX-lastMouseX, dy = e.clientY-lastMouseY;
+        lastMouseX = e.clientX; lastMouseY = e.clientY;
+        yaw -= dx*0.004; pitch = clamp(pitch-dy*0.003, 0.06, 0.95);
+      });
+      renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+    }
+
+    function onResize() {
+      if (!renderer || !camera) return;
+      camera.aspect = innerWidth / innerHeight;
+      camera.fov = innerHeight < 430 ? 76 : 68;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.7));
+    }
+
+    function animate() {
+      if (!started || !renderer) return;
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.045);
+      const now = performance.now();
+
+      const keyboardX = (keyboard.has('KeyD') || keyboard.has('ArrowRight') ? 1 : 0) - (keyboard.has('KeyA') || keyboard.has('ArrowLeft') ? 1 : 0);
+      const keyboardY = (keyboard.has('KeyS') || keyboard.has('ArrowDown') ? 1 : 0) - (keyboard.has('KeyW') || keyboard.has('ArrowUp') ? 1 : 0);
+      let strafe = clamp(movement.x + keyboardX, -1, 1);
+      let forward = clamp(-movement.y - keyboardY, -1, 1);
+      const magnitude = Math.hypot(strafe, forward);
+      if (magnitude > 1) { strafe/=magnitude; forward/=magnitude; }
+      localMoving = magnitude > .05;
+      yaw = ((yaw + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+      const speed = (keyboard.has('ShiftLeft') || keyboard.has('ShiftRight')) ? 8.2 : 5.6;
+      localX += (Math.sin(yaw)*forward + Math.cos(yaw)*strafe) * speed * delta;
+      localZ += (-Math.cos(yaw)*forward + Math.sin(yaw)*strafe) * speed * delta;
+      localX = clamp(localX, -45, 45); localZ = clamp(localZ, -45, 45);
+
+      const grounded = localY <= 0.001;
+      if (jumpQueued && grounded) verticalSpeed = 7.5;
+      jumpQueued = false;
+      verticalSpeed -= 19*delta;
+      localY = Math.max(0, localY + verticalSpeed*delta);
+      if (localY === 0) verticalSpeed = 0;
+
+      const self = playerId ? playerObjects.get(playerId) : null;
+      if (self) {
+        self.group.position.set(localX, localY, localZ);
+        self.group.rotation.y = -yaw;
+        const swing = localMoving ? Math.sin(now*0.012)*0.55 : 0;
+        self.limbs.forEach(limb => { limb.leg.rotation.x = limb.side*swing; limb.arm.rotation.x = -limb.side*swing*.7; });
+        self.body.position.y = 1.05 + (localMoving ? Math.abs(Math.sin(now*0.012))*.035 : 0);
+      }
+
+      for (const avatar of playerObjects.values()) {
+        if (avatar.id === playerId) continue;
+        avatar.group.position.lerp(avatar.target, Math.min(1, delta*12));
+        avatar.group.rotation.y = -avatar.targetYaw;
+        const dist = avatar.group.position.distanceTo(avatar.target);
+        const swing = dist > .04 ? Math.sin(now*0.012+avatar.phase)*.48 : 0;
+        avatar.limbs.forEach(limb => { limb.leg.rotation.x = limb.side*swing; limb.arm.rotation.x = -limb.side*swing*.7; });
+      }
+
+      const focusY = localY + 1.3;
+      const distance = 7.6;
+      const horizontal = Math.cos(pitch)*distance;
+      const desiredCamera = new THREE.Vector3(
+        localX - Math.sin(yaw)*horizontal,
+        focusY + Math.sin(pitch)*distance + 0.6,
+        localZ + Math.cos(yaw)*horizontal
+      );
+      if (!cameraReady) { camera.position.copy(desiredCamera); cameraReady = true; }
+      else camera.position.lerp(desiredCamera, 1-Math.exp(-delta*8));
+      camera.lookAt(localX, focusY, localZ);
+      sendState(now);
+      renderer.render(scene, camera);
+    }
+
+    async function beginGame() {
+      if (started) return;
+      started = true;
+      // Fullscreen can only be requested from this user gesture; browser support varies.
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+        }
+      } catch (_) { /* Some browsers disallow fullscreen; the viewport layout still fills the screen. */ }
+      try { if (screen.orientation?.lock) await screen.orientation.lock('landscape'); } catch (_) {}
+      startScreen.style.display = 'none';
+      hud.style.display = 'block';
+      makeWorld();
+      setupInputs();
+      connect();
+      animate();
+    }
+
+    startButton.addEventListener('click', beginGame, { passive: true });
+    startButton.addEventListener('touchend', (event) => { event.preventDefault(); beginGame(); }, { passive: false });
+
+    // Friendly fallback when WebGL is unavailable on an older phone/browser.
+    if (!document.createElement('canvas').getContext('webgl2') && !document.createElement('canvas').getContext('webgl')) {
+      startButton.addEventListener('click', () => {
+        fatalMessage.textContent = 'هذا المتصفح لا يدعم WebGL. جرّب فتح اللعبة في Chrome محدّث.';
+        fatalScreen.style.display = 'flex';
+      }, { once: true });
+    }
+  </script>
+</body>
+</html>
