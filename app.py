@@ -86,10 +86,8 @@ def default_profile(name: str = "Player") -> dict[str, Any]:
     return {
         "name": name,
         "wallet": 25000,
-        "carriedCoins": 0,
-        "machineLevel": 1,
-        "machineStored": 0,
-        "eggs": {"normal": 0, "advanced": 0, "strong": 0, "rare": 0},
+        "garageCars": [],
+        "primaryCarId": None,
         "ownedCars": [],
         "homeLocked": False,
         "tutorialStep": 0,
@@ -136,19 +134,45 @@ def clean_profile(raw: Any, fallback: dict[str, Any] | None = None) -> dict[str,
     name = clean_name(raw.get("name"), str(base.get("name", "Player")))
     base["name"] = name
     base["wallet"] = int(finite_number(raw.get("wallet"), float(base.get("wallet", 25000)), 0, 2_000_000_000))
-    base["carriedCoins"] = int(finite_number(raw.get("carriedCoins"), 0, 0, 2_000_000_000))
-    base["machineLevel"] = int(finite_number(raw.get("machineLevel"), 1, 1, 999))
-    base["machineStored"] = finite_number(raw.get("machineStored"), 0, 0, 2_000_000_000)
     base["homeLocked"] = bool(raw.get("homeLocked", False))
     base["tutorialStep"] = int(finite_number(raw.get("tutorialStep"), 0, 0, 10))
     for flag in ("homePurchased", "hasSlept", "shopBuilt"):
         base[flag] = bool(raw.get(flag, False))
     base["constructionStartedAt"] = int(finite_number(raw.get("constructionStartedAt"), 0, 0, 10**13))
-    owned = raw.get("ownedCars", [])
-    base["ownedCars"] = list(dict.fromkeys(x for x in owned if isinstance(x, str) and x in CAR_CATALOG))[:len(CAR_CATALOG)] if isinstance(owned, list) else []
-    eggs = raw.get("eggs", {})
-    if isinstance(eggs, dict):
-        base["eggs"] = {k: int(finite_number(eggs.get(k), 0, 0, 1000000)) for k in ("normal", "advanced", "strong", "rare")}
+    # Keep distinct vehicle instances: a player may own several cars of the same model.
+    legacy_owned = raw.get("ownedCars", [])
+    incoming_garage = raw.get("garageCars")
+    safe_garage: list[dict[str, Any]] = []
+    source_garage = incoming_garage if isinstance(incoming_garage, list) else []
+    if not isinstance(incoming_garage, list) and isinstance(legacy_owned, list):
+        source_garage = [{"id": f"legacy-{kind}", "type": kind, "delivered": True, "price": CAR_CATALOG.get(kind, {}).get("price", 1)}
+                         for kind in dict.fromkeys(v for v in legacy_owned if isinstance(v, str) and v in CAR_CATALOG)]
+    seen_ids: set[str] = set()
+    for item in source_garage[:50]:
+        if not isinstance(item, dict) or item.get("type") not in CAR_CATALOG:
+            continue
+        kind = item["type"]
+        car_id = re.sub(r"[^a-zA-Z0-9._:-]", "", str(item.get("id") or ""))[:100]
+        if not car_id or car_id in seen_ids:
+            car_id = secrets.token_hex(8)
+        seen_ids.add(car_id)
+        safe_garage.append({
+            "id": car_id,
+            "type": kind,
+            "color": item.get("color") if isinstance(item.get("color"), str) and re.fullmatch(r"#[0-9a-fA-F]{6}", item.get("color")) else "#43c6e8",
+            "price": int(finite_number(item.get("price"), CAR_CATALOG[kind]["price"], 1, CAR_CATALOG[kind]["price"])),
+            "delivered": bool(item.get("delivered", True)),
+            "primary": bool(item.get("primary", False)),
+            "yaw": finite_number(item.get("yaw"), 0.0, -100000, 100000),
+            "x": finite_number(item.get("x"), 0.0, -10000, 10000) if item.get("x") is not None else None,
+            "z": finite_number(item.get("z"), 0.0, -10000, 10000) if item.get("z") is not None else None,
+        })
+    base["garageCars"] = safe_garage
+    requested_primary = re.sub(r"[^a-zA-Z0-9._:-]", "", str(raw.get("primaryCarId") or ""))[:100]
+    base["primaryCarId"] = requested_primary if any(c["id"] == requested_primary for c in safe_garage) else next((c["id"] for c in safe_garage if c["primary"]), safe_garage[0]["id"] if safe_garage else None)
+    for item in safe_garage:
+        item["primary"] = item["id"] == base["primaryCarId"]
+    base["ownedCars"] = list(dict.fromkeys(c["type"] for c in safe_garage))
     stock = raw.get("stockCars", [])
     safe_stock = []
     if isinstance(stock, list):
@@ -197,6 +221,7 @@ def clean_profile(raw: Any, fallback: dict[str, Any] | None = None) -> dict[str,
             "yaw": finite_number(vehicle.get("yaw"), 0, -100000, 100000),
             "kind": "stock" if vehicle.get("kind") == "stock" else "personal",
             "stockId": re.sub(r"[^a-zA-Z0-9._:-]", "", str(vehicle.get("stockId") or ""))[:100] or None,
+            "personalId": re.sub(r"[^a-zA-Z0-9._:-]", "", str(vehicle.get("personalId") or ""))[:100] or None,
             "driving": bool(vehicle.get("driving", False)),
         }
     else:
@@ -216,7 +241,7 @@ def clean_profile(raw: Any, fallback: dict[str, Any] | None = None) -> dict[str,
     return base
 
 
-def get_or_create_profile(client_key: str, name: str) -> tuple[dict[str, Any], int, int]:
+def get_or_create_profile(client_key: str, name: str, initial_profile: Any = None) -> tuple[dict[str, Any], int, int]:
     now = time.time()
     with connect_db() as conn:
         row = conn.execute("SELECT home_slot, shop_slot, profile_json FROM profiles WHERE client_key=?", (client_key,)).fetchone()
@@ -234,8 +259,8 @@ def get_or_create_profile(client_key: str, name: str) -> tuple[dict[str, Any], i
         for r in conn.execute("SELECT shop_slot, COUNT(*) as n FROM profiles GROUP BY shop_slot").fetchall():
             used_shops[int(r["shop_slot"])] = int(r["n"])
         shop_slot = next((i for i in range(MAX_SHOPS) if i not in used_shops), min(range(MAX_SHOPS), key=lambda i: used_shops.get(i, 0)))
-        profile = default_profile(name)
-        profile["name"] = name
+        profile = clean_profile(initial_profile) if isinstance(initial_profile, dict) else default_profile(name)
+        profile["name"] = clean_name(name, profile.get("name", name))
         profile["shopSlot"] = shop_slot
         conn.execute("INSERT INTO profiles(client_key, home_slot, shop_slot, profile_json, name, updated) VALUES(?,?,?,?,?,?)",
                      (client_key, home_slot, shop_slot, json.dumps(profile, separators=(",", ":")), name, now))
@@ -350,46 +375,32 @@ async def multiplayer_socket(websocket: WebSocket) -> None:
             if kind == "identify":
                 name = clean_name(data.get("name"), player["name"])
                 key = clean_key(data.get("client_key"))
-                if key:
-                    try:
-                        profile, home_slot, shop_slot = get_or_create_profile(key, name)
-                        identified_key = key
-                    except sqlite3.Error:
-                        profile, home_slot, shop_slot = default_profile(name), -1, -1
-                else:
-                    profile, home_slot, shop_slot = default_profile(name), -1, -1
+                # Save data comes from this browser's localStorage only. The server
+                # allocates temporary property lots from currently connected players.
+                raw_profile = data.get("profile") if isinstance(data.get("profile"), dict) else {}
+                profile = dict(raw_profile)
                 async with state_lock:
                     current = players.get(session_id)
                     if current is None:
                         break
+                    used_homes = {int(p.get("home_slot", -1)) for pid, p in players.items() if pid != session_id and int(p.get("home_slot", -1)) >= 0}
+                    used_shops = {int(p.get("shop_slot", -1)) for pid, p in players.items() if pid != session_id and int(p.get("shop_slot", -1)) >= 0}
+                    home_slot = next((i for i in range(50) if i not in used_homes), -1)
+                    shop_slot = next((i for i in range(30) if i not in used_shops), -1)
                     current.update({"name": name, "client_key": key or None, "home_slot": home_slot,
                                     "shop_slot": shop_slot, "home_locked": bool(profile.get("homeLocked", False)),
                                     "house_owned": bool(profile.get("homePurchased", False)),
                                     "shop_built": bool(profile.get("shopBuilt", False))})
                     updated = public_player(current)
+                identified_key = key or "local-only"
+                profile["homeSlot"] = home_slot
+                profile["shopSlot"] = shop_slot
                 await websocket.send_json({"type": "profile", "home_slot": home_slot, "shop_slot": shop_slot, "profile": profile})
                 await broadcast({"type": "state", "player": updated})
                 continue
             if kind == "save":
-                key = clean_key(data.get("client_key"))
-                if not key or key != identified_key:
-                    continue
-                try:
-                    profile = persist_profile(key, data.get("profile"), player["name"])
-                    async with state_lock:
-                        current = players.get(session_id)
-                        if current:
-                            current["home_locked"] = bool(profile.get("homeLocked", False))
-                            current["house_owned"] = bool(profile.get("homePurchased", False))
-                            current["shop_built"] = bool(profile.get("shopBuilt", False))
-                            current["shop_slot"] = int(profile.get("shopSlot", current.get("shop_slot", -1)))
-                            updated = public_player(current)
-                        else:
-                            updated = None
-                    if updated:
-                        await broadcast({"type": "state", "player": updated}, exclude_id=session_id)
-                except (sqlite3.Error, KeyError, ValueError, TypeError):
-                    pass
+                # Intentionally ignore profile saves: money, inventory, house/shop
+                # progress and player position are persisted only in browser localStorage.
                 continue
             if kind != "state":
                 continue
@@ -546,6 +557,20 @@ async def market_offers(client_key: str) -> JSONResponse:
     return JSONResponse([dict(r) for r in rows])
 
 
+@app.get("/api/market/buying")
+async def market_buying(client_key: str) -> JSONResponse:
+    key = clean_key(client_key)
+    if not key:
+        raise HTTPException(400, "Invalid client key")
+    with connect_db() as conn:
+        rows = conn.execute("""SELECT o.offer_id,o.listing_id,o.offer,o.status,o.created,l.car_type,l.seller_name
+            FROM market_offers o JOIN market_listings l ON l.listing_id=o.listing_id
+            WHERE o.buyer_key=? ORDER BY o.created DESC LIMIT 100""", (key,)).fetchall()
+    return JSONResponse([{"offer_id": r["offer_id"], "listing_id": r["listing_id"], "offer": r["offer"],
+                          "status": r["status"], "created": r["created"], "type": r["car_type"],
+                          "car_name": CAR_CATALOG[r["car_type"]]["name"], "seller_name": r["seller_name"]} for r in rows])
+
+
 @app.post("/api/market/respond")
 async def market_respond(req: MarketRespondRequest) -> JSONResponse:
     seller_key = clean_key(req.client_key)
@@ -576,10 +601,16 @@ async def market_respond(req: MarketRespondRequest) -> JSONResponse:
             return JSONResponse({"ok": False, "accepted": False, "message": "لم يعد رصيد المشتري كافياً."})
         buyer_profile["wallet"] -= amount
         seller_profile["wallet"] += amount
-        # Deliver purchased car to the buyer's personal garage and mark seller stock sold.
+        # Transfer a distinct car instance to the buyer; it must be picked up in-world.
         ctype = listing["car_type"]
-        if ctype not in buyer_profile["ownedCars"]:
-            buyer_profile["ownedCars"].append(ctype)
+        personal_id = f"playerbuy-{listing['listing_id']}"
+        buyer_profile["garageCars"] = [c for c in buyer_profile.get("garageCars", []) if c.get("id") != personal_id]
+        buyer_profile["garageCars"].append({"id": personal_id, "type": ctype, "color": listing["color"],
+                                             "price": min(amount, CAR_CATALOG[ctype]["price"]), "delivered": False,
+                                             "primary": False, "x": None, "z": None})
+        if not buyer_profile.get("primaryCarId"):
+            buyer_profile["primaryCarId"] = personal_id
+        buyer_profile = clean_profile(buyer_profile)
         for car in seller_profile.get("stockCars", []):
             if car.get("id") == listing["listing_id"]:
                 car["sold"] = True
