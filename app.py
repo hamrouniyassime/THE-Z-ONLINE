@@ -26,7 +26,7 @@ clients: dict[str, WebSocket] = {}
 players: dict[str, dict[str, Any]] = {}
 state_lock = asyncio.Lock()
 COLORS = ["#ff6b6b", "#ffd166", "#06d6a0", "#4cc9f0", "#b197fc", "#ff8fab", "#f4a261", "#90be6d"]
-VALID_MAPS = {"city"}  # The game now exposes one world only.
+VALID_MAPS = {"city", "go-up"}  # Available multiplayer worlds.
 CAR_CATALOG = {
     "compact": {"name": "Luma Mini", "price": 1800},
     "sedan": {"name": "Coast Sedan", "price": 4200},
@@ -428,7 +428,7 @@ async def multiplayer_socket(websocket: WebSocket) -> None:
                 current["z"] = finite_number(data.get("z"), current["z"], -10000.0, 10000.0)
                 current["y"] = finite_number(data.get("y"), current["y"], 0.0, 100.0)
                 current["yaw"] = finite_number(data.get("yaw"), current["yaw"], -100000.0, 100000.0)
-                current["map"] = "city"
+                current["map"] = map_name
                 current["home_locked"] = bool(data.get("home_locked", current.get("home_locked", False)))
                 current["house_owned"] = bool(data.get("house_owned", current.get("house_owned", False)))
                 current["shop_slot"] = int(finite_number(data.get("shop_slot"), current.get("shop_slot", -1), -1, 10000))
