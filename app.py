@@ -379,10 +379,22 @@ async def multiplayer_socket(websocket: WebSocket) -> None:
                 # allocates temporary property lots from currently connected players.
                 raw_profile = data.get("profile") if isinstance(data.get("profile"), dict) else {}
                 profile = dict(raw_profile)
+                duplicate_sockets = []
+                duplicate_ids = []
                 async with state_lock:
                     current = players.get(session_id)
                     if current is None:
                         break
+                    # One active multiplayer identity per browser client key. A reconnect
+                    # replaces its stale socket instead of leaving ghost copies in the world.
+                    if key:
+                        for old_id, old_player in list(players.items()):
+                            if old_id != session_id and old_player.get("client_key") == key:
+                                duplicate_ids.append(old_id)
+                                old_socket = clients.pop(old_id, None)
+                                if old_socket is not None:
+                                    duplicate_sockets.append(old_socket)
+                                players.pop(old_id, None)
                     used_homes = {int(p.get("home_slot", -1)) for pid, p in players.items() if pid != session_id and int(p.get("home_slot", -1)) >= 0}
                     used_shops = {int(p.get("shop_slot", -1)) for pid, p in players.items() if pid != session_id and int(p.get("shop_slot", -1)) >= 0}
                     home_slot = next((i for i in range(50) if i not in used_homes), -1)
@@ -392,6 +404,13 @@ async def multiplayer_socket(websocket: WebSocket) -> None:
                                     "house_owned": bool(profile.get("homePurchased", False)),
                                     "shop_built": bool(profile.get("shopBuilt", False))})
                     updated = public_player(current)
+                for old_socket in duplicate_sockets:
+                    try:
+                        await old_socket.close(code=4001, reason="Replaced by newer session")
+                    except Exception:
+                        pass
+                for old_id in duplicate_ids:
+                    await broadcast({"type": "leave", "id": old_id})
                 identified_key = key or "local-only"
                 profile["homeSlot"] = home_slot
                 profile["shopSlot"] = shop_slot
