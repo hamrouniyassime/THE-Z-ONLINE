@@ -50,7 +50,7 @@ ALLOWED_VEHICLES = {
     "helicopter", "airliner", "seaplane", "boat", "ship",
 }
 ALLOWED_ANIMATIONS = {
-    "idle", "walk", "run", "jump", "jumpTuck", "jumpLong", "jumpSide",
+    "idle", "walk", "run", "wave", "dance", "sit", "jump", "jumpTuck", "jumpLong", "jumpSide",
     "land", "swim", "treadWater", "drive", "rideBike", "rideChopper",
     "rideBicycle", "fall", "fallBack", "getupBack", "hit", "stumble",
     "push", "punch", "punchL", "kick", "enter", "exit",
@@ -125,6 +125,7 @@ def public_state(state: dict[str, Any]) -> dict[str, Any]:
         "vehicleId": state["vehicleId"],
         "vehicleType": state["vehicleType"],
         "vehicleColor": state["vehicleColor"],
+        "vehicleSpeed": state["vehicleSpeed"],
     }
 
 
@@ -255,6 +256,7 @@ async def multiplayer_socket(websocket: WebSocket):
             "vehicleId": "",
             "vehicleType": "",
             "vehicleColor": "",
+            "vehicleSpeed": 0.0,
         }
         clients[player_id] = {"websocket": websocket, "room": WORLD_ROOM, "state": state}
         room_members.add(player_id)
@@ -349,6 +351,7 @@ async def multiplayer_socket(websocket: WebSocket):
                     "vehicleId": vehicle_id if in_vehicle else "",
                     "vehicleType": vehicle_type if in_vehicle else "",
                     "vehicleColor": vehicle_color if in_vehicle else "",
+                    "vehicleSpeed": safe_number(packet.get("vehicleSpeed"), 0.0, -110.0, 110.0) if in_vehicle else 0.0,
                 }
                 clients[player_id]["state"] = state
                 await send_to_room(WORLD_ROOM, {"type": "player_update", "player": public_state(state)}, exclude=player_id)
