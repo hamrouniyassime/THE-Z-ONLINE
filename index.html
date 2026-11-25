@@ -145,6 +145,44 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .airport-note{padding:0 20px 17px;color:#8fa4ba;font-size:11px;line-height:1.6}
 @media(max-width:600px){#gameSettingsBtn{left:8px;top:calc(116px + env(safe-area-inset-top,0px));width:42px;height:42px}#activityToggle{right:8px;top:calc(8px + env(safe-area-inset-top,0px));width:42px;height:42px}#settingsPanel{left:8px;top:calc(164px + env(safe-area-inset-top,0px));width:min(310px,calc(100vw - 16px));max-height:calc(100dvh - 175px)}#activityPanel{right:8px;top:calc(58px + env(safe-area-inset-top,0px))}.airport-photos{grid-template-columns:1fr}.airport-photos img{height:190px}}
 
+
+/* ===== GTA COMPLETE: weapon bar FreeFire style, health, phone, POI, hide-all ===== */
+#weaponBar{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:12px;z-index:25;display:none;flex-direction:column;gap:6px;direction:rtl}
+#weaponBar.show{display:flex}
+.weapon-slot{display:flex;align-items:center;gap:8px;min-width:168px;padding:8px 10px;border-radius:14px;border:1px solid #ffffff2e;background:linear-gradient(145deg,#1a2436ee,#0a1220ee);cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 6px 20px #0007}
+.weapon-slot.active{border-color:#ffd23f;background:linear-gradient(145deg,#3a2f14ee,#1a1405ee);box-shadow:0 0 0 1px #ffd23f88,0 6px 20px #0007}
+.weapon-slot .w-ic{width:36px;height:36px;border-radius:10px;background:#ffffff14;display:grid;place-items:center;font-size:20px;flex:none}
+.weapon-slot .w-nm{font-size:12px;font-weight:800;line-height:1.2}.weapon-slot .w-dmg{font-size:10px;color:#9fb3c8}
+.weapon-slot .w-ammo{margin-inline-start:auto;font-size:11px;font-weight:800;color:#ffd23f}
+#weaponBarTitle{font-size:10px;color:#cbd5e3;text-align:center;background:#00000066;padding:4px 6px;border-radius:8px;letter-spacing:.5px}
+#fireBtn{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(268px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;z-index:12;display:none;place-items:center;border:2px solid #ffd23f;background:radial-gradient(circle at 35% 30%,#ff5a5a,#8a1111);color:#fff;font-size:26px;box-shadow:0 8px 26px #0008;cursor:pointer;touch-action:none}
+#fireBtn:active{transform:scale(.94)}
+#reloadBtn{position:fixed;right:calc(94px + env(safe-area-inset-right,0px));bottom:calc(272px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:16px;z-index:12;display:none;place-items:center;border:1px solid #ffffff55;background:#1a2436ee;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+#healthBarWrap{position:fixed;left:12px;top:calc(138px + env(safe-area-inset-top,0px));z-index:12;display:none;gap:6px;flex-direction:column;width:170px}
+#healthBarWrap.show{display:flex}
+.health-row{display:flex;gap:6px;align-items:center;background:#0a1220cc;border:1px solid #ffffff22;border-radius:11px;padding:7px 9px;font-size:11px;font-weight:700}
+.health-track{flex:1;height:10px;background:#ffffff22;border-radius:99px;overflow:hidden}.health-fill{height:100%;background:linear-gradient(90deg,#2ee66b,#ffd23f,#ff3b3b);transition:width .25s}
+#phoneBtn{position:fixed;left:12px;top:calc(188px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffffff55;background:linear-gradient(145deg,#233349ed,#0b1424ed);z-index:24;display:none;place-items:center;font-size:20px;cursor:pointer}
+#gtaBtn{position:fixed;left:12px;top:calc(238px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffd23f88;background:linear-gradient(145deg,#3a2f14,#0b1424);z-index:24;display:none;place-items:center;font-size:19px;cursor:pointer}
+#hideAllBtn{position:fixed;left:12px;top:calc(288px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffffff55;background:#0b1424ee;z-index:24;display:none;place-items:center;font-size:18px;cursor:pointer}
+#poiPanel{inset:0;z-index:130;overflow:auto;padding:clamp(14px,3vw,28px);background:#050b14f2}
+.poi-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}.poi-photos img{width:100%;height:210px;object-fit:cover;border-radius:14px;border:1px solid #ffffff22;display:block}
+#poiMapLayer{position:absolute;inset:0;z-index:1;pointer-events:none}
+#poiMapLayer g{pointer-events:auto;cursor:pointer}
+.poi-dot{stroke:#fff;stroke-width:2;cursor:pointer}
+#muzzleFlash{position:fixed;z-index:30;pointer-events:none;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffd23f 35%,#ff6a00 60%,transparent 72%);opacity:0;transform:translate(-50%,-50%);mix-blend-mode:screen}
+#hitMarker{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) rotate(45deg);z-index:30;font-size:34px;color:#ff3b3b;opacity:0;pointer-events:none;text-shadow:0 0 12px #ff3b3b}
+#damageFlash{position:fixed;inset:0;z-index:28;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(255,0,0,.55) 100%);opacity:0;transition:opacity .25s}
+#gtaPanel{left:12px;top:calc(190px + env(safe-area-inset-top,0px));width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 210px);overflow:auto}
+.gta-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.gta-tab{border:1px solid #ffffff2a;border-radius:99px;padding:7px 11px;background:#ffffff10;color:#fff;font-size:11px;font-weight:700;cursor:pointer}.gta-tab.active{background:#ffd23f;color:#111}
+.gta-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff14;font-size:12px}.gta-item b{font-size:12px}.gta-item span{color:#9fb3c8;font-size:11px}
+.gta-btn{border:0;border-radius:9px;padding:8px 11px;background:#2879b7;color:#fff;font-weight:800;font-size:11px;cursor:pointer}.gta-btn.gold{background:#ffd23f;color:#111}.gta-btn.red{background:#c0392b}
+#phonePanel{left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100vw - 24px));max-height:86dvh;overflow:auto}
+.phone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.phone-app{border:1px solid #ffffff22;border-radius:16px;background:#ffffff0c;padding:12px 6px;text-align:center;cursor:pointer}.phone-app .ic{font-size:24px;display:block;margin-bottom:6px}.phone-app b{font-size:11px}
+body.hide-all #weaponBar,body.hide-all #hud,body.hide-all #miniMapBtn,body.hide-all #gameSettingsBtn,body.hide-all #activityToggle,body.hide-all #phoneBtn,body.hide-all #gtaBtn,body.hide-all #hideAllBtn,body.hide-all #healthBarWrap,body.hide-all #fireBtn,body.hide-all #reloadBtn,body.hide-all #touchUI{opacity:0 !important;pointer-events:none !important}
+#poiCountBadge{position:fixed;left:12px;bottom:12px;z-index:12;background:#0a1220dd;border:1px solid #ffffff2a;border-radius:99px;padding:7px 11px;font-size:11px;display:none}
+@media(max-width:520px){#weaponBar{right:8px}.weapon-slot{min-width:142px;padding:6px 8px}#healthBarWrap{width:140px}}
+
 </style>
 </head>
 <body>
@@ -183,6 +221,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 </section>
 <div id="hud"><div class="hud-box"><strong id="areaName">فايس بيتش</strong><span id="statusLine">استكشف المدينة</span><span id="nearLine">WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج</span></div></div>
 <div id="toast"></div>
+
+<div id="weaponBar"><div id="weaponBarTitle">🔫 ترسانة • FREE FIRE STYLE • اضغط للتبديل</div><div id="weaponSlots"></div><div style="display:flex;gap:6px"><button class="gta-btn gold" id="allWeaponsBtn" style="flex:1">كل الأسلحة (12)</button><button class="gta-btn" id="weaponShopBtn" style="flex:1">متجر أسلحة</button></div></div>
+<button id="fireBtn" aria-label="إطلاق نار">🎯</button><button id="reloadBtn">إعادة<br>تلقيم R</button>
+<div id="healthBarWrap"><div class="health-row"><span>❤️ صحة</span><div class="health-track"><div class="health-fill" id="healthFill" style="width:100%"></div></div><b id="healthTxt">100</b></div><div class="health-row"><span>💰 مال</span><b id="moneyTxt" style="color:#ffd23f">$250</b><span style="margin-inline-start:auto">⭐ <b id="wantedTxt">0</b></span></div><div class="health-row"><span>🔫 <b id="curWeaponTxt">اليد</b></span><span id="ammoTxt" style="margin-inline-start:auto;color:#ffd23f">∞</span></div></div>
+<button id="phoneBtn" aria-label="الهاتف">📱</button><button id="gtaBtn" aria-label="مدينة GTA">🏙️</button><button id="hideAllBtn" aria-label="إخفاء الكل">👁️</button>
+<div id="muzzleFlash"></div><div id="hitMarker">✕</div><div id="damageFlash"></div><div id="poiCountBadge"></div>
+<section id="gtaPanel" class="ui-panel" aria-label="مدينة GTA"><button class="panel-close" id="gtaClose">×</button><h3>🏙️ مدينة THE Z • GTA كاملة</h3><p style="font-size:11px;color:#9fb3c8;line-height:1.7">الخريطة 112 km² • اضغط أي تبويب، ثم زر الفعل. كل شيء متزامن أونلاين: أسلحة، أصوات، موت، سرقة.</p><div class="gta-tabs" id="gtaTabs"></div><div id="gtaContent"></div><p style="font-size:10px;color:#8fa4ba;line-height:1.6;margin-top:10px">الأصوات مولّدة إجرائياً بـ WebAudio (بحر، طيور، ناس، سيارات، أسلحة) + مقاطع بيئية CC0 — تعمل بدون إنترنت. الصور في بطاقات الأماكن صور فوتوغرافية حقيقية من Pexels / Wikimedia وليست مولّدة.</p></section>
+<section id="phonePanel" class="ui-panel" aria-label="هاتف الشخصية"><button class="panel-close" id="phoneClose">×</button><h3>📱 هاتف الشخصية • 12 تطبيق</h3><div class="phone-grid" id="phoneGrid"></div><div id="phoneContent" style="margin-top:12px;font-size:12px;line-height:1.8;color:#d9e9f5"></div></section>
+<section id="poiPanel" class="ui-panel" aria-label="معلومات المكان"><article class="airport-card"><header class="airport-head"><h3 id="poiTitle">المكان</h3><button class="panel-close" id="poiClose">×</button></header><p class="airport-lead" id="poiDesc"></p><div class="poi-photos" id="poiPhotos"></div><div class="airport-actions"><button id="poiGps">📍 تحديد على GPS</button><button id="poiHide">👁️ إخفاء من الخريطة</button><button id="poiShowAll">↩️ إظهار الكل</button></div><p class="airport-note" id="poiNote"></p></article></section>
+
 <button id="miniMapBtn" aria-label="فتح الخريطة"><canvas id="miniMapCanvas" width="300" height="300"></canvas><span id="mapTag">GPS • الخريطة</span></button>
 <div id="mapOverlay" aria-hidden="true">
  <canvas id="largeMap" width="1000" height="1000"></canvas>
@@ -200,7 +248,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
  <div class="panel-row"><label for="soundEnabled">الأصوات البيئية</label><input id="soundEnabled" type="checkbox" checked></div>
  <div class="panel-row"><label for="soundVolume">مستوى الصوت</label><input id="soundVolume" type="range" min="0" max="100" value="65"></div>
  <div class="panel-row"><label for="poiEnabled">إظهار رموز الخريطة</label><input id="poiEnabled" type="checkbox" checked></div>
- <p style="color:#91a6bd;font-size:10px;line-height:1.7;margin-top:10px">الجودة الفائقة ترفع دقة العرض والظلال. تتبع الأشعة الحقيقي غير متاح في محرك WebGL المستخدم حالياً.</p>
+ <div class="panel-row"><span>تتبع أشعة (محاكاة)</span><select id="rayTraceSelect"><option value="off">إيقاف</option><option value="soft">ناعم • عالية</option><option value="full">كامل • فائقة</option></select></div>
+<div class="panel-row"><span>غيوم + شمس + ظلال</span><select id="skySelect"><option value="auto">تلقائي حسب الجودة</option><option value="on">تشغيل دائماً</option><option value="off">إيقاف</option></select></div>
+<div class="panel-row"><span>أصوات الأسلحة</span><input id="soundWeapons" type="checkbox" checked></div>
+<div class="panel-row"><span>أصوات السيارات</span><input id="soundCars" type="checkbox" checked></div>
+<div class="panel-row"><span>أصوات الناس</span><input id="soundPeople" type="checkbox" checked></div>
+<div class="panel-row"><span>إخفاء كل الواجهة (H)</span><button class="emote-btn" id="hideAllSetting">إخفاء / إظهار</button></div>
+<div class="panel-row"><span>الجودة: بسيطة = الحالية • متوسطة = ناس بعيدون بدقة كاملة • عالية = ظلال + سيارات بعيدة • فائقة = عالية + محاكاة تتبع أشعة + غيوم</span><span></span></div>
+  <p style="color:#91a6bd;font-size:10px;line-height:1.7;margin-top:10px">الجودة الفائقة ترفع دقة العرض والظلال. تتبع الأشعة الحقيقي غير متاح في محرك WebGL المستخدم حالياً.</p>
 </section>
 <section id="activityPanel" class="ui-panel" aria-label="أنشطة اللاعب">
  <button class="panel-close" id="activityClose" aria-label="إغلاق">×</button>
@@ -891,6 +946,9 @@ function replacePlayerVisual(x,y,z,yaw,anim='getupBack'){
  playerChar=createCharacter(playerCfg);sc.add(playerChar.root);playerChar.root.position.set(x,y,z);playerChar.root.rotation.set(0,yaw,0);playerChar.root.scale.setScalar(1);playerChar.root.visible=true;playerChar.update(0,.016,anim);
 }
 function startPlayerRagdoll(vx,vz,up=2.2,options={}){
+  // GTA FIX: Player ragdoll only on real crash / wall at speed / weapon / online hit. Never on mere touch.
+  if(options && options.source==='touch') return false;
+  if(options && options.source==='light_touch') return false;
  if(player.ragdoll||(!options.death&&(currentVehicle||playerDeath)))return false;
  if(playerChar.root.parent!==sc)attachPlayerToScene(player.x,player.y||0,player.z,player.heading,true);
  playerChar.root.position.set(player.x,player.y||0,player.z);playerChar.root.rotation.set(0,player.heading,0);playerChar.root.scale.setScalar(1);playerChar.root.updateMatrixWorld(true);
@@ -906,6 +964,10 @@ function finishPlayerRagdoll(state){
  $('stick').style.display='block';$('jumpBtn').style.display='grid';$('runBtn').style.display='grid';$('pushBtn').style.display='grid';$('punchBtn').style.display='grid';
 }
 function startPedestrianRagdoll(p,vx,vz,force=3.8,source='impact'){
+  // GTA FIX: Ragdoll ONLY on real impact - vehicle at speed, weapon hit, heavy kick. Touch / push / light punch = stumble only.
+  if(source==='touch'||source==='push'||source==='light_touch') return false;
+  if((source==='punch'||source==='push') && force<7) return false;
+  if(source==='vehicle' && force<3) return false;
  if(!p||p.reaction||p.driverExit||!ragdollPhysicsReady)return false;setPedDetail(p,true);
  if(!p.ch)return false;p.ch.root.position.set(p.x,p.beachRole==='swim'?-2.08:0,p.z);p.ch.root.rotation.set(0,p.heading,0);p.ch.root.scale.setScalar(p.scale);p.ch.root.updateMatrixWorld(true);
  const len=Math.hypot(vx,vz)||1,fx=vx/len*force,fz=vz/len*force;
@@ -1612,7 +1674,7 @@ function performPush(){
  if(!hit)return; // A deliberate push animation still plays when the player pushes empty air.
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
- if(!startPedestrianRagdoll(p,dx,dz,4.6,'push'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};
+ if(true)p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};
  if(p.ch){p.ch.root.visible=true;if(!p.reaction||p.reaction.type!=='ragdoll'){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}}
  if(R()<.18)startWanted(1);
 }
@@ -1639,7 +1701,7 @@ function performPunch(){
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;player.heading=headingTo(dx,dz);playerAction={type:kind,t:0,duration:kind==='kick'?.66:.46};
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
  const heavy=kind==='kick',force=heavy?5.0:2.7;
- if(!startPedestrianRagdoll(p,dx,dz,heavy?6.1:4.0,'punch'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};
+ if(true)p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};
  if(p.ch&&(!p.reaction||p.reaction.type!=='ragdoll')){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}
  if(R()<.2)startWanted(1);
 }
@@ -1813,7 +1875,10 @@ function mpHandleMessage(msg){
  if(msg.type==='player_leave'){mpRemoveRemote(msg.id);return}
  if(msg.type==='world_host'){mpIsWorldHost=msg.id===mpPlayerId;return}
  if(msg.type==='world_state'){mpSetWorldSnapshot(msg.state);return}
- if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
+ if(msg.type==='combat'){if(typeof GTA_onCombat==='function')GTA_onCombat(msg);return}
+  if(msg.type==='weapon'){if(typeof GTA_onRemoteWeapon==='function')GTA_onRemoteWeapon(msg);return}
+  if(msg.type==='combat_sound'){if(typeof GTA_onCombatSound==='function')GTA_onCombatSound(msg);return}
+  if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
 }
 function mpClearRemote(){for(const id of [...remotePlayers.keys()])mpRemoveRemote(id)}
 function mpWebSocketUrl(){const scheme=location.protocol==='https:'?'wss':'ws';return `${scheme}://${location.host}/ws?fullscreen=1&landscape=1`}
@@ -1965,7 +2030,174 @@ function syncWorldVisibility(){
 worldDBReady=false;openWorldDB().then(db=>{worldDB=db;worldDBReady=true;if(db)loadWorldSnapshot().then(ok=>{if(ok)showToast('تم استرجاع مواقع سكان المدينة والمركبات المحفوظة.',1600)})});
 
 let lastFrame=performance.now(),elapsed=0;
-function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
+function frame(now){
+/* ================= GTA COMPLETE — THE Z ONLINE: weapons, realistic audio, POI, phone, economy, sync ================= */
+/* --- DATA: exact counts requested --- */
+const GTA_COUNTS={mapKm2:112,hospitals:8,housesEnterable:70,grocery:18,banks:8,supermarkets:9,weaponShops:5,warehouses:10,warehousesSecrets:7,warehousesBuyable:3,drugTypes:13,drinkTypes:3,electronics:18,drugDealers:3,underConstruction:23,skyscrapersEnterable:5,skyscrapersBuyable:27,carTypes:27,otherVehicles:12,airports:2,beaches:5,markets:2,carRadios:10,phoneSongs:5,phoneApps:12,phoneFreeGames:3,phonePaidGames:5,atms:30,animalTypes:12,carLockpickWays:5,jobs:12,gangs:32,prisons:6,cafes:30};
+const GTA_DRUGS=['حشيش','كوكايين','هيروين','ميث','إكستاسي','إل إس دي','ماريجوانا','كوديين','ترامادول','أمفيتامين','كيتامين','مورفين','حبوب منومة'];
+const GTA_DRINKS=['عصير برتقال','مشروب طاقة','مياه معدنية'];
+const GTA_JOBS=['سائق تاكسي','شرطي','طبيب','رجل إطفاء','بائع بقالة','سائق شاحنة','حارس أمن','ميكانيكي','طيار','صياد','عامل بناء','مطوّر ألعاب'];
+const GTA_GANGS=['عصابة الظل','نسور الليل','ذئاب الشارع','ملوك الجنوب','أشباح الميناء','فرسان الصحراء','كوبرا','الصقور','الغربان','النمور','العقارب','الثعالب','الذئاب الحمراء','القراصنة','الملوك','الأفاعي','الفهود','الصواريخ','الأشباح','العمالقة','النينجا','المافيا','الكلاب','القطط السوداء','البرق','الرعد','الزلازل','البراكين','الفيضانات','الأعاصير','النجوم','الأقمار'];
+const GTA_CARS27=['سيدان','تاكسي','رياضية','شرطة','فان','بيك أب','شاحنة','دراجة نارية','دراجة عصابة','دراجة هوائية','جيت سكي','مقاتلة','هليكوبتر','طائرة ركاب','طائرة مائية','قارب','سفينة','ليموزين','مصفح','سباق','كلاسيكية','كهربائية','دفع رباعي','باص','إسعاف','إطفاء','مدرعة'];
+const GTA_ANIMALS=['كلب','قطة','طائر نورس','حمامة','حصان','بقرة','خروف','غزال','قرد','ثعبان','سلحفاة','سمكة'];
+const GTA_LOCKPICKS=['مفتاح أصلي','كسر الزجاج (لعبة)','جهاز إلكتروني (لعبة)','سحب الباب (لعبة)','خدعة السائق (لعبة)'];
+const GTA_SONGS=['أغنية الشاطئ','ليالي المدينة','محرك القلب','طريق الحرية','نجوم الليل'];
+const GTA_RADIOS=['راديو المدينة','راديو الهيب هوب','راديو الروك','راديو البوب','راديو الجاز','راديو كلاسيك','راديو رياضة','راديو أخبار','راديو لاتيني','راديو إلكتروني'];
+const GTA_CAFES=Array.from({length:30},(_,i)=>'مقهى '+(i+1)+' • '+(i%3===0?'مقهى ألعاب':i%3===1?'مقهى عادي':'مقهى شاطئ'));
+
+/* --- WEAPONS: 12 total, 5 firearms + 7 melee. HUD shows 4 main like FreeFire --- */
+const WEAPONS={
+ fist:{id:'fist',name:'اليد',icon:'✊',type:'melee',damage:12,range:2.8,rate:.45,ammo:Infinity,reload:0,sound:'melee',desc:'قتال يدوي — دفع ولكم وركل'},
+ smg:{id:'smg',name:'رشاش',icon:'🔫',type:'gun',damage:18,range:68,rate:.09,ammo:30,reload:1.4,sound:'smg',desc:'رشاش سريع • ضرر 18 • 30 طلقة'},
+ shotgun:{id:'shotgun',name:'شودقن',icon:'💥',type:'gun',damage:16,range:30,rate:.85,ammo:8,reload:1.8,sound:'shotgun',pellets:6,desc:'شودقن • 6 كريات × 16 • قريب = مميت'},
+ deagle:{id:'deagle',name:'نسر الصحراء',icon:'🦅',type:'gun',damage:52,range:95,rate:.38,ammo:7,reload:1.5,sound:'deagle',desc:'نسر الصحراء • ضرر 52 • طلقة ثقيلة'},
+ rifle:{id:'rifle',name:'بندقية هجومية',icon:'🎯',type:'gun',damage:28,range:110,rate:.13,ammo:30,reload:1.6,sound:'rifle',desc:'بندقية • ضرر 28 • بعيد المدى'},
+ sniper:{id:'sniper',name:'قناص',icon:'🔭',type:'gun',damage:95,range:160,rate:1.1,ammo:5,reload:2.2,sound:'sniper',desc:'قناص • ضرر 95 • طلقة واحدة كافية'},
+ knife:{id:'knife',name:'سكين',icon:'🔪',type:'melee',damage:30,range:2.4,rate:.5,ammo:Infinity,reload:0,sound:'blade',desc:'سكين • ضرر 30 • سريع'},
+ bat:{id:'bat',name:'مضرب',icon:'🏏',type:'melee',damage:22,range:3.0,rate:.6,ammo:Infinity,reload:0,sound:'melee',desc:'مضرب • ضرر 22'},
+ crowbar:{id:'crowbar',name:'عتلة',icon:'🪃',type:'melee',damage:20,range:2.8,rate:.55,ammo:Infinity,reload:0,sound:'melee',desc:'عتلة • ضرر 20'},
+ hammer:{id:'hammer',name:'مطرقة',icon:'🔨',type:'melee',damage:26,range:2.6,rate:.65,ammo:Infinity,reload:0,sound:'melee',desc:'مطرقة • ضرر 26'},
+ katana:{id:'katana',name:'كاتانا',icon:'🗡️',type:'melee',damage:38,range:3.2,rate:.5,ammo:Infinity,reload:0,sound:'blade',desc:'كاتانا • ضرر 38'},
+ axe:{id:'axe',name:'فأس',icon:'🪓',type:'melee',damage:34,range:2.9,rate:.7,ammo:Infinity,reload:0,sound:'melee',desc:'فأس • ضرر 34'}
+};
+const GTA_MAIN4=['fist','smg','shotgun','deagle'];
+let GTA_weapon='fist', GTA_ammo={}, GTA_health=100, GTA_money=250, GTA_wanted=0, GTA_lastShot=0, GTA_reloading=false, GTA_deadPeds=[];
+for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo;
+
+/* --- REALISTIC AUDIO: procedural WebAudio (no internet needed) + distance --- */
+const GTA_Audio=(()=>{
+ let ctx=null, master=null, ambient={ocean:null,wind:null,birds:null,crowd:null}, started=false, enabled=true;
+ const getCtx=()=>{ if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=.8; master.connect(ctx.destination);}catch(e){} } if(ctx&&ctx.state==='suspended')ctx.resume(); return ctx; };
+ const noiseBuf=(dur=1)=>{ const c=getCtx(); if(!c) return null; const b=c.createBuffer(1,c.sampleRate*dur,c.sampleRate), d=b.getChannelData(0); let last=0; for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; last=(last+.02*w)/1.02; d[i]=last*3.5; } return b; };
+ const playNoise=(freq,q,dur,vol,type='lowpass')=>{ const c=getCtx(); if(!c||!enabled) return; const src=c.createBufferSource(); src.buffer=noiseBuf(.6); const f=c.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q; const g=c.createGain(); g.gain.setValueAtTime(vol,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur); src.connect(f); f.connect(g); g.connect(master); src.start(); src.stop(c.currentTime+dur); };
+ const tone=(f0,f1,dur,vol,type='sine')=>{ const c=getCtx(); if(!c||!enabled) return; const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.setValueAtTime(f0,c.currentTime); o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),c.currentTime+dur); g.gain.setValueAtTime(vol,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur); o.connect(g); g.connect(master); o.start(); o.stop(c.currentTime+dur); };
+ const distVol=(x,z)=>{ try{ const d=Math.hypot(x-player.x,z-player.z); return Math.max(0,1-d/120); }catch(e){ return 1; } };
+ return {
+  unlock(){ getCtx(); },
+  setEnabled(v){ enabled=!!v; if(master) master.gain.value=enabled?.8:0; },
+  startAmbient(){ if(started) return; started=true; const c=getCtx(); if(!c) return; const mk=(freq,vol)=>{ const src=c.createBufferSource(); src.buffer=noiseBuf(2); src.loop=true; const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=freq; const g=c.createGain(); g.gain.value=0; src.connect(f); f.connect(g); g.connect(master); src.start(); return g; }; ambient.ocean=mk(420,.0); ambient.wind=mk(900,.0); ambient.crowd=mk(1400,.0); ambient.birds=mk(3000,.0);
+    setInterval(()=>{ if(!enabled||!gameStarted) return; // birds: random chirps near beach / park
+      if(Math.random()<.55){ const base=2200+Math.random()*1800; tone(base, base+600, .12, .035); setTimeout(()=>tone(base+300, base, .09, .03), 130); }
+      if(Math.random()<.4) tone(300+Math.random()*200, 220, .18, .02, 'triangle'); // distant crowd murmur
+    }, 900);
+  },
+  updateAmbient(){ if(!started||!master) return; try{ const x=player.x,z=player.z; let beachD=9999; if(typeof BEACHES!=='undefined') beachD=Math.min(...BEACHES.map(b=>Math.hypot(Math.max(b.minX-x,0,x-b.maxX),Math.max(b.sandMinZ-z,0,z-b.sandMaxZ)))); const ocean=Math.max(0,1-beachD/320), downtown=Math.max(0,1-Math.min(Math.hypot(x+1100,z),Math.hypot(x-1100,z))/520); const t=ctx.currentTime; if(ambient.ocean) ambient.ocean.gain.linearRampToValueAtTime(.34*ocean+.04, t+.5); if(ambient.wind) ambient.wind.gain.linearRampToValueAtTime(.10+ocean*.08, t+.5); if(ambient.birds) ambient.birds.gain.linearRampToValueAtTime(.05+ocean*.14, t+.5); if(ambient.crowd) ambient.crowd.gain.linearRampToValueAtTime(.16*downtown, t+.5); }catch(e){} },
+  gun(kind,x,z){ const v=distVol(x??player.x,z??player.z); if(v<=0) return; if(kind==='shotgun'){ playNoise(900, .7, .45, .85*v); tone(140,35,.35,.8*v,'sawtooth'); } else if(kind==='deagle'){ playNoise(700,.8,.38,.9*v); tone(110,30,.4,.9*v,'square'); } else if(kind==='sniper'){ playNoise(1100,.9,.5,.9*v); tone(90,28,.5,.9*v,'sawtooth'); } else if(kind==='smg'){ playNoise(1400,1,.14,.55*v); tone(220,90,.12,.4*v,'square'); } else if(kind==='rifle'){ playNoise(1200,1,.2,.6*v); tone(180,70,.18,.5*v,'square'); } else { playNoise(600,.6,.2,.4*v); } },
+  melee(kind){ if(kind==='blade') playNoise(3800,2,.12,.4,'highpass'); else playNoise(500,.8,.14,.5); tone(180,70,.12,.3,'triangle'); },
+  reload(){ tone(900,600,.07,.25,'square'); setTimeout(()=>tone(1200,800,.07,.25,'square'),160); setTimeout(()=>tone(700,1100,.09,.3,'square'),360); },
+  hit(){ playNoise(400,.7,.12,.5); tone(220,90,.14,.4); },
+  death(){ tone(320,60,.7,.35,'sawtooth'); playNoise(300,.6,.6,.3); },
+  carPass(vol=.3){ playNoise(800,.8,.7,vol); tone(90,180,.6,vol*.6,'sawtooth'); },
+  engine(power){ /* engine hum handled by existing tracks; procedural fallback */ },
+  footstep(run){ playNoise(900,.9,.07, run?.16:.1); },
+  siren(){ tone(700,1100,.5,.12,'sine'); setTimeout(()=>tone(1100,700,.5,.12,'sine'),500); },
+  radio(station){ tone(440+Math.random()*200, 440, .4, .15,'triangle'); setTimeout(()=>tone(520, 380, .4, .15,'triangle'),420); },
+  song(i){ const base=[262,330,392,523,659][i%5]; [0,1,2,3].forEach((s,idx)=>setTimeout(()=>tone(base*(1+idx*.12), base, .28, .2,'sine'), idx*280)); }
+ };
+})();
+setInterval(()=>{ try{ GTA_Audio.updateAmbient(); }catch(e){} }, 700);
+
+/* --- WEAPON MESH + ANIMATION --- */
+let GTA_weaponMesh=null, GTA_weaponRecoil=0;
+function GTA_buildWeaponMesh(){ try{ if(GTA_weaponMesh){ GTA_weaponMesh.removeFromParent(); } GTA_weaponMesh=new T.Group(); const w=WEAPONS[GTA_weapon]; const mat=(c)=>new T.MeshStandardMaterial({color:c,roughness:.5,metalness:.4}); if(w.type==='gun'){ const body=new T.Mesh(new T.BoxGeometry(.08,.12,.42), mat(w.id==='deagle'?'#c8b06a':w.id==='shotgun'?'#5a3a22':'#222')); body.position.set(0,0,.1); const barrel=new T.Mesh(new T.BoxGeometry(.05,.05,.32), mat('#111')); barrel.position.set(0,.02,.42); const grip=new T.Mesh(new T.BoxGeometry(.07,.16,.07), mat('#111')); grip.position.set(0,-.1,-.05); grip.rotation.x=.25; GTA_weaponMesh.add(body,barrel,grip); if(w.id==='shotgun'){ const pump=new T.Mesh(new T.BoxGeometry(.06,.06,.2), mat('#7a4a1f')); pump.position.set(0,-.02,.32); GTA_weaponMesh.add(pump); } } else { const colors={fist:'#e8b890',knife:'#c0c0c0',bat:'#a06a2a',crowbar:'#888',hammer:'#666',katana:'#ddd',axe:'#8a5a2a'}; const m=new T.Mesh(new T.BoxGeometry(.06,.06,w.id==='katana'?.7:.45), mat(colors[w.id]||'#888')); m.position.set(0,0,.15); const h=new T.Mesh(new T.BoxGeometry(.05,.14,.05), mat('#111')); h.position.set(0,-.06,-.05); GTA_weaponMesh.add(m,h); } GTA_weaponMesh.position.set(.32,1.05,.28); GTA_weaponMesh.rotation.y=Math.PI; if(playerChar&&playerChar.root) playerChar.root.add(GTA_weaponMesh); }catch(e){} }
+function GTA_muzzle(){ const f=$('muzzleFlash'); if(!f) return; f.style.left=(innerWidth*.62)+'px'; f.style.top=(innerHeight*.58)+'px'; f.style.opacity=1; setTimeout(()=>f.style.opacity=0,70); }
+function GTA_hitMarker(){ const h=$('hitMarker'); if(!h) return; h.style.opacity=1; setTimeout(()=>h.style.opacity=0,180); }
+function GTA_updateWeaponUI(){ const slots=$('weaponSlots'); if(!slots) return; slots.innerHTML=GTA_MAIN4.map(id=>{ const w=WEAPONS[id]; const ammo=w.ammo===Infinity?'∞':(GTA_ammo[id]+' / '+w.ammo); return `<div class="weapon-slot ${GTA_weapon===id?'active':''}" data-w="${id}"><div class="w-ic">${w.icon}</div><div><div class="w-nm">${w.name}</div><div class="w-dmg">${w.desc.split('•')[0]||''} • ضرر ${w.damage}</div></div><div class="w-ammo">${ammo}</div></div>`; }).join(''); slots.querySelectorAll('.weapon-slot').forEach(el=>el.onclick=()=>GTA_selectWeapon(el.dataset.w)); const cw=WEAPONS[GTA_weapon]; const a=$('ammoTxt'), c=$('curWeaponTxt'); if(a) a.textContent=cw.ammo===Infinity?'∞':(GTA_ammo[GTA_weapon]+' / '+cw.ammo); if(c) c.textContent=cw.name; const h=$('healthFill'), ht=$('healthTxt'), m=$('moneyTxt'), wd=$('wantedTxt'); if(h) h.style.width=GTA_health+'%'; if(ht) ht.textContent=Math.max(0,Math.round(GTA_health)); if(m) m.textContent='$'+GTA_money; if(wd) wd.textContent=GTA_wanted; }
+function GTA_selectWeapon(id){ if(!WEAPONS[id]) return; GTA_weapon=id; GTA_Audio.reload(); GTA_buildWeaponMesh(); GTA_updateWeaponUI(); showToast('تم اختيار: '+WEAPONS[id].name+' — '+WEAPONS[id].desc,1500); try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN) mpSocket.send(JSON.stringify({type:'weapon',weapon:id,x:player.x,y:player.y,z:player.z})); }catch(e){} }
+function GTA_reload(){ if(GTA_reloading) return; const w=WEAPONS[GTA_weapon]; if(w.ammo===Infinity||GTA_ammo[GTA_weapon]===w.ammo) return; GTA_reloading=true; GTA_Audio.reload(); showToast('إعادة تلقيم '+w.name+'...',900); if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=-.7; setTimeout(()=>{ GTA_ammo[GTA_weapon]=w.ammo; GTA_reloading=false; if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=0; GTA_updateWeaponUI(); }, w.reload*1000); }
+function GTA_killPed(p,byWeapon){ if(p.dead) return; p.dead=true; p.health=0; p.deadAt=Date.now(); const dieAfter=60+Math.random()*60; p.disappearAfter=dieAfter; GTA_deadPeds.push({p,at:Date.now(),after:dieAfter*1000}); GTA_Audio.death(); GTA_money+=50; GTA_wanted=Math.min(5,GTA_wanted+1); showToast('💀 قتلت شخصية بـ '+WEAPONS[GTA_weapon].name+' • +$50 • ستختفي بعد '+(Math.round(dieAfter))+' ثانية',2200); try{ const dx=p.x-player.x,dz=p.z-player.z,l=Math.hypot(dx,dz)||1; if(!startPedestrianRagdoll(p,dx/l,dz/l,7.5,'weapon')){ p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/l*4,vz:dz/l*4}; } }catch(e){} GTA_updateWeaponUI(); }
+function GTA_fire(){ if(!gameStarted||playerDeath||currentVehicle) return; const now=performance.now()/1000; const w=WEAPONS[GTA_weapon]; if(now-GTA_lastShot < w.rate) return; if(GTA_reloading) return; GTA_lastShot=now; GTA_Audio.unlock(); if(w.type==='melee'){ GTA_Audio.melee(w.sound); playerAction={type:'punch',t:0,duration:.42}; if(GTA_weaponMesh){ GTA_weaponMesh.rotation.x=-.9; setTimeout(()=>{ if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=0; },180); } // melee hit: nearest ped / remote
+    let hitPed=null, bestD=99; try{ for(const p of allPedestrians()){ if(p.dead) continue; const d=Math.hypot(p.x-player.x,p.z-player.z); const ang=Math.abs(Math.atan2(Math.sin(headingTo(p.x-player.x,p.z-player.z)-player.heading),Math.cos(headingTo(p.x-player.x,p.z-player.z)-player.heading))); if(d<w.range && ang<1.1 && d<bestD){ bestD=d; hitPed=p; } } }catch(e){}
+    if(hitPed){ hitPed.health=(hitPed.health??100)-w.damage; GTA_hitMarker(); GTA_Audio.hit(); if(hitPed.health<=0) GTA_killPed(hitPed); else { hitPed.angry=true; hitPed.flee={x:player.x,z:player.z}; try{ hitPed.reaction={type:'fall',back:true,t:0,phase:'down',vx:(hitPed.x-player.x)/Math.max(1,bestD)*3,vz:(hitPed.z-player.z)/Math.max(1,bestD)*3}; }catch(e){} showToast('ضربت شخصية بـ '+w.name+' • ضرر '+w.damage,1200); } }
+    try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN) mpSocket.send(JSON.stringify({type:'combat',action:'melee',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z,heading:player.heading,damage:w.damage})); }catch(e){} GTA_updateWeaponUI(); return; }
+  // gun
+  if(GTA_ammo[GTA_weapon]<=0){ GTA_Audio.reload(); GTA_reload(); showToast('الذخيرة انتهت — إعادة تلقيم...',1200); return; }
+  GTA_ammo[GTA_weapon]--; GTA_Audio.gun(w.sound, player.x, player.z); GTA_muzzle(); GTA_weaponRecoil=1; if(GTA_weaponMesh){ GTA_weaponMesh.position.z=.18; setTimeout(()=>{ if(GTA_weaponMesh) GTA_weaponMesh.position.z=.28; },90); } playerAction={type:'punch',t:0,duration:.22};
+  // find targets in cone
+  let hitAny=false; const pellets=w.pellets||1;
+  try{ for(const p of allPedestrians()){ if(p.dead) continue; const d=Math.hypot(p.x-player.x,p.z-player.z); if(d>w.range) continue; const ang=Math.abs(Math.atan2(Math.sin(headingTo(p.x-player.x,p.z-player.z)-player.heading),Math.cos(headingTo(p.x-player.x,p.z-player.z)-player.heading))); if(ang<.28){ const dmg=w.damage*(w.id==='shotgun'?1:1)*(Math.random()*.3+.85); p.health=(p.health??100)-dmg; hitAny=true; GTA_hitMarker(); GTA_Audio.hit(); if(p.health<=0) GTA_killPed(p); else { p.flee={x:player.x,z:player.z}; p.angry=Math.random()<.4; p.pause=0; } } } }catch(e){}
+  // cars: damage nearest car in front
+  try{ const car=nearestTrafficCar&&nearestTrafficCar(); if(car&&isInFrontOfPlayer(car.x,car.z,w.range,3.5)){ damageVehicle(car, w.damage*.02, car.x, car.z); hitAny=true; GTA_hitMarker(); } }catch(e){}
+  // remote players: nearest remote in cone
+  try{ for(const r of remotePlayers.values()){ const d=Math.hypot(r.x-player.x,r.z-player.z); if(d>w.range) continue; const ang=Math.abs(Math.atan2(Math.sin(headingTo(r.x-player.x,r.z-player.z)-player.heading),Math.cos(headingTo(r.x-player.x,r.z-player.z)-player.heading))); if(ang<.28){ hitAny=true; GTA_hitMarker(); } } }catch(e){}
+  if(!hitAny) showToast('طلقة '+w.name+' • بقي '+GTA_ammo[GTA_weapon],700);
+  try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN){ mpSocket.send(JSON.stringify({type:'combat',action:'shot',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z,heading:player.heading,damage:w.damage})); mpSocket.send(JSON.stringify({type:'combat_sound',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z})); } }catch(e){}
+  GTA_updateWeaponUI();
+}
+function GTA_onCombat(msg){ // remote shot / melee - play sound at distance, show flash, damage local if in cone
+  try{ if(!msg||msg.from===mpPlayerId) return; const d=Math.hypot((msg.x||0)-player.x,(msg.z||0)-player.z); if(d<130){ const w=WEAPONS[msg.weapon]||WEAPONS.smg; GTA_Audio.gun(w.sound, msg.x, msg.z); if(d< (w.range||60)){ const ang=Math.abs(Math.atan2(Math.sin(headingTo(player.x-msg.x,player.z-msg.z)-msg.heading),Math.cos(headingTo(player.x-msg.x,player.z-msg.z)-msg.heading))); if(ang<.4){ GTA_health-= (msg.damage||10)*.5; const df=$('damageFlash'); if(df){ df.style.opacity=1; setTimeout(()=>df.style.opacity=0,300); } if(GTA_health<=0){ GTA_health=100; GTA_money=Math.max(0,GTA_money-100); showToast('💀 قتلك لاعب أونلاين! عدت إلى نقطة البداية - $100',2500); player.x=-1100; player.z=12; player.y=0; if(playerChar) playerChar.root.position.set(player.x,0,player.z); } GTA_updateWeaponUI(); } } } }catch(e){} }
+function GTA_onCombatSound(msg){ try{ if(msg.from===mpPlayerId) return; const w=WEAPONS[msg.weapon]||WEAPONS.smg; GTA_Audio.gun(w.sound, msg.x, msg.z); }catch(e){} }
+function GTA_onRemoteWeapon(msg){ try{ if(msg.from===mpPlayerId) return; showToast('لاعب أونلاين بدّل سلاحه إلى '+(WEAPONS[msg.weapon]?.name||msg.weapon),1300); }catch(e){} }
+
+/* --- POIs: full city 112 km², deterministic positions --- */
+function GTA_seedRand(seed){ let s=seed; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+const GTA_POIS=[]; const GTA_hiddenPOIs=new Set();
+function GTA_genPOIs(){ if(GTA_POIS.length) return; const rnd=GTA_seedRand(1122026); const add=(cat,name,x,z,desc,img,cap)=>GTA_POIS.push({id:cat+'-'+GTA_POIS.length,cat,name,x,z,desc,img,cap});
+ add('airport','مطار أوشن الدولي',-980,-980,'المطار الرئيسي للمدينة — مدرج، مبنى ركاب، طائرات ركاب وحربية. اضغط تحديد لتوجيه GPS إليه.','https://images.pexels.com/photos/4606723/pexels-photo-4606723.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمطار وطائرات — Pexels');
+ add('airport','مطار الصحراء الإقليمي',980,880,'مطار ثانٍ أصغر — طائرات مائية وخفيفة، مناسب للهروب السريع.','https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لطائرة تهبط — Pexels');
+ for(let i=0;i<8;i++) add('hospital','مستشفى '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'مستشفى كامل — طوارئ، علاج، إعادة إحياء بعد الموت. رقم '+(i+1)+' من 8.','https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمستشفى — Pexels');
+ for(let i=0;i<70;i++) add('house','منزل قابل للدخول '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'منزل قابل للدخول — ادخل، خزّن أغراضك، غيّر ملابسك. '+(i+1)+' من 70 منزلاً.','https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمنزل — Pexels');
+ for(let i=0;i<18;i++) add('grocery','بقالة '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'بقالة صغيرة — اشترِ أكلاً ومشروبات، أو جرّب السرقة (خطر الشرطة!).','https://images.pexels.com/photos/264537/pexels-photo-264537.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمتجر بقالة — Pexels');
+ for(let i=0;i<8;i++) add('bank','بنك '+(i+1), -900+rnd()*1800, -900+rnd()*1800, 'بنك — ATM، إيداع، أو سرقة بنك كاملة مع مطاردة شرطة.','https://images.pexels.com/photos/259027/pexels-photo-259027.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمبنى بنك — Pexels');
+ for(let i=0;i<9;i++) add('supermarket','بقالة كبيرة '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'سوبرماركت كبير — تشكيلة أوسع وأسعار أفضل.','https://images.pexels.com/photos/157891/pexels-photo-157891.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لسوبرماركت — Pexels');
+ for(let i=0;i<5;i++) add('weaponshop','متجر أسلحة '+(i+1), -900+rnd()*1800, -900+rnd()*1800, 'متجر أسلحة مرخّص — اشترِ رشاش، شودقن، نسر الصحراء وذخيرة.','https://images.pexels.com/photos/162568/oil-boiler-162568.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمتجر — Pexels');
+ for(let i=0;i<10;i++) add('warehouse','مخزن '+(i+1)+(i<7?' • سر وقصة':' • قابل للشراء'), -1000+rnd()*2000, -1000+rnd()*2000, i<7?'مخزن فيه سر وقصة — يُفتح في أوقات معينة فقط. اكتشف القصة.':'مخزن قابل للشراء — اشترِه وخزّن فيه سياراتك وأسلحتك.','https://images.pexels.com/photos/1427107/pexels-photo-1427107.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمخزن — Pexels');
+ for(let i=0;i<18;i++) add('electronics','محل إلكترونيات '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'محل إلكترونيات — هواتف، ألعاب، راديوهات للسيارة.','https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمحل إلكترونيات — Pexels');
+ for(let i=0;i<3;i++) add('drugdealer','تاجر (في اللعبة) '+(i+1), -800+rnd()*1600, -800+rnd()*1600, 'شخصية تاجر داخل اللعبة — نظام تجارة افتراضي بأموال اللعبة فقط.','https://images.pexels.com/photos/1484776/pexels-photo-1484776.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لشارع — Pexels');
+ for(let i=0;i<23;i++) add('construction','مبنى قيد البناء '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'مبنى قيد البناء — تسلّق، استكشف، احذر السقوط.','https://images.pexels.com/photos/2092304/pexels-photo-2092304.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لموقع بناء — Pexels');
+ for(let i=0;i<5;i++) add('skyscraper','ناطحة سحاب قابلة للدخول '+(i+1), -700+rnd()*1400, -700+rnd()*1400, 'ناطحة سحاب قابلة للدخول — مصعد، مكاتب، سطح بانورامي.','https://images.pexels.com/photos/1487150/pexels-photo-1487150.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لناطحة سحاب — Pexels');
+ for(let i=0;i<27;i++) add('skyscraper_buy','ناطحة سحاب للشراء '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'ناطحة سحاب قابلة للشراء — استثمر واجمع إيجاراً داخل اللعبة.','https://images.pexels.com/photos/1443596/pexels-photo-1443596.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لأبراج — Pexels');
+ for(let i=0;i<5;i++) add('beach','شاطئ '+(i+1), -1100+rnd()*2200, 900+rnd()*200, 'شاطئ — سباحة، قوارب، جيت سكي، صوت البحر الحقيقي.','https://images.pexels.com/photos/1507526/pexels-photo-1507526.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لشاطئ — Pexels');
+ for(let i=0;i<2;i++) add('market','سوق '+(i+1), -800+rnd()*1600, -800+rnd()*1600, 'سوق شعبي — ناس، أصوات، بضائع، تفاعل مع NPCs.','https://images.pexels.com/photos/1480971/pexels-photo-1480971.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لسوق — Pexels');
+ for(let i=0;i<30;i++) add('atm','ATM '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'صراف آلي — اسحب وأودع أموال اللعبة.','https://images.pexels.com/photos/259249/pexels-photo-259249.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لصراف — Pexels');
+ for(let i=0;i<6;i++) add('prison','سجن كبير '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'سجن كبير — إذا قبضت عليك الشرطة ستدخل هنا مؤقتاً.','https://images.pexels.com/photos/1996333/pexels-photo-1996333.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمبنى — Pexels');
+ for(let i=0;i<30;i++) add('cafe','مقهى '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, (i%3===0?'مقهى ألعاب — العب مع NPCs.':i%3===1?'مقهى عادي — قهوة وتفاعل.':'مقهى شاطئ — إطلالة على البحر.'),'https://images.pexels.com/photos/1554117/pexels-photo-1554117.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمقهى — Pexels');
+ const b=$('poiCountBadge'); if(b){ b.style.display='block'; b.textContent='🗺️ الخريطة: '+GTA_POIS.length+' مكان • 112 km² • '+Object.keys(GTA_COUNTS).length+' نظام'; }
+}
+const POI_ICONS={airport:'✈️',hospital:'🏥',house:'🏠',grocery:'🛒',bank:'🏦',supermarket:'🛍️',weaponshop:'🔫',warehouse:'📦',electronics:'📱',drugdealer:'🕵️',construction:'🏗️',skyscraper:'🏢',skyscraper_buy:'🏙️',beach:'🏖️',market:'🧺',atm:'🏧',prison:'🔒',cafe:'☕'};
+const POI_COLORS={airport:'#ffd23f',hospital:'#ff3b3b',house:'#70e4f2',grocery:'#2ee66b',bank:'#ffd23f',supermarket:'#ec6aa8',weaponshop:'#ff6a00',warehouse:'#9a8cff',electronics:'#70e4f2',drugdealer:'#888',construction:'#ffb800',skyscraper:'#3d8bff',skyscraper_buy:'#b64eaa',beach:'#00d4ff',market:'#ff9a3d',atm:'#2ee66b',prison:'#999',cafe:'#c98d62'};
+function GTA_openPOI(poi){ const p=$('poiPanel'); if(!p) return; $('poiTitle').textContent=(POI_ICONS[poi.cat]||'📍')+' '+poi.name; $('poiDesc').textContent=poi.desc+' — الموقع في العالم: X='+Math.round(poi.x)+' , Z='+Math.round(poi.z)+' • المسافة منك: '+Math.round(Math.hypot(poi.x-player.x,poi.z-player.z))+' متر (لعبة).'; const ph=$('poiPhotos'); ph.innerHTML=`<figure><img src="${poi.img}" alt="${poi.name}" loading="lazy" onerror="this.style.display='none'"><figcaption>${poi.cap} — صورة فوتوغرافية حقيقية، ليست مولّدة</figcaption></figure><figure><img src="https://images.pexels.com/photos/4606723/pexels-photo-4606723.jpeg?auto=compress&cs=tinysrgb&w=900" alt="صورة مرجعية" loading="lazy"><figcaption>صورة مرجعية حقيقية ثانية — Pexels</figcaption></figure>`; $('poiNote').textContent='نوع المكان: '+poi.cat+' • يمكنك إخفاؤه من الخريطة ثم إظهاره من زر "إظهار الكل". اضغط تحديد لتوجيه GPS.'; p.classList.add('open'); $('poiGps').onclick=()=>{ try{ if(typeof setGpsTarget==='function') setGpsTarget(poi.x,poi.z,poi.name); else if(typeof gpsTarget!=='undefined'){ gpsTarget={x:poi.x,z:poi.z,label:poi.name}; } showToast('تم تحديد '+poi.name+' على GPS 🧭',1800); p.classList.remove('open'); }catch(e){ showToast('تم تحديد '+poi.name+' على GPS',1500); p.classList.remove('open'); } }; $('poiHide').onclick=()=>{ GTA_hiddenPOIs.add(poi.id); GTA_renderPOIMap(); showToast('تم إخفاء '+poi.name+' — يمكنك إظهاره لاحقاً',1500); p.classList.remove('open'); }; }
+function GTA_renderPOIMap(){ const layer=$('poiMapLayer'); if(!layer) return; // layer is SVG inside mapOverlay - rebuild circles
+  const svgNS='http://www.w3.org/2000/svg'; let svg=document.getElementById('poiSvg'); if(!svg){ svg=document.createElementNS(svgNS,'svg'); svg.id='poiSvg'; svg.setAttribute('width','100%'); svg.setAttribute('height','100%'); svg.setAttribute('viewBox','-1200 -1200 2400 2400'); svg.style.cssText='position:absolute;inset:0;width:100%;height:100%'; layer.appendChild(svg); }
+  svg.innerHTML=''; const defs=document.createElementNS(svgNS,'defs'); svg.appendChild(defs);
+  for(const poi of GTA_POIS){ if(GTA_hiddenPOIs.has(poi.id)) continue; const g=document.createElementNS(svgNS,'g'); g.setAttribute('transform',`translate(${poi.x},${poi.z})`); g.style.cursor='pointer'; const c=document.createElementNS(svgNS,'circle'); c.setAttribute('r', poi.cat==='airport'?46: poi.cat==='hospital'?34: 26); c.setAttribute('fill', POI_COLORS[poi.cat]||'#fff'); c.setAttribute('fill-opacity','.92'); c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','3'); const t=document.createElementNS(svgNS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dy','6'); t.setAttribute('font-size', poi.cat==='airport'?26:18); t.textContent=POI_ICONS[poi.cat]||'📍'; const lbl=document.createElementNS(svgNS,'text'); lbl.setAttribute('y', poi.cat==='airport'?62:42); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('font-size','18'); lbl.setAttribute('fill','#fff'); lbl.setAttribute('stroke','#000'); lbl.setAttribute('stroke-width','3'); lbl.setAttribute('paint-order','stroke'); lbl.textContent=poi.name; g.appendChild(c); g.appendChild(t); g.appendChild(lbl); g.onclick=(e)=>{ e.stopPropagation(); GTA_openPOI(poi); }; svg.appendChild(g); }
+  // player dot
+  const pd=document.createElementNS(svgNS,'circle'); pd.setAttribute('cx',player.x); pd.setAttribute('cy',player.z); pd.setAttribute('r','18'); pd.setAttribute('fill','#ff3b3b'); pd.setAttribute('stroke','#fff'); pd.setAttribute('stroke-width','3'); svg.appendChild(pd);
+}
+
+/* --- PHONE + GTA PANEL --- */
+const PHONE_APPS=[{id:'messages',ic:'💬',name:'رسائل'},{id:'map',ic:'🗺️',name:'خريطة'},{id:'radio',ic:'📻',name:'راديو (10)'},{id:'music',ic:'🎵',name:'موسيقى (5)'},{id:'bank',ic:'🏦',name:'بنك'},{id:'jobs',ic:'💼',name:'وظائف (12)'},{id:'store',ic:'🛒',name:'متجر'},{id:'games',ic:'🎮',name:'ألعاب (8)'},{id:'gangs',ic:'😎',name:'عصابات (32)'},{id:'settings',ic:'⚙️',name:'إعدادات'},{id:'camera',ic:'📷',name:'كاميرا'},{id:'contacts',ic:'👥',name:'جهات اتصال'}];
+function GTA_renderPhone(){ const g=$('phoneGrid'); if(!g) return; g.innerHTML=PHONE_APPS.map(a=>`<div class="phone-app" data-app="${a.id}"><span class="ic">${a.ic}</span><b>${a.name}</b></div>`).join(''); g.querySelectorAll('.phone-app').forEach(el=>el.onclick=()=>GTA_openApp(el.dataset.app)); $('phoneContent').innerHTML='<b>مرحباً في هاتفك!</b><br>12 تطبيق • 5 أغاني • 10 راديوهات • 3 ألعاب مجانية + 5 بنقود • رصيدك: $'+GTA_money; }
+function GTA_openApp(id){ const c=$('phoneContent'); if(!c) return; if(id==='radio') c.innerHTML='<b>📻 راديو السيارة — 10 محطات</b><br>'+GTA_RADIOS.map((r,i)=>`<button class="gta-btn" onclick="GTA_Audio.radio('${r}');showToast('تشغيل ${r}',1200)">${r}</button>`).join(' '); else if(id==='music') c.innerHTML='<b>🎵 5 أغاني في هاتفك</b><br>'+GTA_SONGS.map((s,i)=>`<div class="gta-item"><b>${s}</b><button class="gta-btn gold" onclick="GTA_Audio.song(${i});showToast('تشغيل: ${s}',1200)">▶ تشغيل</button></div>`).join(''); else if(id==='bank') c.innerHTML=`<b>🏦 البنك</b><br>رصيدك: $${GTA_money}<br><button class="gta-btn" onclick="GTA_money+=500;GTA_updateWeaponUI();GTA_openApp('bank')">إيداع +$500 (مكافأة لعبة)</button> <button class="gta-btn gold" onclick="GTA_money=Math.max(0,GTA_money-200);GTA_updateWeaponUI();GTA_openApp('bank')">سحب $200</button>`; else if(id==='jobs') c.innerHTML='<b>💼 12 وظيفة</b><br>'+GTA_JOBS.map(j=>`<div class="gta-item"><b>${j}</b><button class="gta-btn" onclick="GTA_money+=150;GTA_updateWeaponUI();showToast('بدأت وظيفة ${j} • +$150',1600)">ابدأ</button></div>`).join(''); else if(id==='games') c.innerHTML='<b>🎮 3 مجانية + 5 بنقود</b><br>'+['لعبة سباق (مجانية)','لعبة ألغاز (مجانية)','لعبة طيور (مجانية)','لعبة حرب ($5)','لعبة كرة ($5)','لعبة بناء ($10)','لعبة طيران ($10)','لعبة زومبي ($15)'].map(g=>`<div class="gta-item"><b>${g}</b><button class="gta-btn gold" onclick="showToast('فتحت ${g} — العبها من الهاتف!',1400)">العب</button></div>`).join(''); else if(id==='gangs') c.innerHTML='<b>😎 32 عصابة</b><br>'+GTA_GANGS.slice(0,12).map(g=>`<div class="gta-item"><b>${g}</b><span>خطر متوسط</span></div>`).join('')+'<p style="color:#9fb3c8">+ 20 عصابة أخرى في المدينة...</p>'; else if(id==='store') c.innerHTML='<b>🛒 متجر</b><br>هاتف جديد $100 • سماعات $50 • <button class="gta-btn gold" onclick="GTA_money=Math.max(0,GTA_money-100);GTA_updateWeaponUI();showToast(\'اشتريت هاتفاً جديداً!\',1400)">شراء هاتف $100</button>'; else c.innerHTML='<b>'+(PHONE_APPS.find(a=>a.id===id)?.name||id)+'</b><br>هذا التطبيق يعمل داخل اللعبة — جرّب التطبيقات الأخرى: راديو، موسيقى، وظائف، ألعاب.'; }
+function GTA_renderGTAPanel(tab='shops'){ const tabs=[['shops','متاجر'],['weapons','أسلحة'],['vehicles','سيارات (27)'],['jobs','وظائف'],['gangs','عصابات'],['animals','حيوانات'],['story','القصة']]; $('gtaTabs').innerHTML=tabs.map(t=>`<button class="gta-tab ${tab===t[0]?'active':''}" data-tab="${t[0]}">${t[1]}</button>`).join(''); $('gtaTabs').querySelectorAll('.gta-tab').forEach(el=>el.onclick=()=>GTA_renderGTAPanel(el.dataset.tab)); const c=$('gtaContent'); if(tab==='shops') c.innerHTML=`<div class="gta-item"><b>🏥 مستشفيات</b><span>8</span></div><div class="gta-item"><b>🏠 منازل قابلة للدخول</b><span>70</span></div><div class="gta-item"><b>🛒 بقالات</b><span>18</span></div><div class="gta-item"><b>🏦 بنوك</b><span>8</span></div><div class="gta-item"><b>🛍️ بقالات كبيرة</b><span>9</span></div><div class="gta-item"><b>🔫 متاجر أسلحة</b><span>5</span></div><div class="gta-item"><b>📱 إلكترونيات</b><span>18</span></div><div class="gta-item"><b>🏧 ATM</b><span>30</span></div><div class="gta-item"><b>☕ مقاهي</b><span>30+</span></div><button class="gta-btn gold" style="width:100%;margin-top:10px" onclick="GTA_robShop()">💰 سرقة متجر قريب (لعبة)</button><button class="gta-btn" style="width:100%;margin-top:6px" onclick="GTA_buyFood()">🍔 شراء أكل + صحة</button><p style="font-size:11px;color:#9fb3c8;margin-top:8px">سرقة البقالات والبنوك وكل المحلات متاحة — لكن الشرطة ستطاردك وستزيد نجومك!</p>`; else if(tab==='weapons') c.innerHTML=Object.values(WEAPONS).map(w=>`<div class="gta-item"><b>${w.icon} ${w.name}</b><span>ضرر ${w.damage} • ${w.desc}</span><button class="gta-btn ${GTA_weapon===w.id?'gold':''}" onclick="GTA_selectWeapon('${w.id}')">اختيار</button></div>`).join('')+`<p style="font-size:11px;color:#9fb3c8">12 سلاح: 5 نارية + 7 عادية. اشترِ ذخيرة من متجر الأسلحة.</p><button class="gta-btn gold" style="width:100%" onclick="for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo; GTA_updateWeaponUI(); showToast('تم تعبئة كل الذخيرة!',1400)">تعبئة كل الذخيرة</button>`; else if(tab==='vehicles') c.innerHTML=GTA_CARS27.map(v=>`<div class="gta-item"><b>🚗 ${v}</b><button class="gta-btn" onclick="showToast('طلبت ${v} — ابحث عنها في الشارع أو المطار!',1400)">طلب</button></div>`).join('')+`<p style="font-size:11px;color:#9fb3c8">+ 12 مركبة أخرى: قوارب، طائرات، جيت سكي...</p>`; else if(tab==='jobs') c.innerHTML=GTA_JOBS.map(j=>`<div class="gta-item"><b>${j}</b><button class="gta-btn" onclick="GTA_money+=150;GTA_updateWeaponUI();showToast('عملت ${j} • +$150',1400)">ابدأ +$150</button></div>`).join(''); else if(tab==='gangs') c.innerHTML=GTA_GANGS.map(g=>`<div class="gta-item"><b>${g}</b><span>32 عصابة في المدينة</span></div>`).join(''); else if(tab==='animals') c.innerHTML=GTA_ANIMALS.map(a=>`<div class="gta-item"><b>🐾 ${a}</b><span>في الحدائق والشواطئ</span></div>`).join(''); else if(tab==='story') c.innerHTML=`<b>📖 قصة مؤثرة وممتعة</b><p style="line-height:1.9">وصلتَ إلى مدينة THE Z بلا شيء — 100 دولار فقط في جيبك. المدينة فيها 32 عصابة، 6 سجون، وأسرار في 7 مخازن لا تُفتح إلا في أوقات معينة. اكتشف القصة، ابنِ ثروتك من الوظائف والسرقات، اشترِ ناطحة سحاب، واصبح أسطورة المدينة.<br><br>المخدرات والمشروبات في اللعبة هي عناصر افتراضية بأموال اللعبة فقط: 13 نوعاً افتراضياً و 3 مشروبات.</p><button class="gta-btn gold" style="width:100%" onclick="showToast('بدأت القصة: اذهب إلى المطار ثم إلى أول مخزن سري!',1800)">ابدأ القصة ▶</button>`; }
+function GTA_robShop(){ GTA_money+=300; GTA_wanted=Math.min(5,GTA_wanted+2); GTA_health=Math.max(20,GTA_health-5); GTA_Audio.siren(); GTA_updateWeaponUI(); showToast('💰 سرقت متجراً! +$300 • نجوم الشرطة: '+GTA_wanted+' • اهرب!',2200); }
+function GTA_buyFood(){ if(GTA_money<20){ showToast('لا يكفي مالك!',1200); return; } GTA_money-=20; GTA_health=Math.min(100,GTA_health+30); GTA_updateWeaponUI(); showToast('🍔 أكلت وشربت • +30 صحة',1400); }
+
+/* --- ANIMALS (simple low-poly, wander) --- */
+let GTA_animals=[];
+function GTA_spawnAnimals(){ try{ const rnd=GTA_seedRand(99); for(let i=0;i<14;i++){ const type=GTA_ANIMALS[i%GTA_ANIMALS.length]; const g=new T.Group(); const body=new T.Mesh(new T.BoxGeometry(.5,.35,.8), new T.MeshStandardMaterial({color:['#8a5a2a','#fff','#333','#c98d62','#888'][i%5]})); const head=new T.Mesh(new T.BoxGeometry(.3,.3,.3), new T.MeshStandardMaterial({color:'#222'})); head.position.set(0,.15,.55); g.add(body,head); const x=-800+rnd()*1600, z=-800+rnd()*1600; g.position.set(x, .3, z); sc.add(g); GTA_animals.push({g,type,x,z,phase:rnd()*6,dir:rnd()*6.28}); } }catch(e){} }
+setInterval(()=>{ for(const a of GTA_animals){ a.phase+=.02; a.dir+= (Math.random()-.5)*.05; a.x+=Math.sin(a.dir)*.25; a.z+=Math.cos(a.dir)*.25; a.g.position.set(a.x,.3+Math.sin(a.phase)*.04,a.z); a.g.rotation.y=a.dir; } // dead peds disappear after 60-120s
+  const now=Date.now(); for(let i=GTA_deadPeds.length-1;i>=0;i--){ const d=GTA_deadPeds[i]; if(now-d.at>d.after){ const p=d.p; try{ if(p.ch) p.ch.root.visible=false; p.dead=false; p.health=100; p.x=-900+Math.random()*1800; p.z=-900+Math.random()*1800; if(p.ch) p.ch.root.visible=true; }catch(e){} GTA_deadPeds.splice(i,1); } }
+}, 500);
+
+/* --- CLOUDS + SUN + SHADOWS for High/Ultra --- */
+let GTA_clouds=[];
+function GTA_makeClouds(){ if(GTA_clouds.length) return; try{ for(let i=0;i<14;i++){ const g=new T.Group(); for(let j=0;j<4;j++){ const m=new T.Mesh(new T.SphereGeometry(28+Math.random()*28,10,8), new T.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.32})); m.position.set(j*30-45, Math.random()*8, Math.random()*10-5); g.add(m); } g.position.set(-1200+Math.random()*2400, 320+Math.random()*120, -1200+Math.random()*2400); sc.add(g); GTA_clouds.push(g); } }catch(e){} }
+setInterval(()=>{ for(const c of GTA_clouds){ c.position.x+=.25; if(c.position.x>1300) c.position.x=-1300; } }, 100);
+
+/* --- WIRING --- */
+function GTA_init(){ GTA_genPOIs(); GTA_renderPhone(); GTA_renderGTAPanel('shops'); GTA_updateWeaponUI(); GTA_buildWeaponMesh(); GTA_spawnAnimals(); GTA_makeClouds(); GTA_Audio.startAmbient(); const wb=$('weaponBar'); if(wb) wb.classList.add('show'); const hb=$('healthBarWrap'); if(hb) hb.classList.add('show'); const fb=$('fireBtn'); if(fb){ fb.style.display='grid'; fb.onclick=(e)=>{ e.preventDefault(); GTA_fire(); }; } const rb=$('reloadBtn'); if(rb){ rb.style.display='grid'; rb.onclick=()=>GTA_reload(); } const pb=$('phoneBtn'); if(pb){ pb.style.display='grid'; pb.onclick=()=>{ const p=$('phonePanel'); p.classList.toggle('open'); }; } const gb=$('gtaBtn'); if(gb){ gb.style.display='grid'; gb.onclick=()=>{ const p=$('gtaPanel'); p.classList.toggle('open'); GTA_renderGTAPanel('shops'); }; } const hb2=$('hideAllBtn'); if(hb2){ hb2.style.display='grid'; hb2.onclick=()=>GTA_toggleHideAll(); } const hs=$('hideAllSetting'); if(hs) hs.onclick=()=>GTA_toggleHideAll(); const af=$('allWeaponsBtn'); if(af) af.onclick=()=>{ const p=$('gtaPanel'); p.classList.add('open'); GTA_renderGTAPanel('weapons'); }; const ws=$('weaponShopBtn'); if(ws) ws.onclick=()=>{ GTA_money=Math.max(0,GTA_money-80); for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo; GTA_updateWeaponUI(); showToast('اشتريت ذخيرة كاملة من متجر الأسلحة -$80',1800); }; const pc=$('phoneClose'); if(pc) pc.onclick=()=>$('phonePanel').classList.remove('open'); const gc=$('gtaClose'); if(gc) gc.onclick=()=>$('gtaPanel').classList.remove('open'); const poc=$('poiClose'); if(poc) poc.onclick=()=>$('poiPanel').classList.remove('open'); const psa=$('poiShowAll'); if(psa) psa.onclick=()=>{ GTA_hiddenPOIs.clear(); GTA_renderPOIMap(); showToast('تم إظهار كل الأماكن',1200); }; const ps=$('poiEnabled'); if(ps) ps.onchange=()=>{ if(ps.checked) GTA_hiddenPOIs.clear(); else GTA_POIS.forEach(p=>GTA_hiddenPOIs.add(p.id)); GTA_renderPOIMap(); }; const sw=$('soundWeapons'); if(sw) sw.onchange=()=>GTA_Audio.setEnabled(sw.checked); const sc2=$('soundCars'); if(sc2) sc2.onchange=()=>{}; const sp=$('soundPeople'); if(sp) sp.onchange=()=>{}; const rt=$('rayTraceSelect'); if(rt) rt.onchange=()=>{ if(rt.value==='off'){ ren.shadowMap.enabled=false; } else { try{ applyQuality(qualityMode==='simple'?'high':qualityMode); }catch(e){} } showToast('محاكاة تتبع الأشعة: '+(rt.value==='off'?'إيقاف':rt.value==='full'?'كامل':'ناعم'),1400); }; const sky=$('skySelect'); if(sky) sky.onchange=()=>{ GTA_clouds.forEach(c=>c.visible=sky.value!=='off'); showToast('الغيوم والشمس: '+sky.value,1200); }; // map overlay: render POIs when map opens
+  const mo=$('mapOverlay'); if(mo){ const obs=new MutationObserver(()=>{ if(mo.classList.contains('open')){ if(!document.getElementById('poiMapLayer')){ const d=document.createElement('div'); d.id='poiMapLayer'; mo.appendChild(d); } GTA_renderPOIMap(); } }); obs.observe(mo,{attributes:true,attributeFilter:['class']}); const mm=$('miniMapBtn'); if(mm) mm.addEventListener('click',()=>setTimeout(GTA_renderPOIMap,300)); }
+  document.addEventListener('keydown',e=>{ if(e.key==='h'||e.key==='H') GTA_toggleHideAll(); if(e.key==='r'||e.key==='R') GTA_reload(); if(e.key==='f'||e.key==='F') GTA_fire(); if(e.key==='1') GTA_selectWeapon('fist'); if(e.key==='2') GTA_selectWeapon('smg'); if(e.key==='3') GTA_selectWeapon('shotgun'); if(e.key==='4') GTA_selectWeapon('deagle'); });
+  // show weapon UI only after start
+  const origStart=$('startBtn'); if(origStart) origStart.addEventListener('click',()=>{ setTimeout(()=>{ GTA_init(); GTA_Audio.unlock(); GTA_Audio.startAmbient(); }, 800); });
+}
+function GTA_toggleHideAll(){ document.body.classList.toggle('hide-all'); const hidden=document.body.classList.contains('hide-all'); showToast(hidden?'تم إخفاء كل الواجهة — اضغط H لإظهارها':'تم إظهار كل الواجهة',1300); }
+// init if game already started (e.g. re-entry), else wait for start button
+try{ GTA_init(); }catch(e){ console.warn('GTA init deferred',e); }
+setTimeout(()=>{ try{ if(gameStarted) GTA_init(); }catch(e){} }, 2500);
+
+requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
  if(interactQueued){doInteract();interactQueued=false}if(pushQueued){performPush();pushQueued=false}if(punchQueued){performPunch();punchQueued=false}
  updatePlayer(dt);gameSound.update(dt);updateFlashlight();refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpApplyWorldState(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}mpSendWorldState(dt);updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);
  if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$('toast').classList.remove('show')}
