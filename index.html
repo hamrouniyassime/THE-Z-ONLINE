@@ -145,43 +145,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .airport-note{padding:0 20px 17px;color:#8fa4ba;font-size:11px;line-height:1.6}
 @media(max-width:600px){#gameSettingsBtn{left:8px;top:calc(116px + env(safe-area-inset-top,0px));width:42px;height:42px}#activityToggle{right:8px;top:calc(8px + env(safe-area-inset-top,0px));width:42px;height:42px}#settingsPanel{left:8px;top:calc(164px + env(safe-area-inset-top,0px));width:min(310px,calc(100vw - 16px));max-height:calc(100dvh - 175px)}#activityPanel{right:8px;top:calc(58px + env(safe-area-inset-top,0px))}.airport-photos{grid-template-columns:1fr}.airport-photos img{height:190px}}
 
+</style>
+<style>
 
-/* ===== GTA COMPLETE: weapon bar FreeFire style, health, phone, POI, hide-all ===== */
-#weaponBar{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:12px;z-index:25;display:none;flex-direction:column;gap:6px;direction:rtl}
-#weaponBar.show{display:flex}
-.weapon-slot{display:flex;align-items:center;gap:8px;min-width:168px;padding:8px 10px;border-radius:14px;border:1px solid #ffffff2e;background:linear-gradient(145deg,#1a2436ee,#0a1220ee);cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 6px 20px #0007}
-.weapon-slot.active{border-color:#ffd23f;background:linear-gradient(145deg,#3a2f14ee,#1a1405ee);box-shadow:0 0 0 1px #ffd23f88,0 6px 20px #0007}
-.weapon-slot .w-ic{width:36px;height:36px;border-radius:10px;background:#ffffff14;display:grid;place-items:center;font-size:20px;flex:none}
-.weapon-slot .w-nm{font-size:12px;font-weight:800;line-height:1.2}.weapon-slot .w-dmg{font-size:10px;color:#9fb3c8}
-.weapon-slot .w-ammo{margin-inline-start:auto;font-size:11px;font-weight:800;color:#ffd23f}
-#weaponBarTitle{font-size:10px;color:#cbd5e3;text-align:center;background:#00000066;padding:4px 6px;border-radius:8px;letter-spacing:.5px}
-#fireBtn{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(268px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;z-index:12;display:none;place-items:center;border:2px solid #ffd23f;background:radial-gradient(circle at 35% 30%,#ff5a5a,#8a1111);color:#fff;font-size:26px;box-shadow:0 8px 26px #0008;cursor:pointer;touch-action:none}
-#fireBtn:active{transform:scale(.94)}
-#reloadBtn{position:fixed;right:calc(94px + env(safe-area-inset-right,0px));bottom:calc(272px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:16px;z-index:12;display:none;place-items:center;border:1px solid #ffffff55;background:#1a2436ee;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
-#healthBarWrap{position:fixed;left:12px;top:calc(138px + env(safe-area-inset-top,0px));z-index:12;display:none;gap:6px;flex-direction:column;width:170px}
-#healthBarWrap.show{display:flex}
-.health-row{display:flex;gap:6px;align-items:center;background:#0a1220cc;border:1px solid #ffffff22;border-radius:11px;padding:7px 9px;font-size:11px;font-weight:700}
-.health-track{flex:1;height:10px;background:#ffffff22;border-radius:99px;overflow:hidden}.health-fill{height:100%;background:linear-gradient(90deg,#2ee66b,#ffd23f,#ff3b3b);transition:width .25s}
-#phoneBtn{position:fixed;left:12px;top:calc(188px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffffff55;background:linear-gradient(145deg,#233349ed,#0b1424ed);z-index:24;display:none;place-items:center;font-size:20px;cursor:pointer}
-#gtaBtn{position:fixed;left:12px;top:calc(238px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffd23f88;background:linear-gradient(145deg,#3a2f14,#0b1424);z-index:24;display:none;place-items:center;font-size:19px;cursor:pointer}
-#hideAllBtn{position:fixed;left:12px;top:calc(288px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffffff55;background:#0b1424ee;z-index:24;display:none;place-items:center;font-size:18px;cursor:pointer}
-#poiPanel{inset:0;z-index:130;overflow:auto;padding:clamp(14px,3vw,28px);background:#050b14f2}
-.poi-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}.poi-photos img{width:100%;height:210px;object-fit:cover;border-radius:14px;border:1px solid #ffffff22;display:block}
-#poiMapLayer{position:absolute;inset:0;z-index:1;pointer-events:none}
-#poiMapLayer g{pointer-events:auto;cursor:pointer}
-.poi-dot{stroke:#fff;stroke-width:2;cursor:pointer}
-#muzzleFlash{position:fixed;z-index:30;pointer-events:none;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffd23f 35%,#ff6a00 60%,transparent 72%);opacity:0;transform:translate(-50%,-50%);mix-blend-mode:screen}
-#hitMarker{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) rotate(45deg);z-index:30;font-size:34px;color:#ff3b3b;opacity:0;pointer-events:none;text-shadow:0 0 12px #ff3b3b}
-#damageFlash{position:fixed;inset:0;z-index:28;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(255,0,0,.55) 100%);opacity:0;transition:opacity .25s}
-#gtaPanel{left:12px;top:calc(190px + env(safe-area-inset-top,0px));width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 210px);overflow:auto}
-.gta-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.gta-tab{border:1px solid #ffffff2a;border-radius:99px;padding:7px 11px;background:#ffffff10;color:#fff;font-size:11px;font-weight:700;cursor:pointer}.gta-tab.active{background:#ffd23f;color:#111}
-.gta-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff14;font-size:12px}.gta-item b{font-size:12px}.gta-item span{color:#9fb3c8;font-size:11px}
-.gta-btn{border:0;border-radius:9px;padding:8px 11px;background:#2879b7;color:#fff;font-weight:800;font-size:11px;cursor:pointer}.gta-btn.gold{background:#ffd23f;color:#111}.gta-btn.red{background:#c0392b}
-#phonePanel{left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100vw - 24px));max-height:86dvh;overflow:auto}
-.phone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.phone-app{border:1px solid #ffffff22;border-radius:16px;background:#ffffff0c;padding:12px 6px;text-align:center;cursor:pointer}.phone-app .ic{font-size:24px;display:block;margin-bottom:6px}.phone-app b{font-size:11px}
-body.hide-all #weaponBar,body.hide-all #hud,body.hide-all #miniMapBtn,body.hide-all #gameSettingsBtn,body.hide-all #activityToggle,body.hide-all #phoneBtn,body.hide-all #gtaBtn,body.hide-all #hideAllBtn,body.hide-all #healthBarWrap,body.hide-all #fireBtn,body.hide-all #reloadBtn,body.hide-all #touchUI{opacity:0 !important;pointer-events:none !important}
-#poiCountBadge{position:fixed;left:12px;bottom:12px;z-index:12;background:#0a1220dd;border:1px solid #ffffff2a;border-radius:99px;padding:7px 11px;font-size:11px;display:none}
-@media(max-width:520px){#weaponBar{right:8px}.weapon-slot{min-width:142px;padding:6px 8px}#healthBarWrap{width:140px}}
+/* THE Z ONLINE — city expansion hub */
+#worldHubBtn,#phoneHubBtn{position:fixed;z-index:26;top:calc(66px + env(safe-area-inset-top,0px));width:46px;height:46px;border-radius:14px;border:1px solid #ffffff55;background:linear-gradient(145deg,#243b55f2,#101827f2);color:#fff;font-size:19px;font-weight:900;display:none;box-shadow:0 7px 22px #0008}
+#worldHubBtn{right:66px}#phoneHubBtn{right:120px}
+#worldHubPanel{inset:0;z-index:130;overflow:auto;padding:14px;background:#050a13f2}
+.world-hub-card{width:min(980px,100%);min-height:70vh;margin:2vh auto;background:linear-gradient(145deg,#152438,#080e19);border:1px solid #ffffff28;border-radius:22px;padding:16px;box-shadow:0 25px 90px #000b}
+.world-hub-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.world-hub-head h2{font-size:19px;margin:0}.world-hub-sub{font-size:11px;color:#9db3ca;margin-top:4px}
+.world-tabs{display:flex;gap:7px;overflow:auto;padding:5px 0 12px;scrollbar-width:thin}
+.world-tab{flex:0 0 auto;border:1px solid #ffffff25;border-radius:11px;background:#ffffff0c;color:#eaf3ff;padding:9px 12px;font:700 12px system-ui}
+.world-tab.active{background:#286ca7;border-color:#7edcff}
+.world-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:9px}
+.world-card{border:1px solid #ffffff20;border-radius:14px;background:linear-gradient(145deg,#1a2a3d,#0c1522);padding:12px;min-width:0}
+.world-card h4{font-size:13px;margin:0 0 5px;color:#fff}.world-card p{font-size:11px;line-height:1.65;color:#aebed0;margin:0 0 9px}
+.world-card button,.world-action{border:1px solid #ffffff2b;border-radius:10px;background:#246fa6;color:#fff;padding:9px 11px;font:700 11px system-ui}
+.world-card button:disabled{opacity:.5}
+.world-stat{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.world-pill{border:1px solid #ffffff22;border-radius:999px;padding:6px 10px;color:#dcecff;background:#ffffff0b;font-size:11px}
+#poiDetailPanel{inset:0;z-index:132;overflow:auto;padding:14px;background:#030711eF}
+.poi-detail-card{width:min(560px,100%);margin:12vh auto;background:#111f30;border:1px solid #ffffff2b;border-radius:20px;padding:18px}
+.poi-detail-card h3{margin:0 0 8px}.poi-detail-card p{color:#b5c5d7;font-size:13px;line-height:1.8}
+.poi-detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.poi-detail-actions button{border:0;border-radius:11px;padding:11px 14px;background:#267bb4;color:white;font-weight:800}
+#worldToastInfo{font-size:11px;color:#91a9c3;margin-top:10px}
+@media(max-width:600px){#worldHubBtn,#phoneHubBtn{width:40px;height:40px;top:calc(58px + env(safe-area-inset-top,0px))}#worldHubBtn{right:55px}#phoneHubBtn{right:101px}.world-hub-card{padding:12px}.world-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.world-card{padding:10px}}
 
 </style>
 </head>
@@ -221,16 +211,6 @@ body.hide-all #weaponBar,body.hide-all #hud,body.hide-all #miniMapBtn,body.hide-
 </section>
 <div id="hud"><div class="hud-box"><strong id="areaName">فايس بيتش</strong><span id="statusLine">استكشف المدينة</span><span id="nearLine">WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج</span></div></div>
 <div id="toast"></div>
-
-<div id="weaponBar"><div id="weaponBarTitle">🔫 ترسانة • FREE FIRE STYLE • اضغط للتبديل</div><div id="weaponSlots"></div><div style="display:flex;gap:6px"><button class="gta-btn gold" id="allWeaponsBtn" style="flex:1">كل الأسلحة (12)</button><button class="gta-btn" id="weaponShopBtn" style="flex:1">متجر أسلحة</button></div></div>
-<button id="fireBtn" aria-label="إطلاق نار">🎯</button><button id="reloadBtn">إعادة<br>تلقيم R</button>
-<div id="healthBarWrap"><div class="health-row"><span>❤️ صحة</span><div class="health-track"><div class="health-fill" id="healthFill" style="width:100%"></div></div><b id="healthTxt">100</b></div><div class="health-row"><span>💰 مال</span><b id="moneyTxt" style="color:#ffd23f">$250</b><span style="margin-inline-start:auto">⭐ <b id="wantedTxt">0</b></span></div><div class="health-row"><span>🔫 <b id="curWeaponTxt">اليد</b></span><span id="ammoTxt" style="margin-inline-start:auto;color:#ffd23f">∞</span></div></div>
-<button id="phoneBtn" aria-label="الهاتف">📱</button><button id="gtaBtn" aria-label="مدينة GTA">🏙️</button><button id="hideAllBtn" aria-label="إخفاء الكل">👁️</button>
-<div id="muzzleFlash"></div><div id="hitMarker">✕</div><div id="damageFlash"></div><div id="poiCountBadge"></div>
-<section id="gtaPanel" class="ui-panel" aria-label="مدينة GTA"><button class="panel-close" id="gtaClose">×</button><h3>🏙️ مدينة THE Z • GTA كاملة</h3><p style="font-size:11px;color:#9fb3c8;line-height:1.7">الخريطة 112 km² • اضغط أي تبويب، ثم زر الفعل. كل شيء متزامن أونلاين: أسلحة، أصوات، موت، سرقة.</p><div class="gta-tabs" id="gtaTabs"></div><div id="gtaContent"></div><p style="font-size:10px;color:#8fa4ba;line-height:1.6;margin-top:10px">الأصوات مولّدة إجرائياً بـ WebAudio (بحر، طيور، ناس، سيارات، أسلحة) + مقاطع بيئية CC0 — تعمل بدون إنترنت. الصور في بطاقات الأماكن صور فوتوغرافية حقيقية من Pexels / Wikimedia وليست مولّدة.</p></section>
-<section id="phonePanel" class="ui-panel" aria-label="هاتف الشخصية"><button class="panel-close" id="phoneClose">×</button><h3>📱 هاتف الشخصية • 12 تطبيق</h3><div class="phone-grid" id="phoneGrid"></div><div id="phoneContent" style="margin-top:12px;font-size:12px;line-height:1.8;color:#d9e9f5"></div></section>
-<section id="poiPanel" class="ui-panel" aria-label="معلومات المكان"><article class="airport-card"><header class="airport-head"><h3 id="poiTitle">المكان</h3><button class="panel-close" id="poiClose">×</button></header><p class="airport-lead" id="poiDesc"></p><div class="poi-photos" id="poiPhotos"></div><div class="airport-actions"><button id="poiGps">📍 تحديد على GPS</button><button id="poiHide">👁️ إخفاء من الخريطة</button><button id="poiShowAll">↩️ إظهار الكل</button></div><p class="airport-note" id="poiNote"></p></article></section>
-
 <button id="miniMapBtn" aria-label="فتح الخريطة"><canvas id="miniMapCanvas" width="300" height="300"></canvas><span id="mapTag">GPS • الخريطة</span></button>
 <div id="mapOverlay" aria-hidden="true">
  <canvas id="largeMap" width="1000" height="1000"></canvas>
@@ -248,14 +228,7 @@ body.hide-all #weaponBar,body.hide-all #hud,body.hide-all #miniMapBtn,body.hide-
  <div class="panel-row"><label for="soundEnabled">الأصوات البيئية</label><input id="soundEnabled" type="checkbox" checked></div>
  <div class="panel-row"><label for="soundVolume">مستوى الصوت</label><input id="soundVolume" type="range" min="0" max="100" value="65"></div>
  <div class="panel-row"><label for="poiEnabled">إظهار رموز الخريطة</label><input id="poiEnabled" type="checkbox" checked></div>
- <div class="panel-row"><span>تتبع أشعة (محاكاة)</span><select id="rayTraceSelect"><option value="off">إيقاف</option><option value="soft">ناعم • عالية</option><option value="full">كامل • فائقة</option></select></div>
-<div class="panel-row"><span>غيوم + شمس + ظلال</span><select id="skySelect"><option value="auto">تلقائي حسب الجودة</option><option value="on">تشغيل دائماً</option><option value="off">إيقاف</option></select></div>
-<div class="panel-row"><span>أصوات الأسلحة</span><input id="soundWeapons" type="checkbox" checked></div>
-<div class="panel-row"><span>أصوات السيارات</span><input id="soundCars" type="checkbox" checked></div>
-<div class="panel-row"><span>أصوات الناس</span><input id="soundPeople" type="checkbox" checked></div>
-<div class="panel-row"><span>إخفاء كل الواجهة (H)</span><button class="emote-btn" id="hideAllSetting">إخفاء / إظهار</button></div>
-<div class="panel-row"><span>الجودة: بسيطة = الحالية • متوسطة = ناس بعيدون بدقة كاملة • عالية = ظلال + سيارات بعيدة • فائقة = عالية + محاكاة تتبع أشعة + غيوم</span><span></span></div>
-  <p style="color:#91a6bd;font-size:10px;line-height:1.7;margin-top:10px">الجودة الفائقة ترفع دقة العرض والظلال. تتبع الأشعة الحقيقي غير متاح في محرك WebGL المستخدم حالياً.</p>
+ <p style="color:#91a6bd;font-size:10px;line-height:1.7;margin-top:10px">الجودة الفائقة ترفع دقة العرض والظلال. تتبع الأشعة الحقيقي غير متاح في محرك WebGL المستخدم حالياً.</p>
 </section>
 <section id="activityPanel" class="ui-panel" aria-label="أنشطة اللاعب">
  <button class="panel-close" id="activityClose" aria-label="إغلاق">×</button>
@@ -278,6 +251,23 @@ body.hide-all #weaponBar,body.hide-all #hud,body.hide-all #miniMapBtn,body.hide-
   <div class="airport-actions"><button id="airportGps">تحديد المطار على GPS</button><button id="airportReturnMap">العودة إلى الخريطة</button></div>
   <p class="airport-note">تنبيه: الصور أعلاه صور فوتوغرافية مرجعية لمطارات وطائرات حقيقية، وليست لقطات من المطار الافتراضي المصمم داخل اللعبة. تحتاج الصور إلى اتصال بالإنترنت.</p>
  </article>
+</section>
+
+
+<button id="worldHubBtn" aria-label="عالم المدينة" title="المدينة والوظائف">⌂</button>
+<button id="phoneHubBtn" aria-label="هاتف اللاعب" title="هاتف اللاعب">▣</button>
+<section id="worldHubPanel" class="ui-panel" aria-label="مركز المدينة">
+ <div class="world-hub-card">
+  <div class="world-hub-head"><div><h2>THE Z ONLINE — مركز المدينة</h2><div class="world-hub-sub" id="worldHubSubtitle">العالم المفتوح • 112 كم² • اقتصاد ومهن واستكشاف</div></div><button class="panel-close" id="worldHubClose">×</button></div>
+  <div class="world-stat" id="worldStats"></div>
+  <nav class="world-tabs" id="worldTabs">
+   <button class="world-tab active" data-tab="jobs">الوظائف</button><button class="world-tab" data-tab="properties">العقارات</button><button class="world-tab" data-tab="business">المتاجر</button><button class="world-tab" data-tab="equipment">المعدات</button><button class="world-tab" data-tab="phone">الهاتف</button><button class="world-tab" data-tab="radio">الراديو</button><button class="world-tab" data-tab="story">القصة</button><button class="world-tab" data-tab="catalog">دليل المدينة</button>
+  </nav>
+  <div id="worldHubBody"></div>
+ </div>
+</section>
+<section id="poiDetailPanel" class="ui-panel" aria-label="تفاصيل الموقع">
+ <div class="poi-detail-card"><div class="world-hub-head"><h3 id="poiDetailTitle">موقع المدينة</h3><button class="panel-close" id="poiDetailClose">×</button></div><p id="poiDetailDescription"></p><div class="poi-detail-actions" id="poiDetailActions"></div><div id="worldToastInfo"></div></div>
 </section>
 
 <div id="touchUI">
@@ -309,7 +299,7 @@ const ra=(a,b)=>a+R()*(b-a),pk=a=>a[R()*a.length|0],sh=(c,f)=>'#'+new T.Color(c)
 const cv=document.getElementById('c'),isTouchDevice=matchMedia('(pointer:coarse)').matches,ren=new T.WebGLRenderer({canvas:cv,antialias:!isTouchDevice,powerPreference:'high-performance'});
 ren.setPixelRatio(Math.min(devicePixelRatio,isTouchDevice?1:1.25));ren.outputEncoding=T.sRGBEncoding;
 const sc=new T.Scene(),cam=new T.PerspectiveCamera(65,1,.3,9000);cam.rotation.order='YXZ';
-sc.fog=new T.FogExp2(0xe68aa0,.00042);
+sc.fog=new T.FogExp2(0xe68aa0,.00016);
 const cnv=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
 const mkT=(c,rep)=>{const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;t.anisotropy=8;if(rep){t.wrapS=t.wrapT=T.RepeatWrapping}return t};
 // سماء الغروب
@@ -317,7 +307,7 @@ const sun=new T.Vector3(.2,.07,-1).normalize();
 const sky=new T.Mesh(new T.SphereGeometry(4500,32,16),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{s:{value:sun}},
 vertexShader:'varying vec3 v;void main(){v=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
 fragmentShader:'varying vec3 v;uniform vec3 s;void main(){float h=v.y;vec3 hor=vec3(1.,.55,.4),mid=vec3(.65,.22,.58),top=vec3(.06,.06,.3);vec3 c=mix(hor,mid,smoothstep(0.,.22,h));c=mix(c,top,smoothstep(.18,.75,h));if(h<0.)c=mix(hor,vec3(.35,.12,.35),clamp(-h*4.,0.,1.));float d=dot(v,s);c+=vec3(1.,.8,.5)*smoothstep(.9986,.9993,d)*2.+vec3(1.,.5,.3)*pow(max(d,0.),30.)*.7;gl_FragColor=vec4(c,1.);}'}));
-sc.add(sky);
+sky.scale.setScalar(2.2);sc.add(sky);
 sc.add(new T.HemisphereLight(0xffa6c4,0x40305f,.9));
 const dl=new T.DirectionalLight(0xffb98a,1.1);dl.position.copy(sun).multiplyScalar(500);sc.add(dl);
 
@@ -433,7 +423,7 @@ function city(cx){
   if(t=='S')[[-9,-9],[9,-9],[-9,9],[9,9]].forEach(([ox,oz])=>{const w=ra(12,15),d=ra(12,15),h=R()<.2?ra(25,50):ra(7,17),x=X+ox,z=Z+oz;blk(x,z,w,d,h,R()*5|0);
    const dir=Math.sign(oz),col=pk(['#ff4f9a','#27d4e8','#ffd23f','#7cff6b','#ff7a3d']),aw=new T.Mesh(new T.BoxGeometry(w,.3,2.4),new T.MeshStandardMaterial({color:col}));aw.position.set(x,3.7,z+dir*(d/2+1.1));aw.rotation.x=dir*.25;sc.add(aw);
    const sg=new T.Mesh(new T.BoxGeometry(w*.6,1.3,.4),new T.MeshBasicMaterial({color:col}));sg.position.set(x,5.6,z+dir*(d/2+.2));sc.add(sg);boxes.push([x-w/2,x+w/2,z-d/2,z+d/2,h])});
-  if(t=='P'){for(const r of[-11.25,11.25])for(let n=0;n<12;n++)if(R()<.72)car(X-15+1.3+n*2.6,Z+r,Math.PI/2,pk(['#e63946','#f1faee','#1d3557','#ffd166','#06d6a0','#222','#9d4edd','#ff8fab']))}
+  if(t=='P'){for(const r of[-11.25,11.25])for(let n=0;n<6;n++)if(R()<.72)car(X-15+1.3+n*2.6,Z+r,Math.PI/2,pk(['#e63946','#f1faee','#1d3557','#ffd166','#06d6a0','#222','#9d4edd','#ff8fab']))}
   if(t=='H')[[-9,-9],[9,-9],[-9,9],[9,9]].forEach(([ox,oz])=>{const w=ra(9,12),d=ra(9,11),h=ra(6,8.5),x=X+ox+ra(-1.5,1.5),z=Z+oz+ra(-1.5,1.5),v=R()*4|0;
    hL[v].push({x,y:0,z,sx:w,sy:h,sz:d,c:pk(['#fff3df','#ffd3c0','#d3e8ff','#dcffd0','#fff0b0','#ffc8e2','#e6deff'])});
    rL[v].push({x,y:h,z,sx:w,sy:ra(2.5,4),sz:d,c:pk(['#b4533c','#6b6f7a','#3b3b46','#a03a3a','#5c7a5a'])});boxes.push([x-w/2,x+w/2,z-d/2,z+d/2,h+2.8]);
@@ -451,7 +441,9 @@ const BEACH={id:'vice-south',cx:-1100,minX:-1400,maxX:-800,sandMinZ:270,sandMaxZ
 const BEACHES=[
  BEACH,
  {id:'vice-north',cx:-1100,minX:-1400,maxX:-800,sandMinZ:-555,sandMaxZ:-270,shoreZ:-555,waterMinZ:-1180,waterMaxZ:-555,dir:-1},
- {id:'ocean-north',cx:1100,minX:800,maxX:1400,sandMinZ:-555,sandMaxZ:-270,shoreZ:-555,waterMinZ:-1180,waterMaxZ:-555,dir:-1}
+ {id:'ocean-north',cx:1100,minX:800,maxX:1400,sandMinZ:-555,sandMaxZ:-270,shoreZ:-555,waterMinZ:-1180,waterMaxZ:-555,dir:-1},
+ {id:'south-cove',cx:-3700,minX:-4000,maxX:-3400,sandMinZ:800,sandMaxZ:1085,shoreZ:1085,waterMinZ:1085,waterMaxZ:1680,dir:1},
+ {id:'east-bay',cx:3600,minX:3300,maxX:3900,sandMinZ:-1085,sandMaxZ:-800,shoreZ:-1085,waterMinZ:-1680,waterMaxZ:-1085,dir:-1}
 ];
 function beachZoneAt(x,z){return BEACHES.find(b=>x>=b.minX-35&&x<=b.maxX+35&&z>=b.waterMinZ&&z<=b.waterMaxZ||x>=b.minX&&x<=b.maxX&&z>=b.sandMinZ&&z<=b.sandMaxZ)||null}
 function isBeachSand(x,z){return BEACHES.some(b=>x>b.minX&&x<b.maxX&&z>=b.sandMinZ&&z<=b.sandMaxZ)}
@@ -946,9 +938,6 @@ function replacePlayerVisual(x,y,z,yaw,anim='getupBack'){
  playerChar=createCharacter(playerCfg);sc.add(playerChar.root);playerChar.root.position.set(x,y,z);playerChar.root.rotation.set(0,yaw,0);playerChar.root.scale.setScalar(1);playerChar.root.visible=true;playerChar.update(0,.016,anim);
 }
 function startPlayerRagdoll(vx,vz,up=2.2,options={}){
-  // GTA FIX: Player ragdoll only on real crash / wall at speed / weapon / online hit. Never on mere touch.
-  if(options && options.source==='touch') return false;
-  if(options && options.source==='light_touch') return false;
  if(player.ragdoll||(!options.death&&(currentVehicle||playerDeath)))return false;
  if(playerChar.root.parent!==sc)attachPlayerToScene(player.x,player.y||0,player.z,player.heading,true);
  playerChar.root.position.set(player.x,player.y||0,player.z);playerChar.root.rotation.set(0,player.heading,0);playerChar.root.scale.setScalar(1);playerChar.root.updateMatrixWorld(true);
@@ -964,10 +953,6 @@ function finishPlayerRagdoll(state){
  $('stick').style.display='block';$('jumpBtn').style.display='grid';$('runBtn').style.display='grid';$('pushBtn').style.display='grid';$('punchBtn').style.display='grid';
 }
 function startPedestrianRagdoll(p,vx,vz,force=3.8,source='impact'){
-  // GTA FIX: Ragdoll ONLY on real impact - vehicle at speed, weapon hit, heavy kick. Touch / push / light punch = stumble only.
-  if(source==='touch'||source==='push'||source==='light_touch') return false;
-  if((source==='punch'||source==='push') && force<7) return false;
-  if(source==='vehicle' && force<3) return false;
  if(!p||p.reaction||p.driverExit||!ragdollPhysicsReady)return false;setPedDetail(p,true);
  if(!p.ch)return false;p.ch.root.position.set(p.x,p.beachRole==='swim'?-2.08:0,p.z);p.ch.root.rotation.set(0,p.heading,0);p.ch.root.scale.setScalar(p.scale);p.ch.root.updateMatrixWorld(true);
  const len=Math.hypot(vx,vz)||1,fx=vx/len*force,fz=vz/len*force;
@@ -1030,9 +1015,9 @@ function randomCharacterCfg(){
  return {g,hair:g==='f'?pk(['long','pony','short','spiky']):pk(['short','buzz','spiky','short','bald']),hc:pk(hairColors),skin:pk(skinColors),eye:pk(['#34251d','#31526a','#171717','#4d382e']),shirt:pk(shirtColors),pants:pk(pantColors),shoe:pk(shoeColors),beard:g==='m'&&R()<.24,glasses:R()<.16,skirt:g==='f'&&R()<.35};
 }
 function showToast(message,duration=2300){const t=$('toast');t.textContent=message;t.classList.add('show');toastTimer=duration/1000}
-function cityName(x){return x<-700?'فايس بيتش — المدينة الغربية':x>700?'أوشن هايتس — المدينة الشرقية':'الجسر الكبير'}
+function cityName(x){return x>3900?'مناطق العقارات الداخلية':x<-700?'فايس بيتش — المدينة الغربية':x>700?'أوشن هايتس — المدينة الشرقية':'الجسر الكبير'}
 function inCity(x,z,s=295){return (Math.abs(x+1100)<s&&Math.abs(z)<s)||(Math.abs(x-1100)<Math.max(s,850)&&Math.abs(z)<Math.max(s,520))||(x>1240&&x<2040&&z>295&&z<565)}
-function walkZone(x,z){const west=Math.abs(x+1100)<295&&Math.abs(z)<295;const eastOld=Math.abs(x-1100)<295&&Math.abs(z)<295;const airportZone=x>AIRPORT.minX&&x<AIRPORT.maxX&&z>AIRPORT.minZ&&z<AIRPORT.maxZ;const suburbZone=x>1240&&x<2040&&z>260&&z<565;const marinaZone=x>960&&x<1410&&z>-420&&z<-270;return west||eastOld||airportZone||suburbZone||marinaZone||isBeachSand(x,z)||isBeachWater(x,z)||(Math.abs(z)<10.4&&Math.abs(x)<BL+2)}
+function walkZone(x,z){return Number.isFinite(x)&&Number.isFinite(z)&&Math.abs(x)<=5291&&Math.abs(z)<=5291}
 function insideBox(x,z,b,pad=0){return x>b[0]-pad&&x<b[1]+pad&&z>b[2]-pad&&z<b[3]+pad}
 function groundAt(x,z){let h=0;for(const b of boxes)if(insideBox(x,z,b,-.03)&&b[4])h=Math.max(h,b[4]);return h}
 function blockedAt(x,z,y=0,pad=.42){for(const b of boxes){if(insideBox(x,z,b,pad)&&y<(b[4]||999)-.45)return true}return false}
@@ -1076,7 +1061,7 @@ function registerPedestrian(ch,cfg,x,z,scale=1,id=null,cx=null){
 }
 function disposePedDetail(p){if(!p.ch)return;if(p.ch.dispose)p.ch.dispose();if(p.ch.root.parent)p.ch.root.parent.remove(p.ch.root);p.ch=null}
 function setPedDetail(p,detailed){if(detailed){if(!p.ch){p.ch=createCharacter(p.cfg);p.ch.root.position.set(p.x,0,p.z);p.ch.root.scale.setScalar(p.scale);sc.add(p.ch.root)}p.ch.root.visible=true}else if(p.ch){p.ch.root.visible=false}}
-const RESIDENTS_PER_CITY=500;
+const RESIDENTS_PER_CITY=250;
 const RESIDENT_COUNT=RESIDENTS_PER_CITY*CX.length;
 function beachResidentSpawn(zone,i){
  const dir=zone.dir,mid=(zone.sandMinZ+zone.sandMaxZ)/2;
@@ -1150,7 +1135,7 @@ function updateCrowdLOD(dt=0){
   mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
  }
 }
-/* ========= حركة المرور: 200 مركبة برية لكل مدينة + مركبات المطار والميناء ========= */
+/* ========= حركة المرور: 100 مركبة برية لكل مدينة + مركبات المطار والميناء ========= */
 const carTypes=['sedan','taxi','sport','police','van','pickup','truck','motorcycle','gangBike','bicycle'];
 const carNames={sedan:'سيارة',taxi:'تاكسي',sport:'سيارة رياضية',police:'سيارة شرطة',van:'شاحنة صغيرة',pickup:'بيك أب',truck:'شاحنة',motorcycle:'دراجة نارية',gangBike:'دراجة نارية',bicycle:'دراجة هوائية',jetski:'دراجة مائية',fighter:'طائرة حربية',helicopter:'هليكوبتر',airliner:'طائرة ركاب',seaplane:'طائرة مائية',boat:'قارب',ship:'سفينة كبيرة'};
 const typeIndex={sedan:0,taxi:0,sport:0,police:0,van:1,pickup:1,truck:1,motorcycle:2,gangBike:3,bicycle:4,jetski:5,fighter:6,helicopter:7,airliner:8,seaplane:9,boat:10,ship:11};
@@ -1193,10 +1178,10 @@ function buildTrafficVisual(car){
 }
 function disposeTrafficVisual(car){if(!car.root||car.userDriven)return;const root=car.root;if(root.parent)root.parent.remove(root);if(car.driver?.character?.dispose)car.driver.character.dispose();if(car.door)car.door.traverse(o=>{if(o.isMesh&&o.material&&o.material!==glassMat)o.material.dispose()});root.traverse(o=>{if(o.isMesh&&o.geometry)o.geometry.dispose()});if(car.model&&car.model.materials)for(const m of Object.values(car.model.materials))m.dispose();car.root=null;car.model=null;car.driver=null;car.door=null;car.spinParts=[];car.smoke=[];car.fx=null}
 const palette=['#e63946','#f1faee','#1d3557','#ffd166','#06d6a0','#24252a','#9d4edd','#ff8fab','#4cc9f0','#d5d5d5','#dd8a30','#f4f4f4'];
-const MOVING_CARS_PER_CITY=180,PARKED_CARS_PER_CITY=20;
+const MOVING_CARS_PER_CITY=90,PARKED_CARS_PER_CITY=10;
 function spawnTraffic(){
  for(const cityCx of CX){
-  // 180 moving + 20 parked = exactly 200 ground vehicles in each city.
+  // 90 moving + 10 parked = exactly 100 ground vehicles in each city.
   const coreMoving=cityCx===1100?Math.round(MOVING_CARS_PER_CITY*500/720):MOVING_CARS_PER_CITY;
   for(let i=0;i<MOVING_CARS_PER_CITY;i++){
    const suburb=cityCx===1100&&i>=coreMoving;let axis,road,lane,dir,t,spawnCx=cityCx,baseZ=0,span=214;
@@ -1281,6 +1266,8 @@ function mapTransform(w,h,cx,cz,zoom){const scale=w*zoom/900;return {scale,x:v=>
 function drawMap(ctx,w,h,cx,cz,zoom){
  ctx.clearRect(0,0,w,h);ctx.fillStyle='#07506a';ctx.fillRect(0,0,w,h);const tr=mapTransform(w,h,cx,cz,zoom);
  const rect=(x1,z1,x2,z2,col)=>{const a=tr.x(x1),b=tr.y(z1),c=tr.x(x2),d=tr.y(z2);ctx.fillStyle=col;ctx.fillRect(a,b,c-a,d-b)};
+ // 112 km² island base
+ rect(-5291,-5291,5291,5291,'#3d574d');
  // District land masses
  for(const cc of CX){if(cc===1100){rect(680,-520,2040,570,'#3c5651');rect(870,-230,1330,230,'#4b6253');rect(1240,295,2040,565,'#536b55');rect(970,-410,1390,-280,'#796b58')}else{rect(cc-300,-300,cc+300,300,'#3c5651');rect(cc-230,-230,cc+230,230,'#4b6253')}}
  // airport runway, terminal and apron on the expanded eastern city
@@ -1293,6 +1280,8 @@ function drawMap(ctx,w,h,cx,cz,zoom){
  // City road grid
  for(const cc of CX){ctx.lineCap='butt';ctx.strokeStyle='#252b33';ctx.lineWidth=Math.max(1,14*tr.scale);for(const r of roads){ctx.beginPath();ctx.moveTo(tr.x(cc+r),tr.y(-228));ctx.lineTo(tr.x(cc+r),tr.y(228));ctx.stroke();ctx.beginPath();ctx.moveTo(tr.x(cc-228),tr.y(r));ctx.lineTo(tr.x(cc+228),tr.y(r));ctx.stroke();}
   ctx.strokeStyle='#e6c75f';ctx.lineWidth=Math.max(.5,.65*tr.scale);for(const r of roads){ctx.beginPath();ctx.moveTo(tr.x(cc-225),tr.y(r));ctx.lineTo(tr.x(cc+225),tr.y(r));ctx.stroke()}}
+ // 112 km² highway corridors
+ ctx.strokeStyle='#292f36';ctx.lineWidth=Math.max(2,18*tr.scale);for(const v of[-3000,-1500,0,1500,3000]){ctx.beginPath();ctx.moveTo(tr.x(-5291),tr.y(v));ctx.lineTo(tr.x(5291),tr.y(v));ctx.stroke();ctx.beginPath();ctx.moveTo(tr.x(v),tr.y(-5291));ctx.lineTo(tr.x(v),tr.y(5291));ctx.stroke()}
  // Expanded airport district
  rect(1240,314,2040,326,'#282e35');rect(1240,414,2040,426,'#282e35');rect(1240,514,2040,526,'#282e35');for(const x of[1280,1400,1520,1640,1760,1880,2000])rect(x-6,310,x+6,530,'#282e35');
  rect(1315,-29,1965,29,'#343a43');ctx.strokeStyle='#f0f0e9';ctx.lineWidth=Math.max(1,2*tr.scale);ctx.setLineDash([7*tr.scale,7*tr.scale]);ctx.beginPath();ctx.moveTo(tr.x(1320),tr.y(0));ctx.lineTo(tr.x(1960),tr.y(0));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffffffb8';ctx.font=`bold ${Math.max(8,11*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.fillText('OCEAN INTERNATIONAL AIRPORT',tr.x(1630),tr.y(-48));
@@ -1316,7 +1305,7 @@ $('mapZoomIn').addEventListener('click',()=>{mapState.zoom=Math.min(2.5,mapState
 $('mapRecenter').addEventListener('click',()=>{mapState.cx=player.x;mapState.cz=player.z;mapState.zoom=.8;updateMaps()});$('clearRoute').addEventListener('click',clearGps);
 largeCanvas.addEventListener('pointerdown',e=>{if(!mapState.open)return;largeCanvas.setPointerCapture(e.pointerId);mapState.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false};});
 largeCanvas.addEventListener('pointermove',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;const dx=e.clientX-d.lastX,dy=e.clientY-d.lastY;if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7)d.moved=true;if(d.moved){const r=largeCanvas.getBoundingClientRect(),scale=largeCanvas.width*mapState.zoom/900;mapState.cx-=dx*(largeCanvas.width/r.width)/scale;mapState.cz-=dy*(largeCanvas.height/r.height)/scale;updateMaps()}d.lastX=e.clientX;d.lastY=e.clientY});
-largeCanvas.addEventListener('pointerup',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;if(!d.moved){const r=largeCanvas.getBoundingClientRect(),px=(e.clientX-r.left)*largeCanvas.width/r.width,py=(e.clientY-r.top)*largeCanvas.height/r.height,tr=mapTransform(largeCanvas.width,largeCanvas.height,mapState.cx,mapState.cz,mapState.zoom),wx=tr.wx(px),wz=tr.wz(py);if(mapPoiVisible&&Math.hypot(wx-1630,wz+72)<78)showAirportPanel();else setGpsDestination(wx,wz);updateMaps()}mapState.drag=null});
+largeCanvas.addEventListener('pointerup',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;if(!d.moved){const r=largeCanvas.getBoundingClientRect(),px=(e.clientX-r.left)*largeCanvas.width/r.width,py=(e.clientY-r.top)*largeCanvas.height/r.height,tr=mapTransform(largeCanvas.width,largeCanvas.height,mapState.cx,mapState.cz,mapState.zoom),wx=tr.wx(px),wz=tr.wz(py);const picked=mapPoiVisible?nearestPoiFromMap(wx,wz,Math.max(15,8/(mapState.zoom*largeCanvas.width/900))):null;if(picked)openPoiDetail(picked);else setGpsDestination(wx,wz);updateMaps()}mapState.drag=null});
 largeCanvas.addEventListener('wheel',e=>{e.preventDefault();mapState.zoom=Math.max(.12,Math.min(2.5,mapState.zoom*(e.deltaY<0?1.15:.87)));updateMaps()},{passive:false});
 function resizeMapCanvas(){largeCanvas.width=Math.max(1,innerWidth);largeCanvas.height=Math.max(1,innerHeight);updateMaps()}window.addEventListener('resize',resizeMapCanvas);resizeMapCanvas();
 
@@ -1385,7 +1374,35 @@ function updatePoliceUnit(car,dt){
  if(dist<3.8){car.captureClock=(car.captureClock||0)+dt;if(car.captureClock>1.05)arrestPlayer()}else car.captureClock=0;
 }
 
+function trafficBucketsForFrame(){
+ const buckets=new Map();
+ for(const c of traffic){if(c.exploded)continue;const key=Math.floor(c.x/24)+','+Math.floor(c.z/24);let a=buckets.get(key);if(!a)buckets.set(key,a=[]);a.push(c)}
+ return buckets;
+}
+const _vehicleForward=(yaw)=>({x:Math.sin(yaw||0),z:Math.cos(yaw||0)});
+function findTrafficLeader(car,buckets){
+ const f=_vehicleForward(car.heading),dims=vehicleBodyDims[car.type]||vehicleBodyDims.sedan;
+ const scale=typeScale[car.type]||1,halfW=dims[0]*scale,halfL=dims[1]*scale;
+ let best=null,bestGap=Infinity;
+ const cx=Math.floor(car.x/24),cz=Math.floor(car.z/24),candidates=[];
+ for(let ox=-2;ox<=2;ox++)for(let oz=-2;oz<=2;oz++){const list=buckets.get((cx+ox)+','+(cz+oz));if(list)candidates.push(...list)}
+ for(const other of candidates){
+  if(other===car||other.exploded||other.axis==='special'&&other.y>4)continue;
+  if(Math.abs((other.y||0)-(car.y||0))>2.8)continue;
+  const dx=other.x-car.x,dz=other.z-car.z,ahead=dx*f.x+dz*f.z;
+  if(ahead<=0||ahead>34)continue;
+  const lateral=Math.abs(dx*(-f.z)+dz*f.x),od=vehicleBodyDims[other.type]||vehicleBodyDims.sedan,os=typeScale[other.type]||1;
+  if(lateral>halfW+od[0]*os+.72)continue;
+  const of=_vehicleForward(other.heading),headingDot=f.x*of.x+f.z*of.z;
+  if(headingDot<.48&&other.speed>.8)continue;
+  const gap=ahead-halfL-od[1]*os;
+  if(gap<bestGap){bestGap=gap;best={car:other,gap:Math.max(.2,gap)}}
+ }
+ return best;
+}
+
 function updateTraffic(dt){
+ const trafficBuckets=trafficBucketsForFrame();
  const lanes=new Map();for(const c of traffic){if(c.axis!=='x'&&c.axis!=='z')continue;const key=c.routeCity+'|'+c.axis+'|'+Math.round(c.lane*10);let a=lanes.get(key);if(!a)lanes.set(key,a=[]);a.push(c)}
  for(const a of lanes.values())a.sort((u,v)=>u.t-v.t);
  const pedMap=buildPedestrianSpatial();
@@ -1430,9 +1447,39 @@ function updateTraffic(dt){
   const laneKey=car.routeCity+'|'+car.axis+'|'+Math.round(car.lane*10),arr=lanes.get(laneKey)||[],ix=arr.indexOf(car),other=arr[ix+(car.dir>0?1:-1)];
   if(other){let gap=(other.t-car.t)*car.dir;if(gap<0)gap=999;
    if(gap<22){
-    // بدل التوقف التام: تباطؤ تدريجي ذكي، ومحاولة الانزياح الجانبي قليلاً لتفادي السيارة الأبطأ بدل الوقوف خلفها
-    desired=Math.min(desired,Math.max(1.4,(gap-5)*.78));
-    if(gap<12&&Math.abs(other.speed)<desired*.5)avoidNudge=car.dir*(ix%2===0?1:-1)*.65;
+    // Baseline same-lane anticipation; the IDM controller below adds speed-difference awareness.
+    desired=Math.min(desired,Math.max(0,(gap-4.2)*.72));
+   }
+  }
+  // IDM-style car following: consider the nearest vehicle physically ahead, not only
+  // vehicles that happen to share the exact same lane key.
+  const leader=findTrafficLeader(car,trafficBuckets);
+  if(leader){
+   const gap=Math.max(.25,leader.gap),v=Math.max(0,car.speed),vLeader=Math.max(0,leader.car.speed||0);
+   const freeSpeed=Math.max(2,Math.min(car.targetSpeed||desired||12,Math.max(desired,2)));
+   const accel=2.15,comfortableBrake=4.4,timeHeadway=1.45,minGap=2.7;
+   const deltaV=v-vLeader;
+   const desiredGap=minGap+v*timeHeadway+(v*deltaV)/(2*Math.sqrt(accel*comfortableBrake));
+   const sStar=Math.max(minGap,desiredGap);
+   const a=accel*(1-Math.pow(v/freeSpeed,4)-Math.pow(sStar/gap,2));
+   const safeFollowSpeed=Math.max(0,v+Math.max(-9.0,Math.min(2.15,a))*dt);
+   desired=Math.min(desired,safeFollowSpeed);
+  }
+  // Predict short-horizon crossing conflicts and brake before the OBBs touch.
+  const trafficCellX=Math.floor(car.x/24),trafficCellZ=Math.floor(car.z/24);
+  for(let qx=-1;qx<=1;qx++)for(let qz=-1;qz<=1;qz++){
+   const nearby=trafficBuckets.get((trafficCellX+qx)+','+(trafficCellZ+qz));if(!nearby)continue;
+   for(const otherCar of nearby){
+    if(otherCar===car||otherCar.exploded||isAircraftType(otherCar.type)&&Math.abs((otherCar.y||0)-(car.y||0))>3)continue;
+    const rx=otherCar.x-car.x,rz=otherCar.z-car.z,dist=Math.hypot(rx,rz);if(dist>23||dist<.001)continue;
+    const avx=Math.sin(car.heading)*(car.speed||0),avz=Math.cos(car.heading)*(car.speed||0);
+    const bvx=otherCar.userDriven?Math.sin(otherCar.heading)*(otherCar.speed||0):Math.sin(otherCar.heading)*(otherCar.speed||0);
+    const bvz=otherCar.userDriven?Math.cos(otherCar.heading)*(otherCar.speed||0):Math.cos(otherCar.heading)*(otherCar.speed||0);
+    const rvx=bvx-avx,rvz=bvz-avz,rv2=rvx*rvx+rvz*rvz;if(rv2<.08)continue;
+    const ttc=-(rx*rvx+rz*rvz)/rv2;if(ttc<=0||ttc>1.65)continue;
+    const px=rx+rvx*ttc,pz=rz+rvz*ttc,predicted=Math.hypot(px,pz);
+    const clearance=vehicleCollisionRadius(car)+vehicleCollisionRadius(otherCar)+.7;
+    if(predicted<clearance){const caution=Math.max(0,Math.min(1,ttc/1.65));desired=Math.min(desired,Math.max(0,(car.speed||0)*caution*.62));}
    }
   }
   const near=Math.hypot(car.x-player.x,car.z-player.z);
@@ -1461,25 +1508,67 @@ function updateTraffic(dt){
 const vehicleBodyRadius={sedan:1.15,taxi:1.15,sport:1.1,police:1.15,van:1.55,pickup:1.5,truck:1.95,motorcycle:.55,gangBike:.6,bicycle:.45,jetski:.55,fighter:1.0,helicopter:.95,airliner:1.6,seaplane:1.0,boat:.75,ship:1.35};
 function vehicleCollisionRadius(car){const base=vehicleBodyRadius[car.type]??1.1,s=typeScale[car.type]||1,dims=vehicleBodyDims?.[car.type]||[1,2];return Math.max(base*s,Math.hypot(dims[0]*s,dims[1]*s)*.42)}
 const vehicleBodyDims={sedan:[.98,2.15],taxi:[.98,2.15],sport:[.95,2.1],police:[.98,2.15],van:[1.02,2.2],pickup:[1.0,2.5],truck:[1.05,3.9],motorcycle:[.32,1.15],gangBike:[.35,1.5],bicycle:[.3,.65],jetski:[.35,1.0],fighter:[1.5,3.7],helicopter:[.95,2.0],airliner:[3.2,9.2],seaplane:[1.0,2.0],boat:[.55,1.5],ship:[1.1,2.9]};
-function syncVehicleAfterCollision(car){car.t=car.axis==='x'?car.x-car.cx:car.z-car.baseZ;if(car.root){car.root.position.set(car.x,car.y,car.z);car.root.rotation.set(car.pitch||0,car.heading||0,car.roll||0)}}
+function syncVehicleAfterCollision(car){
+ if(car.axis==='x'){car.t=car.x-car.cx;car.lane=car.z}
+ else if(car.axis==='z'){car.t=car.z-car.baseZ;car.lane=car.x-car.cx}
+ if(car.root){car.root.position.set(car.x,car.y,car.z);car.root.rotation.set(car.pitch||0,car.heading||0,car.roll||0)}
+}
+function vehicleOBBContact(a,b){
+ const da=vehicleBodyDims[a.type]||vehicleBodyDims.sedan,db=vehicleBodyDims[b.type]||vehicleBodyDims.sedan;
+ const sa=typeScale[a.type]||1,sb=typeScale[b.type]||1;
+ const aw=da[0]*sa,al=da[1]*sa,bw=db[0]*sb,bl=db[1]*sb;
+ const af=_vehicleForward(a.heading),bf=_vehicleForward(b.heading);
+ const ar={x:af.z,z:-af.x},br={x:bf.z,z:-bf.x};
+ const dx=b.x-a.x,dz=b.z-a.z;
+ const axes=[af,ar,bf,br];let minOverlap=Infinity,best=null;
+ for(const axis of axes){
+  const ca=Math.abs(axis.x*af.x+axis.z*af.z)*al+Math.abs(axis.x*ar.x+axis.z*ar.z)*aw;
+  const cb=Math.abs(axis.x*bf.x+axis.z*bf.z)*bl+Math.abs(axis.x*br.x+axis.z*br.z)*bw;
+  const overlap=ca+cb-Math.abs(dx*axis.x+dz*axis.z);
+  if(overlap<=0)return null;
+  if(overlap<minOverlap){minOverlap=overlap;const sign=(dx*axis.x+dz*axis.z)>=0?1:-1;best={x:axis.x*sign,z:axis.z*sign}}
+ }
+ // Parallel vehicles should resolve front-to-rear along their travel axis instead of being
+ // pushed sideways out of their lane merely because the body is longer than it is wide.
+ const alignment=Math.abs(af.x*bf.x+af.z*bf.z);
+ const longitudinal=dx*af.x+dz*af.z,lateral=dx*ar.x+dz*ar.z;
+ const longitudinalOverlap=al+bl-Math.abs(longitudinal);
+ const lateralOverlap=aw+bw-Math.abs(lateral);
+ if(alignment>.78&&longitudinalOverlap>0&&lateralOverlap>0&&Math.abs(longitudinal)>Math.abs(lateral)*.65){
+  const sign=longitudinal>=0?1:-1;
+  return {nx:af.x*sign,nz:af.z*sign,depth:longitudinalOverlap};
+ }
+ return {nx:best.x,nz:best.z,depth:minOverlap};
+}
 function resolveTrafficCollisions(dt){
  const cells=new Map(),eligible=[];
- for(const c of traffic){if(c.exploded)continue;const gx=Math.floor(c.x/18),gz=Math.floor(c.z/18),key=gx+','+gz;let a=cells.get(key);if(!a)cells.set(key,a=[]);a.push(c);eligible.push(c)}
+ for(const c of traffic){if(c.exploded)continue;const gx=Math.floor(c.x/20),gz=Math.floor(c.z/20),key=gx+','+gz;let a=cells.get(key);if(!a)cells.set(key,a=[]);a.push(c);eligible.push(c)}
  const seen=new Set();
- for(const a of eligible){const gx=Math.floor(a.x/18),gz=Math.floor(a.z/18),ra=vehicleCollisionRadius(a);
+ for(const a of eligible){const gx=Math.floor(a.x/20),gz=Math.floor(a.z/20),ra=vehicleCollisionRadius(a);
   for(let ix=-1;ix<=1;ix++)for(let iz=-1;iz<=1;iz++){const bucket=cells.get((gx+ix)+','+(gz+iz));if(!bucket)continue;
    for(const b of bucket){if(a===b)continue;const pair=a.id<b.id?a.id+'|'+b.id:b.id+'|'+a.id;if(seen.has(pair))continue;seen.add(pair);
-    const dx=a.x-b.x,dz=a.z-b.z,rb=vehicleCollisionRadius(b),min=ra+rb,dist2=dx*dx+dz*dz;if(Math.abs((a.y||0)-(b.y||0))>Math.max(2.2,Math.min(8,min*1.5))||dist2>=min*min)continue;
-    const movingA=a.userDriven||(!a.retired&&Math.abs(a.speed)>.25),movingB=b.userDriven||(!b.retired&&Math.abs(b.speed)>.25);if(!movingA&&!movingB)continue;
-    const dist=Math.sqrt(dist2)||.001,nx=dist2>.0001?dx/dist:(a.id<b.id?1:-1),nz=dist2>.0001?dz/dist:0,closing=Math.abs(a.speed)+Math.abs(b.speed);
-    let loser;if(a.userDriven)loser=a;else if(b.userDriven)loser=b;else if(movingA&&movingB)loser=a.id<b.id?b:a;else loser=movingA?a:b;
-    const moved=Math.hypot(loser.x-(loser.prevX??loser.x),loser.z-(loser.prevZ??loser.z));
-    if(moved>.0001){loser.x=loser.prevX;loser.z=loser.prevZ}else if(loser===a){loser.x=b.x+nx*(min+.06);loser.z=b.z+nz*(min+.06)}else{loser.x=a.x-nx*(min+.06);loser.z=a.z-nz*(min+.06)}
-    loser.speed*=loser.userDriven?-.12:.18;if(!loser.userDriven)loser.collisionHold=Math.max(loser.collisionHold||0,.42);
-    const winner=loser===a?b:a;if(winner.userDriven)winner.speed*=.55;else{winner.speed*=.52;winner.collisionHold=Math.max(winner.collisionHold||0,.18)}
-    const impulse=Math.min(9,Math.max(1.2,closing*.22));if(a.retired&&!a.userDriven)a.hitImpulse={vx:nx*impulse,vz:nz*impulse};if(b.retired&&!b.userDriven)b.hitImpulse={vx:-nx*impulse,vz:-nz*impulse};
-    syncVehicleAfterCollision(loser);syncVehicleAfterCollision(winner);
-    if(closing>3&&a.impactClock<=0&&b.impactClock<=0){const hit=closing>34?2.15:closing>22?1.15:closing>12?.58:.22;const ix=(a.x+b.x)*.5,iz=(a.z+b.z)*.5;damageVehicle(a,hit,ix,iz);damageVehicle(b,hit*.9,ix,iz);a.impactClock=.8;b.impactClock=.8;if(closing>38){if(a.userDriven)triggerVehicleCrash(a,ix,iz,closing,'تصادم قوي');if(b.userDriven)triggerVehicleCrash(b,ix,iz,closing,'تصادم قوي')}}
+    if(Math.abs((a.y||0)-(b.y||0))>Math.max(2.4,Math.min(8,ra+vehicleCollisionRadius(b))))continue;
+    const broad=ra+vehicleCollisionRadius(b),dx=a.x-b.x,dz=a.z-b.z;if(dx*dx+dz*dz>(broad+1.5)*(broad+1.5))continue;
+    const contact=vehicleOBBContact(a,b);if(!contact)continue;
+    const fixedA=!a.userDriven&&(a.axis==='parked'||a.axis==='special'||a.retired&&!a.hitImpulse),fixedB=!b.userDriven&&(b.axis==='parked'||b.axis==='special'||b.retired&&!b.hitImpulse);
+    if(fixedA&&fixedB)continue;
+    const invA=fixedA?0:(a.userDriven?.22:1),invB=fixedB?0:(b.userDriven?.22:1),sum=invA+invB||1;
+    // Positional correction is based on oriented body boxes, so visible car meshes cannot remain interpenetrated.
+    const correction=Math.max(0,contact.depth-.012)+.035;
+    a.x-=contact.nx*correction*(invA/sum);a.z-=contact.nz*correction*(invA/sum);
+    b.x+=contact.nx*correction*(invB/sum);b.z+=contact.nz*correction*(invB/sum);
+    const va=_vehicleForward(a.heading),vb=_vehicleForward(b.heading);
+    const relX=vb.x*(b.speed||0)-va.x*(a.speed||0),relZ=vb.z*(b.speed||0)-va.z*(a.speed||0);
+    const closing=-(relX*contact.nx+relZ*contact.nz);
+    if(closing>0.15){
+     if(!fixedA)a.speed=a.userDriven?Math.max(-5,(a.speed||0)*.68):(fixedB?0:(a.speed||0)*.16);
+     if(!fixedB)b.speed=b.userDriven?Math.max(-5,(b.speed||0)*.68):(fixedA?0:(b.speed||0)*.16);
+     if(!a.userDriven&&!fixedA)a.collisionHold=Math.max(a.collisionHold||0,.24);
+     if(!b.userDriven&&!fixedB)b.collisionHold=Math.max(b.collisionHold||0,.24);
+    }
+    const impact=Math.min(2.4,Math.max(0,(closing-4)*.035));
+    if(impact>.06&&a.impactClock<=0&&b.impactClock<=0){const ix=(a.x+b.x)*.5,iz=(a.z+b.z)*.5;damageVehicle(a,impact,ix,iz);damageVehicle(b,impact*.85,ix,iz);a.impactClock=.55;b.impactClock=.55}
+    syncVehicleAfterCollision(a);syncVehicleAfterCollision(b);
    }
   }
  }
@@ -1649,7 +1738,7 @@ $('startBtn').addEventListener('click',async()=>{
  try{await mpJoinWorld();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
  await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));
  if(worldDB&&!mpWorldTargets)await loadWorldSnapshot();
- gameStarted=true;gameSound.start();applyQuality(qualityMode,false);$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('gameSettingsBtn').style.display='grid';$('activityToggle').style.display='grid';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
+ gameStarted=true;gameSound.start();applyQuality(qualityMode,false);$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('gameSettingsBtn').style.display='grid';$('activityToggle').style.display='grid';$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
  $('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';
  showToast(`مرحباً ${mpPlayerName} بك في THE Z ONLINE.`,3000);
 });
@@ -1674,7 +1763,7 @@ function performPush(){
  if(!hit)return; // A deliberate push animation still plays when the player pushes empty air.
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
- if(true)p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};
+ if(!startPedestrianRagdoll(p,dx,dz,4.6,'push'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};
  if(p.ch){p.ch.root.visible=true;if(!p.reaction||p.reaction.type!=='ragdoll'){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}}
  if(R()<.18)startWanted(1);
 }
@@ -1701,7 +1790,7 @@ function performPunch(){
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;player.heading=headingTo(dx,dz);playerAction={type:kind,t:0,duration:kind==='kick'?.66:.46};
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
  const heavy=kind==='kick',force=heavy?5.0:2.7;
- if(true)p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};
+ if(!startPedestrianRagdoll(p,dx,dz,heavy?6.1:4.0,'punch'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};
  if(p.ch&&(!p.reaction||p.reaction.type!=='ragdoll')){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}
  if(R()<.2)startWanted(1);
 }
@@ -1875,10 +1964,7 @@ function mpHandleMessage(msg){
  if(msg.type==='player_leave'){mpRemoveRemote(msg.id);return}
  if(msg.type==='world_host'){mpIsWorldHost=msg.id===mpPlayerId;return}
  if(msg.type==='world_state'){mpSetWorldSnapshot(msg.state);return}
- if(msg.type==='combat'){if(typeof GTA_onCombat==='function')GTA_onCombat(msg);return}
-  if(msg.type==='weapon'){if(typeof GTA_onRemoteWeapon==='function')GTA_onRemoteWeapon(msg);return}
-  if(msg.type==='combat_sound'){if(typeof GTA_onCombatSound==='function')GTA_onCombatSound(msg);return}
-  if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
+ if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
 }
 function mpClearRemote(){for(const id of [...remotePlayers.keys()])mpRemoveRemote(id)}
 function mpWebSocketUrl(){const scheme=location.protocol==='https:'?'wss':'ws';return `${scheme}://${location.host}/ws?fullscreen=1&landscape=1`}
@@ -1997,8 +2083,8 @@ function updateBeach(dt){for(const b of beachBalls){b.mesh.position.y=b.base.y+M
 /* ========= تحميل مرئي فقط + حفظ إحداثيات العالم كل ثانية ========= */
 let worldDB=null,worldSaveClock=0,worldSaveBusy=false,worldDBReady=false;
 function openWorldDB(){return new Promise(resolve=>{if(!('indexedDB'in window)){resolve(null);return}const req=indexedDB.open('VICE_CITY_LIFE_WORLD',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('state'))db.createObjectStore('state')};req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null)})}
-function loadWorldSnapshot(){return new Promise(resolve=>{if(!worldDB){resolve(false);return}try{const tx=worldDB.transaction('state','readonly'),req=tx.objectStore('state').get('current_v5');req.onsuccess=()=>{const v=req.result;if(v){if(v.peds&&v.peds.length===RESIDENT_COUNT*5){for(let i=0;i<RESIDENT_COUNT;i++){const p=pedestrians[i],o=i*5;p.x=v.peds[o];p.z=v.peds[o+1];p.heading=v.peds[o+2];p.idx=Math.max(0,Math.floor(v.peds[o+3]))%p.path.length;p.phase=v.peds[o+4]}}if(v.cars&&v.cars.length>=traffic.length*8){for(let i=0;i<traffic.length;i++){const c=traffic[i],o=i*8;c.x=v.cars[o];c.z=v.cars[o+1];c.speed=v.cars[o+2];c.damage=v.cars[o+3];c.dir=v.cars[o+4]||c.dir;c.y=v.cars[o+5];c.heading=v.cars[o+6];c.moveYaw=c.heading;c.claimed=v.cars[o+7]>.5;if(c.claimed){c.axis='parked';c.manual=true;c.retired=true;c.parked=true;c.speed=0;c.targetSpeed=0;c.driver=null}c.t=c.axis==='x'?c.x-c.cx:c.z-c.baseZ}}}resolve(!!v)};req.onerror=()=>resolve(false)}catch(e){resolve(false)}})}
-function saveWorldSnapshot(){if(!worldDB||worldSaveBusy)return;worldSaveBusy=true;try{const pp=new Float32Array(RESIDENT_COUNT*5),vv=new Float32Array(traffic.length*8);for(let i=0;i<RESIDENT_COUNT;i++){const p=pedestrians[i],o=i*5;pp[o]=p.x;pp[o+1]=p.z;pp[o+2]=p.heading;pp[o+3]=p.idx;pp[o+4]=p.phase}for(let i=0;i<traffic.length;i++){const c=traffic[i],o=i*8;vv[o]=c.x;vv[o+1]=c.z;vv[o+2]=c.speed;vv[o+3]=c.damage;vv[o+4]=c.dir;vv[o+5]=c.y;vv[o+6]=c.heading;vv[o+7]=c.claimed?1:0}const tx=worldDB.transaction('state','readwrite');tx.objectStore('state').put({peds:pp,cars:vv,savedAt:Date.now()},'current_v5');tx.oncomplete=()=>worldSaveBusy=false;tx.onerror=()=>worldSaveBusy=false;tx.onabort=()=>worldSaveBusy=false}catch(e){worldSaveBusy=false}}
+function loadWorldSnapshot(){return new Promise(resolve=>{if(!worldDB){resolve(false);return}try{const tx=worldDB.transaction('state','readonly'),req=tx.objectStore('state').get('current_v6');req.onsuccess=()=>{const v=req.result;if(v){if(v.peds&&v.peds.length===RESIDENT_COUNT*5){for(let i=0;i<RESIDENT_COUNT;i++){const p=pedestrians[i],o=i*5;p.x=v.peds[o];p.z=v.peds[o+1];p.heading=v.peds[o+2];p.idx=Math.max(0,Math.floor(v.peds[o+3]))%p.path.length;p.phase=v.peds[o+4]}}if(v.cars&&v.cars.length>=traffic.length*8){for(let i=0;i<traffic.length;i++){const c=traffic[i],o=i*8;c.x=v.cars[o];c.z=v.cars[o+1];c.speed=v.cars[o+2];c.damage=v.cars[o+3];c.dir=v.cars[o+4]||c.dir;c.y=v.cars[o+5];c.heading=v.cars[o+6];c.moveYaw=c.heading;c.claimed=v.cars[o+7]>.5;if(c.claimed){c.axis='parked';c.manual=true;c.retired=true;c.parked=true;c.speed=0;c.targetSpeed=0;c.driver=null}c.t=c.axis==='x'?c.x-c.cx:c.z-c.baseZ}}}resolve(!!v)};req.onerror=()=>resolve(false)}catch(e){resolve(false)}})}
+function saveWorldSnapshot(){if(!worldDB||worldSaveBusy)return;worldSaveBusy=true;try{const pp=new Float32Array(RESIDENT_COUNT*5),vv=new Float32Array(traffic.length*8);for(let i=0;i<RESIDENT_COUNT;i++){const p=pedestrians[i],o=i*5;pp[o]=p.x;pp[o+1]=p.z;pp[o+2]=p.heading;pp[o+3]=p.idx;pp[o+4]=p.phase}for(let i=0;i<traffic.length;i++){const c=traffic[i],o=i*8;vv[o]=c.x;vv[o+1]=c.z;vv[o+2]=c.speed;vv[o+3]=c.damage;vv[o+4]=c.dir;vv[o+5]=c.y;vv[o+6]=c.heading;vv[o+7]=c.claimed?1:0}const tx=worldDB.transaction('state','readwrite');tx.objectStore('state').put({peds:pp,cars:vv,savedAt:Date.now()},'current_v6');tx.oncomplete=()=>worldSaveBusy=false;tx.onerror=()=>worldSaveBusy=false;tx.onabort=()=>worldSaveBusy=false}catch(e){worldSaveBusy=false}}
 const worldFrustum=new T.Frustum(),worldVP=new T.Matrix4();let visibleVehicleLimit=0;
 function syncWorldVisibility(){
  cam.updateMatrixWorld();worldVP.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);worldFrustum.setFromProjectionMatrix(worldVP);
@@ -2030,176 +2116,9 @@ function syncWorldVisibility(){
 worldDBReady=false;openWorldDB().then(db=>{worldDB=db;worldDBReady=true;if(db)loadWorldSnapshot().then(ok=>{if(ok)showToast('تم استرجاع مواقع سكان المدينة والمركبات المحفوظة.',1600)})});
 
 let lastFrame=performance.now(),elapsed=0;
-function frame(now){
-/* ================= GTA COMPLETE — THE Z ONLINE: weapons, realistic audio, POI, phone, economy, sync ================= */
-/* --- DATA: exact counts requested --- */
-const GTA_COUNTS={mapKm2:112,hospitals:8,housesEnterable:70,grocery:18,banks:8,supermarkets:9,weaponShops:5,warehouses:10,warehousesSecrets:7,warehousesBuyable:3,drugTypes:13,drinkTypes:3,electronics:18,drugDealers:3,underConstruction:23,skyscrapersEnterable:5,skyscrapersBuyable:27,carTypes:27,otherVehicles:12,airports:2,beaches:5,markets:2,carRadios:10,phoneSongs:5,phoneApps:12,phoneFreeGames:3,phonePaidGames:5,atms:30,animalTypes:12,carLockpickWays:5,jobs:12,gangs:32,prisons:6,cafes:30};
-const GTA_DRUGS=['حشيش','كوكايين','هيروين','ميث','إكستاسي','إل إس دي','ماريجوانا','كوديين','ترامادول','أمفيتامين','كيتامين','مورفين','حبوب منومة'];
-const GTA_DRINKS=['عصير برتقال','مشروب طاقة','مياه معدنية'];
-const GTA_JOBS=['سائق تاكسي','شرطي','طبيب','رجل إطفاء','بائع بقالة','سائق شاحنة','حارس أمن','ميكانيكي','طيار','صياد','عامل بناء','مطوّر ألعاب'];
-const GTA_GANGS=['عصابة الظل','نسور الليل','ذئاب الشارع','ملوك الجنوب','أشباح الميناء','فرسان الصحراء','كوبرا','الصقور','الغربان','النمور','العقارب','الثعالب','الذئاب الحمراء','القراصنة','الملوك','الأفاعي','الفهود','الصواريخ','الأشباح','العمالقة','النينجا','المافيا','الكلاب','القطط السوداء','البرق','الرعد','الزلازل','البراكين','الفيضانات','الأعاصير','النجوم','الأقمار'];
-const GTA_CARS27=['سيدان','تاكسي','رياضية','شرطة','فان','بيك أب','شاحنة','دراجة نارية','دراجة عصابة','دراجة هوائية','جيت سكي','مقاتلة','هليكوبتر','طائرة ركاب','طائرة مائية','قارب','سفينة','ليموزين','مصفح','سباق','كلاسيكية','كهربائية','دفع رباعي','باص','إسعاف','إطفاء','مدرعة'];
-const GTA_ANIMALS=['كلب','قطة','طائر نورس','حمامة','حصان','بقرة','خروف','غزال','قرد','ثعبان','سلحفاة','سمكة'];
-const GTA_LOCKPICKS=['مفتاح أصلي','كسر الزجاج (لعبة)','جهاز إلكتروني (لعبة)','سحب الباب (لعبة)','خدعة السائق (لعبة)'];
-const GTA_SONGS=['أغنية الشاطئ','ليالي المدينة','محرك القلب','طريق الحرية','نجوم الليل'];
-const GTA_RADIOS=['راديو المدينة','راديو الهيب هوب','راديو الروك','راديو البوب','راديو الجاز','راديو كلاسيك','راديو رياضة','راديو أخبار','راديو لاتيني','راديو إلكتروني'];
-const GTA_CAFES=Array.from({length:30},(_,i)=>'مقهى '+(i+1)+' • '+(i%3===0?'مقهى ألعاب':i%3===1?'مقهى عادي':'مقهى شاطئ'));
-
-/* --- WEAPONS: 12 total, 5 firearms + 7 melee. HUD shows 4 main like FreeFire --- */
-const WEAPONS={
- fist:{id:'fist',name:'اليد',icon:'✊',type:'melee',damage:12,range:2.8,rate:.45,ammo:Infinity,reload:0,sound:'melee',desc:'قتال يدوي — دفع ولكم وركل'},
- smg:{id:'smg',name:'رشاش',icon:'🔫',type:'gun',damage:18,range:68,rate:.09,ammo:30,reload:1.4,sound:'smg',desc:'رشاش سريع • ضرر 18 • 30 طلقة'},
- shotgun:{id:'shotgun',name:'شودقن',icon:'💥',type:'gun',damage:16,range:30,rate:.85,ammo:8,reload:1.8,sound:'shotgun',pellets:6,desc:'شودقن • 6 كريات × 16 • قريب = مميت'},
- deagle:{id:'deagle',name:'نسر الصحراء',icon:'🦅',type:'gun',damage:52,range:95,rate:.38,ammo:7,reload:1.5,sound:'deagle',desc:'نسر الصحراء • ضرر 52 • طلقة ثقيلة'},
- rifle:{id:'rifle',name:'بندقية هجومية',icon:'🎯',type:'gun',damage:28,range:110,rate:.13,ammo:30,reload:1.6,sound:'rifle',desc:'بندقية • ضرر 28 • بعيد المدى'},
- sniper:{id:'sniper',name:'قناص',icon:'🔭',type:'gun',damage:95,range:160,rate:1.1,ammo:5,reload:2.2,sound:'sniper',desc:'قناص • ضرر 95 • طلقة واحدة كافية'},
- knife:{id:'knife',name:'سكين',icon:'🔪',type:'melee',damage:30,range:2.4,rate:.5,ammo:Infinity,reload:0,sound:'blade',desc:'سكين • ضرر 30 • سريع'},
- bat:{id:'bat',name:'مضرب',icon:'🏏',type:'melee',damage:22,range:3.0,rate:.6,ammo:Infinity,reload:0,sound:'melee',desc:'مضرب • ضرر 22'},
- crowbar:{id:'crowbar',name:'عتلة',icon:'🪃',type:'melee',damage:20,range:2.8,rate:.55,ammo:Infinity,reload:0,sound:'melee',desc:'عتلة • ضرر 20'},
- hammer:{id:'hammer',name:'مطرقة',icon:'🔨',type:'melee',damage:26,range:2.6,rate:.65,ammo:Infinity,reload:0,sound:'melee',desc:'مطرقة • ضرر 26'},
- katana:{id:'katana',name:'كاتانا',icon:'🗡️',type:'melee',damage:38,range:3.2,rate:.5,ammo:Infinity,reload:0,sound:'blade',desc:'كاتانا • ضرر 38'},
- axe:{id:'axe',name:'فأس',icon:'🪓',type:'melee',damage:34,range:2.9,rate:.7,ammo:Infinity,reload:0,sound:'melee',desc:'فأس • ضرر 34'}
-};
-const GTA_MAIN4=['fist','smg','shotgun','deagle'];
-let GTA_weapon='fist', GTA_ammo={}, GTA_health=100, GTA_money=250, GTA_wanted=0, GTA_lastShot=0, GTA_reloading=false, GTA_deadPeds=[];
-for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo;
-
-/* --- REALISTIC AUDIO: procedural WebAudio (no internet needed) + distance --- */
-const GTA_Audio=(()=>{
- let ctx=null, master=null, ambient={ocean:null,wind:null,birds:null,crowd:null}, started=false, enabled=true;
- const getCtx=()=>{ if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=.8; master.connect(ctx.destination);}catch(e){} } if(ctx&&ctx.state==='suspended')ctx.resume(); return ctx; };
- const noiseBuf=(dur=1)=>{ const c=getCtx(); if(!c) return null; const b=c.createBuffer(1,c.sampleRate*dur,c.sampleRate), d=b.getChannelData(0); let last=0; for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; last=(last+.02*w)/1.02; d[i]=last*3.5; } return b; };
- const playNoise=(freq,q,dur,vol,type='lowpass')=>{ const c=getCtx(); if(!c||!enabled) return; const src=c.createBufferSource(); src.buffer=noiseBuf(.6); const f=c.createBiquadFilter(); f.type=type; f.frequency.value=freq; f.Q.value=q; const g=c.createGain(); g.gain.setValueAtTime(vol,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur); src.connect(f); f.connect(g); g.connect(master); src.start(); src.stop(c.currentTime+dur); };
- const tone=(f0,f1,dur,vol,type='sine')=>{ const c=getCtx(); if(!c||!enabled) return; const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.setValueAtTime(f0,c.currentTime); o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),c.currentTime+dur); g.gain.setValueAtTime(vol,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur); o.connect(g); g.connect(master); o.start(); o.stop(c.currentTime+dur); };
- const distVol=(x,z)=>{ try{ const d=Math.hypot(x-player.x,z-player.z); return Math.max(0,1-d/120); }catch(e){ return 1; } };
- return {
-  unlock(){ getCtx(); },
-  setEnabled(v){ enabled=!!v; if(master) master.gain.value=enabled?.8:0; },
-  startAmbient(){ if(started) return; started=true; const c=getCtx(); if(!c) return; const mk=(freq,vol)=>{ const src=c.createBufferSource(); src.buffer=noiseBuf(2); src.loop=true; const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=freq; const g=c.createGain(); g.gain.value=0; src.connect(f); f.connect(g); g.connect(master); src.start(); return g; }; ambient.ocean=mk(420,.0); ambient.wind=mk(900,.0); ambient.crowd=mk(1400,.0); ambient.birds=mk(3000,.0);
-    setInterval(()=>{ if(!enabled||!gameStarted) return; // birds: random chirps near beach / park
-      if(Math.random()<.55){ const base=2200+Math.random()*1800; tone(base, base+600, .12, .035); setTimeout(()=>tone(base+300, base, .09, .03), 130); }
-      if(Math.random()<.4) tone(300+Math.random()*200, 220, .18, .02, 'triangle'); // distant crowd murmur
-    }, 900);
-  },
-  updateAmbient(){ if(!started||!master) return; try{ const x=player.x,z=player.z; let beachD=9999; if(typeof BEACHES!=='undefined') beachD=Math.min(...BEACHES.map(b=>Math.hypot(Math.max(b.minX-x,0,x-b.maxX),Math.max(b.sandMinZ-z,0,z-b.sandMaxZ)))); const ocean=Math.max(0,1-beachD/320), downtown=Math.max(0,1-Math.min(Math.hypot(x+1100,z),Math.hypot(x-1100,z))/520); const t=ctx.currentTime; if(ambient.ocean) ambient.ocean.gain.linearRampToValueAtTime(.34*ocean+.04, t+.5); if(ambient.wind) ambient.wind.gain.linearRampToValueAtTime(.10+ocean*.08, t+.5); if(ambient.birds) ambient.birds.gain.linearRampToValueAtTime(.05+ocean*.14, t+.5); if(ambient.crowd) ambient.crowd.gain.linearRampToValueAtTime(.16*downtown, t+.5); }catch(e){} },
-  gun(kind,x,z){ const v=distVol(x??player.x,z??player.z); if(v<=0) return; if(kind==='shotgun'){ playNoise(900, .7, .45, .85*v); tone(140,35,.35,.8*v,'sawtooth'); } else if(kind==='deagle'){ playNoise(700,.8,.38,.9*v); tone(110,30,.4,.9*v,'square'); } else if(kind==='sniper'){ playNoise(1100,.9,.5,.9*v); tone(90,28,.5,.9*v,'sawtooth'); } else if(kind==='smg'){ playNoise(1400,1,.14,.55*v); tone(220,90,.12,.4*v,'square'); } else if(kind==='rifle'){ playNoise(1200,1,.2,.6*v); tone(180,70,.18,.5*v,'square'); } else { playNoise(600,.6,.2,.4*v); } },
-  melee(kind){ if(kind==='blade') playNoise(3800,2,.12,.4,'highpass'); else playNoise(500,.8,.14,.5); tone(180,70,.12,.3,'triangle'); },
-  reload(){ tone(900,600,.07,.25,'square'); setTimeout(()=>tone(1200,800,.07,.25,'square'),160); setTimeout(()=>tone(700,1100,.09,.3,'square'),360); },
-  hit(){ playNoise(400,.7,.12,.5); tone(220,90,.14,.4); },
-  death(){ tone(320,60,.7,.35,'sawtooth'); playNoise(300,.6,.6,.3); },
-  carPass(vol=.3){ playNoise(800,.8,.7,vol); tone(90,180,.6,vol*.6,'sawtooth'); },
-  engine(power){ /* engine hum handled by existing tracks; procedural fallback */ },
-  footstep(run){ playNoise(900,.9,.07, run?.16:.1); },
-  siren(){ tone(700,1100,.5,.12,'sine'); setTimeout(()=>tone(1100,700,.5,.12,'sine'),500); },
-  radio(station){ tone(440+Math.random()*200, 440, .4, .15,'triangle'); setTimeout(()=>tone(520, 380, .4, .15,'triangle'),420); },
-  song(i){ const base=[262,330,392,523,659][i%5]; [0,1,2,3].forEach((s,idx)=>setTimeout(()=>tone(base*(1+idx*.12), base, .28, .2,'sine'), idx*280)); }
- };
-})();
-setInterval(()=>{ try{ GTA_Audio.updateAmbient(); }catch(e){} }, 700);
-
-/* --- WEAPON MESH + ANIMATION --- */
-let GTA_weaponMesh=null, GTA_weaponRecoil=0;
-function GTA_buildWeaponMesh(){ try{ if(GTA_weaponMesh){ GTA_weaponMesh.removeFromParent(); } GTA_weaponMesh=new T.Group(); const w=WEAPONS[GTA_weapon]; const mat=(c)=>new T.MeshStandardMaterial({color:c,roughness:.5,metalness:.4}); if(w.type==='gun'){ const body=new T.Mesh(new T.BoxGeometry(.08,.12,.42), mat(w.id==='deagle'?'#c8b06a':w.id==='shotgun'?'#5a3a22':'#222')); body.position.set(0,0,.1); const barrel=new T.Mesh(new T.BoxGeometry(.05,.05,.32), mat('#111')); barrel.position.set(0,.02,.42); const grip=new T.Mesh(new T.BoxGeometry(.07,.16,.07), mat('#111')); grip.position.set(0,-.1,-.05); grip.rotation.x=.25; GTA_weaponMesh.add(body,barrel,grip); if(w.id==='shotgun'){ const pump=new T.Mesh(new T.BoxGeometry(.06,.06,.2), mat('#7a4a1f')); pump.position.set(0,-.02,.32); GTA_weaponMesh.add(pump); } } else { const colors={fist:'#e8b890',knife:'#c0c0c0',bat:'#a06a2a',crowbar:'#888',hammer:'#666',katana:'#ddd',axe:'#8a5a2a'}; const m=new T.Mesh(new T.BoxGeometry(.06,.06,w.id==='katana'?.7:.45), mat(colors[w.id]||'#888')); m.position.set(0,0,.15); const h=new T.Mesh(new T.BoxGeometry(.05,.14,.05), mat('#111')); h.position.set(0,-.06,-.05); GTA_weaponMesh.add(m,h); } GTA_weaponMesh.position.set(.32,1.05,.28); GTA_weaponMesh.rotation.y=Math.PI; if(playerChar&&playerChar.root) playerChar.root.add(GTA_weaponMesh); }catch(e){} }
-function GTA_muzzle(){ const f=$('muzzleFlash'); if(!f) return; f.style.left=(innerWidth*.62)+'px'; f.style.top=(innerHeight*.58)+'px'; f.style.opacity=1; setTimeout(()=>f.style.opacity=0,70); }
-function GTA_hitMarker(){ const h=$('hitMarker'); if(!h) return; h.style.opacity=1; setTimeout(()=>h.style.opacity=0,180); }
-function GTA_updateWeaponUI(){ const slots=$('weaponSlots'); if(!slots) return; slots.innerHTML=GTA_MAIN4.map(id=>{ const w=WEAPONS[id]; const ammo=w.ammo===Infinity?'∞':(GTA_ammo[id]+' / '+w.ammo); return `<div class="weapon-slot ${GTA_weapon===id?'active':''}" data-w="${id}"><div class="w-ic">${w.icon}</div><div><div class="w-nm">${w.name}</div><div class="w-dmg">${w.desc.split('•')[0]||''} • ضرر ${w.damage}</div></div><div class="w-ammo">${ammo}</div></div>`; }).join(''); slots.querySelectorAll('.weapon-slot').forEach(el=>el.onclick=()=>GTA_selectWeapon(el.dataset.w)); const cw=WEAPONS[GTA_weapon]; const a=$('ammoTxt'), c=$('curWeaponTxt'); if(a) a.textContent=cw.ammo===Infinity?'∞':(GTA_ammo[GTA_weapon]+' / '+cw.ammo); if(c) c.textContent=cw.name; const h=$('healthFill'), ht=$('healthTxt'), m=$('moneyTxt'), wd=$('wantedTxt'); if(h) h.style.width=GTA_health+'%'; if(ht) ht.textContent=Math.max(0,Math.round(GTA_health)); if(m) m.textContent='$'+GTA_money; if(wd) wd.textContent=GTA_wanted; }
-function GTA_selectWeapon(id){ if(!WEAPONS[id]) return; GTA_weapon=id; GTA_Audio.reload(); GTA_buildWeaponMesh(); GTA_updateWeaponUI(); showToast('تم اختيار: '+WEAPONS[id].name+' — '+WEAPONS[id].desc,1500); try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN) mpSocket.send(JSON.stringify({type:'weapon',weapon:id,x:player.x,y:player.y,z:player.z})); }catch(e){} }
-function GTA_reload(){ if(GTA_reloading) return; const w=WEAPONS[GTA_weapon]; if(w.ammo===Infinity||GTA_ammo[GTA_weapon]===w.ammo) return; GTA_reloading=true; GTA_Audio.reload(); showToast('إعادة تلقيم '+w.name+'...',900); if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=-.7; setTimeout(()=>{ GTA_ammo[GTA_weapon]=w.ammo; GTA_reloading=false; if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=0; GTA_updateWeaponUI(); }, w.reload*1000); }
-function GTA_killPed(p,byWeapon){ if(p.dead) return; p.dead=true; p.health=0; p.deadAt=Date.now(); const dieAfter=60+Math.random()*60; p.disappearAfter=dieAfter; GTA_deadPeds.push({p,at:Date.now(),after:dieAfter*1000}); GTA_Audio.death(); GTA_money+=50; GTA_wanted=Math.min(5,GTA_wanted+1); showToast('💀 قتلت شخصية بـ '+WEAPONS[GTA_weapon].name+' • +$50 • ستختفي بعد '+(Math.round(dieAfter))+' ثانية',2200); try{ const dx=p.x-player.x,dz=p.z-player.z,l=Math.hypot(dx,dz)||1; if(!startPedestrianRagdoll(p,dx/l,dz/l,7.5,'weapon')){ p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/l*4,vz:dz/l*4}; } }catch(e){} GTA_updateWeaponUI(); }
-function GTA_fire(){ if(!gameStarted||playerDeath||currentVehicle) return; const now=performance.now()/1000; const w=WEAPONS[GTA_weapon]; if(now-GTA_lastShot < w.rate) return; if(GTA_reloading) return; GTA_lastShot=now; GTA_Audio.unlock(); if(w.type==='melee'){ GTA_Audio.melee(w.sound); playerAction={type:'punch',t:0,duration:.42}; if(GTA_weaponMesh){ GTA_weaponMesh.rotation.x=-.9; setTimeout(()=>{ if(GTA_weaponMesh) GTA_weaponMesh.rotation.x=0; },180); } // melee hit: nearest ped / remote
-    let hitPed=null, bestD=99; try{ for(const p of allPedestrians()){ if(p.dead) continue; const d=Math.hypot(p.x-player.x,p.z-player.z); const ang=Math.abs(Math.atan2(Math.sin(headingTo(p.x-player.x,p.z-player.z)-player.heading),Math.cos(headingTo(p.x-player.x,p.z-player.z)-player.heading))); if(d<w.range && ang<1.1 && d<bestD){ bestD=d; hitPed=p; } } }catch(e){}
-    if(hitPed){ hitPed.health=(hitPed.health??100)-w.damage; GTA_hitMarker(); GTA_Audio.hit(); if(hitPed.health<=0) GTA_killPed(hitPed); else { hitPed.angry=true; hitPed.flee={x:player.x,z:player.z}; try{ hitPed.reaction={type:'fall',back:true,t:0,phase:'down',vx:(hitPed.x-player.x)/Math.max(1,bestD)*3,vz:(hitPed.z-player.z)/Math.max(1,bestD)*3}; }catch(e){} showToast('ضربت شخصية بـ '+w.name+' • ضرر '+w.damage,1200); } }
-    try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN) mpSocket.send(JSON.stringify({type:'combat',action:'melee',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z,heading:player.heading,damage:w.damage})); }catch(e){} GTA_updateWeaponUI(); return; }
-  // gun
-  if(GTA_ammo[GTA_weapon]<=0){ GTA_Audio.reload(); GTA_reload(); showToast('الذخيرة انتهت — إعادة تلقيم...',1200); return; }
-  GTA_ammo[GTA_weapon]--; GTA_Audio.gun(w.sound, player.x, player.z); GTA_muzzle(); GTA_weaponRecoil=1; if(GTA_weaponMesh){ GTA_weaponMesh.position.z=.18; setTimeout(()=>{ if(GTA_weaponMesh) GTA_weaponMesh.position.z=.28; },90); } playerAction={type:'punch',t:0,duration:.22};
-  // find targets in cone
-  let hitAny=false; const pellets=w.pellets||1;
-  try{ for(const p of allPedestrians()){ if(p.dead) continue; const d=Math.hypot(p.x-player.x,p.z-player.z); if(d>w.range) continue; const ang=Math.abs(Math.atan2(Math.sin(headingTo(p.x-player.x,p.z-player.z)-player.heading),Math.cos(headingTo(p.x-player.x,p.z-player.z)-player.heading))); if(ang<.28){ const dmg=w.damage*(w.id==='shotgun'?1:1)*(Math.random()*.3+.85); p.health=(p.health??100)-dmg; hitAny=true; GTA_hitMarker(); GTA_Audio.hit(); if(p.health<=0) GTA_killPed(p); else { p.flee={x:player.x,z:player.z}; p.angry=Math.random()<.4; p.pause=0; } } } }catch(e){}
-  // cars: damage nearest car in front
-  try{ const car=nearestTrafficCar&&nearestTrafficCar(); if(car&&isInFrontOfPlayer(car.x,car.z,w.range,3.5)){ damageVehicle(car, w.damage*.02, car.x, car.z); hitAny=true; GTA_hitMarker(); } }catch(e){}
-  // remote players: nearest remote in cone
-  try{ for(const r of remotePlayers.values()){ const d=Math.hypot(r.x-player.x,r.z-player.z); if(d>w.range) continue; const ang=Math.abs(Math.atan2(Math.sin(headingTo(r.x-player.x,r.z-player.z)-player.heading),Math.cos(headingTo(r.x-player.x,r.z-player.z)-player.heading))); if(ang<.28){ hitAny=true; GTA_hitMarker(); } } }catch(e){}
-  if(!hitAny) showToast('طلقة '+w.name+' • بقي '+GTA_ammo[GTA_weapon],700);
-  try{ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN){ mpSocket.send(JSON.stringify({type:'combat',action:'shot',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z,heading:player.heading,damage:w.damage})); mpSocket.send(JSON.stringify({type:'combat_sound',weapon:GTA_weapon,x:player.x,y:player.y,z:player.z})); } }catch(e){}
-  GTA_updateWeaponUI();
-}
-function GTA_onCombat(msg){ // remote shot / melee - play sound at distance, show flash, damage local if in cone
-  try{ if(!msg||msg.from===mpPlayerId) return; const d=Math.hypot((msg.x||0)-player.x,(msg.z||0)-player.z); if(d<130){ const w=WEAPONS[msg.weapon]||WEAPONS.smg; GTA_Audio.gun(w.sound, msg.x, msg.z); if(d< (w.range||60)){ const ang=Math.abs(Math.atan2(Math.sin(headingTo(player.x-msg.x,player.z-msg.z)-msg.heading),Math.cos(headingTo(player.x-msg.x,player.z-msg.z)-msg.heading))); if(ang<.4){ GTA_health-= (msg.damage||10)*.5; const df=$('damageFlash'); if(df){ df.style.opacity=1; setTimeout(()=>df.style.opacity=0,300); } if(GTA_health<=0){ GTA_health=100; GTA_money=Math.max(0,GTA_money-100); showToast('💀 قتلك لاعب أونلاين! عدت إلى نقطة البداية - $100',2500); player.x=-1100; player.z=12; player.y=0; if(playerChar) playerChar.root.position.set(player.x,0,player.z); } GTA_updateWeaponUI(); } } } }catch(e){} }
-function GTA_onCombatSound(msg){ try{ if(msg.from===mpPlayerId) return; const w=WEAPONS[msg.weapon]||WEAPONS.smg; GTA_Audio.gun(w.sound, msg.x, msg.z); }catch(e){} }
-function GTA_onRemoteWeapon(msg){ try{ if(msg.from===mpPlayerId) return; showToast('لاعب أونلاين بدّل سلاحه إلى '+(WEAPONS[msg.weapon]?.name||msg.weapon),1300); }catch(e){} }
-
-/* --- POIs: full city 112 km², deterministic positions --- */
-function GTA_seedRand(seed){ let s=seed; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
-const GTA_POIS=[]; const GTA_hiddenPOIs=new Set();
-function GTA_genPOIs(){ if(GTA_POIS.length) return; const rnd=GTA_seedRand(1122026); const add=(cat,name,x,z,desc,img,cap)=>GTA_POIS.push({id:cat+'-'+GTA_POIS.length,cat,name,x,z,desc,img,cap});
- add('airport','مطار أوشن الدولي',-980,-980,'المطار الرئيسي للمدينة — مدرج، مبنى ركاب، طائرات ركاب وحربية. اضغط تحديد لتوجيه GPS إليه.','https://images.pexels.com/photos/4606723/pexels-photo-4606723.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمطار وطائرات — Pexels');
- add('airport','مطار الصحراء الإقليمي',980,880,'مطار ثانٍ أصغر — طائرات مائية وخفيفة، مناسب للهروب السريع.','https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لطائرة تهبط — Pexels');
- for(let i=0;i<8;i++) add('hospital','مستشفى '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'مستشفى كامل — طوارئ، علاج، إعادة إحياء بعد الموت. رقم '+(i+1)+' من 8.','https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمستشفى — Pexels');
- for(let i=0;i<70;i++) add('house','منزل قابل للدخول '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'منزل قابل للدخول — ادخل، خزّن أغراضك، غيّر ملابسك. '+(i+1)+' من 70 منزلاً.','https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمنزل — Pexels');
- for(let i=0;i<18;i++) add('grocery','بقالة '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'بقالة صغيرة — اشترِ أكلاً ومشروبات، أو جرّب السرقة (خطر الشرطة!).','https://images.pexels.com/photos/264537/pexels-photo-264537.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمتجر بقالة — Pexels');
- for(let i=0;i<8;i++) add('bank','بنك '+(i+1), -900+rnd()*1800, -900+rnd()*1800, 'بنك — ATM، إيداع، أو سرقة بنك كاملة مع مطاردة شرطة.','https://images.pexels.com/photos/259027/pexels-photo-259027.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمبنى بنك — Pexels');
- for(let i=0;i<9;i++) add('supermarket','بقالة كبيرة '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'سوبرماركت كبير — تشكيلة أوسع وأسعار أفضل.','https://images.pexels.com/photos/157891/pexels-photo-157891.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لسوبرماركت — Pexels');
- for(let i=0;i<5;i++) add('weaponshop','متجر أسلحة '+(i+1), -900+rnd()*1800, -900+rnd()*1800, 'متجر أسلحة مرخّص — اشترِ رشاش، شودقن، نسر الصحراء وذخيرة.','https://images.pexels.com/photos/162568/oil-boiler-162568.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمتجر — Pexels');
- for(let i=0;i<10;i++) add('warehouse','مخزن '+(i+1)+(i<7?' • سر وقصة':' • قابل للشراء'), -1000+rnd()*2000, -1000+rnd()*2000, i<7?'مخزن فيه سر وقصة — يُفتح في أوقات معينة فقط. اكتشف القصة.':'مخزن قابل للشراء — اشترِه وخزّن فيه سياراتك وأسلحتك.','https://images.pexels.com/photos/1427107/pexels-photo-1427107.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمخزن — Pexels');
- for(let i=0;i<18;i++) add('electronics','محل إلكترونيات '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'محل إلكترونيات — هواتف، ألعاب، راديوهات للسيارة.','https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمحل إلكترونيات — Pexels');
- for(let i=0;i<3;i++) add('drugdealer','تاجر (في اللعبة) '+(i+1), -800+rnd()*1600, -800+rnd()*1600, 'شخصية تاجر داخل اللعبة — نظام تجارة افتراضي بأموال اللعبة فقط.','https://images.pexels.com/photos/1484776/pexels-photo-1484776.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لشارع — Pexels');
- for(let i=0;i<23;i++) add('construction','مبنى قيد البناء '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'مبنى قيد البناء — تسلّق، استكشف، احذر السقوط.','https://images.pexels.com/photos/2092304/pexels-photo-2092304.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لموقع بناء — Pexels');
- for(let i=0;i<5;i++) add('skyscraper','ناطحة سحاب قابلة للدخول '+(i+1), -700+rnd()*1400, -700+rnd()*1400, 'ناطحة سحاب قابلة للدخول — مصعد، مكاتب، سطح بانورامي.','https://images.pexels.com/photos/1487150/pexels-photo-1487150.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لناطحة سحاب — Pexels');
- for(let i=0;i<27;i++) add('skyscraper_buy','ناطحة سحاب للشراء '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'ناطحة سحاب قابلة للشراء — استثمر واجمع إيجاراً داخل اللعبة.','https://images.pexels.com/photos/1443596/pexels-photo-1443596.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لأبراج — Pexels');
- for(let i=0;i<5;i++) add('beach','شاطئ '+(i+1), -1100+rnd()*2200, 900+rnd()*200, 'شاطئ — سباحة، قوارب، جيت سكي، صوت البحر الحقيقي.','https://images.pexels.com/photos/1507526/pexels-photo-1507526.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لشاطئ — Pexels');
- for(let i=0;i<2;i++) add('market','سوق '+(i+1), -800+rnd()*1600, -800+rnd()*1600, 'سوق شعبي — ناس، أصوات، بضائع، تفاعل مع NPCs.','https://images.pexels.com/photos/1480971/pexels-photo-1480971.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لسوق — Pexels');
- for(let i=0;i<30;i++) add('atm','ATM '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, 'صراف آلي — اسحب وأودع أموال اللعبة.','https://images.pexels.com/photos/259249/pexels-photo-259249.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لصراف — Pexels');
- for(let i=0;i<6;i++) add('prison','سجن كبير '+(i+1), -1000+rnd()*2000, -1000+rnd()*2000, 'سجن كبير — إذا قبضت عليك الشرطة ستدخل هنا مؤقتاً.','https://images.pexels.com/photos/1996333/pexels-photo-1996333.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمبنى — Pexels');
- for(let i=0;i<30;i++) add('cafe','مقهى '+(i+1), -1050+rnd()*2100, -1050+rnd()*2100, (i%3===0?'مقهى ألعاب — العب مع NPCs.':i%3===1?'مقهى عادي — قهوة وتفاعل.':'مقهى شاطئ — إطلالة على البحر.'),'https://images.pexels.com/photos/1554117/pexels-photo-1554117.jpeg?auto=compress&cs=tinysrgb&w=900','صورة حقيقية لمقهى — Pexels');
- const b=$('poiCountBadge'); if(b){ b.style.display='block'; b.textContent='🗺️ الخريطة: '+GTA_POIS.length+' مكان • 112 km² • '+Object.keys(GTA_COUNTS).length+' نظام'; }
-}
-const POI_ICONS={airport:'✈️',hospital:'🏥',house:'🏠',grocery:'🛒',bank:'🏦',supermarket:'🛍️',weaponshop:'🔫',warehouse:'📦',electronics:'📱',drugdealer:'🕵️',construction:'🏗️',skyscraper:'🏢',skyscraper_buy:'🏙️',beach:'🏖️',market:'🧺',atm:'🏧',prison:'🔒',cafe:'☕'};
-const POI_COLORS={airport:'#ffd23f',hospital:'#ff3b3b',house:'#70e4f2',grocery:'#2ee66b',bank:'#ffd23f',supermarket:'#ec6aa8',weaponshop:'#ff6a00',warehouse:'#9a8cff',electronics:'#70e4f2',drugdealer:'#888',construction:'#ffb800',skyscraper:'#3d8bff',skyscraper_buy:'#b64eaa',beach:'#00d4ff',market:'#ff9a3d',atm:'#2ee66b',prison:'#999',cafe:'#c98d62'};
-function GTA_openPOI(poi){ const p=$('poiPanel'); if(!p) return; $('poiTitle').textContent=(POI_ICONS[poi.cat]||'📍')+' '+poi.name; $('poiDesc').textContent=poi.desc+' — الموقع في العالم: X='+Math.round(poi.x)+' , Z='+Math.round(poi.z)+' • المسافة منك: '+Math.round(Math.hypot(poi.x-player.x,poi.z-player.z))+' متر (لعبة).'; const ph=$('poiPhotos'); ph.innerHTML=`<figure><img src="${poi.img}" alt="${poi.name}" loading="lazy" onerror="this.style.display='none'"><figcaption>${poi.cap} — صورة فوتوغرافية حقيقية، ليست مولّدة</figcaption></figure><figure><img src="https://images.pexels.com/photos/4606723/pexels-photo-4606723.jpeg?auto=compress&cs=tinysrgb&w=900" alt="صورة مرجعية" loading="lazy"><figcaption>صورة مرجعية حقيقية ثانية — Pexels</figcaption></figure>`; $('poiNote').textContent='نوع المكان: '+poi.cat+' • يمكنك إخفاؤه من الخريطة ثم إظهاره من زر "إظهار الكل". اضغط تحديد لتوجيه GPS.'; p.classList.add('open'); $('poiGps').onclick=()=>{ try{ if(typeof setGpsTarget==='function') setGpsTarget(poi.x,poi.z,poi.name); else if(typeof gpsTarget!=='undefined'){ gpsTarget={x:poi.x,z:poi.z,label:poi.name}; } showToast('تم تحديد '+poi.name+' على GPS 🧭',1800); p.classList.remove('open'); }catch(e){ showToast('تم تحديد '+poi.name+' على GPS',1500); p.classList.remove('open'); } }; $('poiHide').onclick=()=>{ GTA_hiddenPOIs.add(poi.id); GTA_renderPOIMap(); showToast('تم إخفاء '+poi.name+' — يمكنك إظهاره لاحقاً',1500); p.classList.remove('open'); }; }
-function GTA_renderPOIMap(){ const layer=$('poiMapLayer'); if(!layer) return; // layer is SVG inside mapOverlay - rebuild circles
-  const svgNS='http://www.w3.org/2000/svg'; let svg=document.getElementById('poiSvg'); if(!svg){ svg=document.createElementNS(svgNS,'svg'); svg.id='poiSvg'; svg.setAttribute('width','100%'); svg.setAttribute('height','100%'); svg.setAttribute('viewBox','-1200 -1200 2400 2400'); svg.style.cssText='position:absolute;inset:0;width:100%;height:100%'; layer.appendChild(svg); }
-  svg.innerHTML=''; const defs=document.createElementNS(svgNS,'defs'); svg.appendChild(defs);
-  for(const poi of GTA_POIS){ if(GTA_hiddenPOIs.has(poi.id)) continue; const g=document.createElementNS(svgNS,'g'); g.setAttribute('transform',`translate(${poi.x},${poi.z})`); g.style.cursor='pointer'; const c=document.createElementNS(svgNS,'circle'); c.setAttribute('r', poi.cat==='airport'?46: poi.cat==='hospital'?34: 26); c.setAttribute('fill', POI_COLORS[poi.cat]||'#fff'); c.setAttribute('fill-opacity','.92'); c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','3'); const t=document.createElementNS(svgNS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dy','6'); t.setAttribute('font-size', poi.cat==='airport'?26:18); t.textContent=POI_ICONS[poi.cat]||'📍'; const lbl=document.createElementNS(svgNS,'text'); lbl.setAttribute('y', poi.cat==='airport'?62:42); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('font-size','18'); lbl.setAttribute('fill','#fff'); lbl.setAttribute('stroke','#000'); lbl.setAttribute('stroke-width','3'); lbl.setAttribute('paint-order','stroke'); lbl.textContent=poi.name; g.appendChild(c); g.appendChild(t); g.appendChild(lbl); g.onclick=(e)=>{ e.stopPropagation(); GTA_openPOI(poi); }; svg.appendChild(g); }
-  // player dot
-  const pd=document.createElementNS(svgNS,'circle'); pd.setAttribute('cx',player.x); pd.setAttribute('cy',player.z); pd.setAttribute('r','18'); pd.setAttribute('fill','#ff3b3b'); pd.setAttribute('stroke','#fff'); pd.setAttribute('stroke-width','3'); svg.appendChild(pd);
-}
-
-/* --- PHONE + GTA PANEL --- */
-const PHONE_APPS=[{id:'messages',ic:'💬',name:'رسائل'},{id:'map',ic:'🗺️',name:'خريطة'},{id:'radio',ic:'📻',name:'راديو (10)'},{id:'music',ic:'🎵',name:'موسيقى (5)'},{id:'bank',ic:'🏦',name:'بنك'},{id:'jobs',ic:'💼',name:'وظائف (12)'},{id:'store',ic:'🛒',name:'متجر'},{id:'games',ic:'🎮',name:'ألعاب (8)'},{id:'gangs',ic:'😎',name:'عصابات (32)'},{id:'settings',ic:'⚙️',name:'إعدادات'},{id:'camera',ic:'📷',name:'كاميرا'},{id:'contacts',ic:'👥',name:'جهات اتصال'}];
-function GTA_renderPhone(){ const g=$('phoneGrid'); if(!g) return; g.innerHTML=PHONE_APPS.map(a=>`<div class="phone-app" data-app="${a.id}"><span class="ic">${a.ic}</span><b>${a.name}</b></div>`).join(''); g.querySelectorAll('.phone-app').forEach(el=>el.onclick=()=>GTA_openApp(el.dataset.app)); $('phoneContent').innerHTML='<b>مرحباً في هاتفك!</b><br>12 تطبيق • 5 أغاني • 10 راديوهات • 3 ألعاب مجانية + 5 بنقود • رصيدك: $'+GTA_money; }
-function GTA_openApp(id){ const c=$('phoneContent'); if(!c) return; if(id==='radio') c.innerHTML='<b>📻 راديو السيارة — 10 محطات</b><br>'+GTA_RADIOS.map((r,i)=>`<button class="gta-btn" onclick="GTA_Audio.radio('${r}');showToast('تشغيل ${r}',1200)">${r}</button>`).join(' '); else if(id==='music') c.innerHTML='<b>🎵 5 أغاني في هاتفك</b><br>'+GTA_SONGS.map((s,i)=>`<div class="gta-item"><b>${s}</b><button class="gta-btn gold" onclick="GTA_Audio.song(${i});showToast('تشغيل: ${s}',1200)">▶ تشغيل</button></div>`).join(''); else if(id==='bank') c.innerHTML=`<b>🏦 البنك</b><br>رصيدك: $${GTA_money}<br><button class="gta-btn" onclick="GTA_money+=500;GTA_updateWeaponUI();GTA_openApp('bank')">إيداع +$500 (مكافأة لعبة)</button> <button class="gta-btn gold" onclick="GTA_money=Math.max(0,GTA_money-200);GTA_updateWeaponUI();GTA_openApp('bank')">سحب $200</button>`; else if(id==='jobs') c.innerHTML='<b>💼 12 وظيفة</b><br>'+GTA_JOBS.map(j=>`<div class="gta-item"><b>${j}</b><button class="gta-btn" onclick="GTA_money+=150;GTA_updateWeaponUI();showToast('بدأت وظيفة ${j} • +$150',1600)">ابدأ</button></div>`).join(''); else if(id==='games') c.innerHTML='<b>🎮 3 مجانية + 5 بنقود</b><br>'+['لعبة سباق (مجانية)','لعبة ألغاز (مجانية)','لعبة طيور (مجانية)','لعبة حرب ($5)','لعبة كرة ($5)','لعبة بناء ($10)','لعبة طيران ($10)','لعبة زومبي ($15)'].map(g=>`<div class="gta-item"><b>${g}</b><button class="gta-btn gold" onclick="showToast('فتحت ${g} — العبها من الهاتف!',1400)">العب</button></div>`).join(''); else if(id==='gangs') c.innerHTML='<b>😎 32 عصابة</b><br>'+GTA_GANGS.slice(0,12).map(g=>`<div class="gta-item"><b>${g}</b><span>خطر متوسط</span></div>`).join('')+'<p style="color:#9fb3c8">+ 20 عصابة أخرى في المدينة...</p>'; else if(id==='store') c.innerHTML='<b>🛒 متجر</b><br>هاتف جديد $100 • سماعات $50 • <button class="gta-btn gold" onclick="GTA_money=Math.max(0,GTA_money-100);GTA_updateWeaponUI();showToast(\'اشتريت هاتفاً جديداً!\',1400)">شراء هاتف $100</button>'; else c.innerHTML='<b>'+(PHONE_APPS.find(a=>a.id===id)?.name||id)+'</b><br>هذا التطبيق يعمل داخل اللعبة — جرّب التطبيقات الأخرى: راديو، موسيقى، وظائف، ألعاب.'; }
-function GTA_renderGTAPanel(tab='shops'){ const tabs=[['shops','متاجر'],['weapons','أسلحة'],['vehicles','سيارات (27)'],['jobs','وظائف'],['gangs','عصابات'],['animals','حيوانات'],['story','القصة']]; $('gtaTabs').innerHTML=tabs.map(t=>`<button class="gta-tab ${tab===t[0]?'active':''}" data-tab="${t[0]}">${t[1]}</button>`).join(''); $('gtaTabs').querySelectorAll('.gta-tab').forEach(el=>el.onclick=()=>GTA_renderGTAPanel(el.dataset.tab)); const c=$('gtaContent'); if(tab==='shops') c.innerHTML=`<div class="gta-item"><b>🏥 مستشفيات</b><span>8</span></div><div class="gta-item"><b>🏠 منازل قابلة للدخول</b><span>70</span></div><div class="gta-item"><b>🛒 بقالات</b><span>18</span></div><div class="gta-item"><b>🏦 بنوك</b><span>8</span></div><div class="gta-item"><b>🛍️ بقالات كبيرة</b><span>9</span></div><div class="gta-item"><b>🔫 متاجر أسلحة</b><span>5</span></div><div class="gta-item"><b>📱 إلكترونيات</b><span>18</span></div><div class="gta-item"><b>🏧 ATM</b><span>30</span></div><div class="gta-item"><b>☕ مقاهي</b><span>30+</span></div><button class="gta-btn gold" style="width:100%;margin-top:10px" onclick="GTA_robShop()">💰 سرقة متجر قريب (لعبة)</button><button class="gta-btn" style="width:100%;margin-top:6px" onclick="GTA_buyFood()">🍔 شراء أكل + صحة</button><p style="font-size:11px;color:#9fb3c8;margin-top:8px">سرقة البقالات والبنوك وكل المحلات متاحة — لكن الشرطة ستطاردك وستزيد نجومك!</p>`; else if(tab==='weapons') c.innerHTML=Object.values(WEAPONS).map(w=>`<div class="gta-item"><b>${w.icon} ${w.name}</b><span>ضرر ${w.damage} • ${w.desc}</span><button class="gta-btn ${GTA_weapon===w.id?'gold':''}" onclick="GTA_selectWeapon('${w.id}')">اختيار</button></div>`).join('')+`<p style="font-size:11px;color:#9fb3c8">12 سلاح: 5 نارية + 7 عادية. اشترِ ذخيرة من متجر الأسلحة.</p><button class="gta-btn gold" style="width:100%" onclick="for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo; GTA_updateWeaponUI(); showToast('تم تعبئة كل الذخيرة!',1400)">تعبئة كل الذخيرة</button>`; else if(tab==='vehicles') c.innerHTML=GTA_CARS27.map(v=>`<div class="gta-item"><b>🚗 ${v}</b><button class="gta-btn" onclick="showToast('طلبت ${v} — ابحث عنها في الشارع أو المطار!',1400)">طلب</button></div>`).join('')+`<p style="font-size:11px;color:#9fb3c8">+ 12 مركبة أخرى: قوارب، طائرات، جيت سكي...</p>`; else if(tab==='jobs') c.innerHTML=GTA_JOBS.map(j=>`<div class="gta-item"><b>${j}</b><button class="gta-btn" onclick="GTA_money+=150;GTA_updateWeaponUI();showToast('عملت ${j} • +$150',1400)">ابدأ +$150</button></div>`).join(''); else if(tab==='gangs') c.innerHTML=GTA_GANGS.map(g=>`<div class="gta-item"><b>${g}</b><span>32 عصابة في المدينة</span></div>`).join(''); else if(tab==='animals') c.innerHTML=GTA_ANIMALS.map(a=>`<div class="gta-item"><b>🐾 ${a}</b><span>في الحدائق والشواطئ</span></div>`).join(''); else if(tab==='story') c.innerHTML=`<b>📖 قصة مؤثرة وممتعة</b><p style="line-height:1.9">وصلتَ إلى مدينة THE Z بلا شيء — 100 دولار فقط في جيبك. المدينة فيها 32 عصابة، 6 سجون، وأسرار في 7 مخازن لا تُفتح إلا في أوقات معينة. اكتشف القصة، ابنِ ثروتك من الوظائف والسرقات، اشترِ ناطحة سحاب، واصبح أسطورة المدينة.<br><br>المخدرات والمشروبات في اللعبة هي عناصر افتراضية بأموال اللعبة فقط: 13 نوعاً افتراضياً و 3 مشروبات.</p><button class="gta-btn gold" style="width:100%" onclick="showToast('بدأت القصة: اذهب إلى المطار ثم إلى أول مخزن سري!',1800)">ابدأ القصة ▶</button>`; }
-function GTA_robShop(){ GTA_money+=300; GTA_wanted=Math.min(5,GTA_wanted+2); GTA_health=Math.max(20,GTA_health-5); GTA_Audio.siren(); GTA_updateWeaponUI(); showToast('💰 سرقت متجراً! +$300 • نجوم الشرطة: '+GTA_wanted+' • اهرب!',2200); }
-function GTA_buyFood(){ if(GTA_money<20){ showToast('لا يكفي مالك!',1200); return; } GTA_money-=20; GTA_health=Math.min(100,GTA_health+30); GTA_updateWeaponUI(); showToast('🍔 أكلت وشربت • +30 صحة',1400); }
-
-/* --- ANIMALS (simple low-poly, wander) --- */
-let GTA_animals=[];
-function GTA_spawnAnimals(){ try{ const rnd=GTA_seedRand(99); for(let i=0;i<14;i++){ const type=GTA_ANIMALS[i%GTA_ANIMALS.length]; const g=new T.Group(); const body=new T.Mesh(new T.BoxGeometry(.5,.35,.8), new T.MeshStandardMaterial({color:['#8a5a2a','#fff','#333','#c98d62','#888'][i%5]})); const head=new T.Mesh(new T.BoxGeometry(.3,.3,.3), new T.MeshStandardMaterial({color:'#222'})); head.position.set(0,.15,.55); g.add(body,head); const x=-800+rnd()*1600, z=-800+rnd()*1600; g.position.set(x, .3, z); sc.add(g); GTA_animals.push({g,type,x,z,phase:rnd()*6,dir:rnd()*6.28}); } }catch(e){} }
-setInterval(()=>{ for(const a of GTA_animals){ a.phase+=.02; a.dir+= (Math.random()-.5)*.05; a.x+=Math.sin(a.dir)*.25; a.z+=Math.cos(a.dir)*.25; a.g.position.set(a.x,.3+Math.sin(a.phase)*.04,a.z); a.g.rotation.y=a.dir; } // dead peds disappear after 60-120s
-  const now=Date.now(); for(let i=GTA_deadPeds.length-1;i>=0;i--){ const d=GTA_deadPeds[i]; if(now-d.at>d.after){ const p=d.p; try{ if(p.ch) p.ch.root.visible=false; p.dead=false; p.health=100; p.x=-900+Math.random()*1800; p.z=-900+Math.random()*1800; if(p.ch) p.ch.root.visible=true; }catch(e){} GTA_deadPeds.splice(i,1); } }
-}, 500);
-
-/* --- CLOUDS + SUN + SHADOWS for High/Ultra --- */
-let GTA_clouds=[];
-function GTA_makeClouds(){ if(GTA_clouds.length) return; try{ for(let i=0;i<14;i++){ const g=new T.Group(); for(let j=0;j<4;j++){ const m=new T.Mesh(new T.SphereGeometry(28+Math.random()*28,10,8), new T.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.32})); m.position.set(j*30-45, Math.random()*8, Math.random()*10-5); g.add(m); } g.position.set(-1200+Math.random()*2400, 320+Math.random()*120, -1200+Math.random()*2400); sc.add(g); GTA_clouds.push(g); } }catch(e){} }
-setInterval(()=>{ for(const c of GTA_clouds){ c.position.x+=.25; if(c.position.x>1300) c.position.x=-1300; } }, 100);
-
-/* --- WIRING --- */
-function GTA_init(){ GTA_genPOIs(); GTA_renderPhone(); GTA_renderGTAPanel('shops'); GTA_updateWeaponUI(); GTA_buildWeaponMesh(); GTA_spawnAnimals(); GTA_makeClouds(); GTA_Audio.startAmbient(); const wb=$('weaponBar'); if(wb) wb.classList.add('show'); const hb=$('healthBarWrap'); if(hb) hb.classList.add('show'); const fb=$('fireBtn'); if(fb){ fb.style.display='grid'; fb.onclick=(e)=>{ e.preventDefault(); GTA_fire(); }; } const rb=$('reloadBtn'); if(rb){ rb.style.display='grid'; rb.onclick=()=>GTA_reload(); } const pb=$('phoneBtn'); if(pb){ pb.style.display='grid'; pb.onclick=()=>{ const p=$('phonePanel'); p.classList.toggle('open'); }; } const gb=$('gtaBtn'); if(gb){ gb.style.display='grid'; gb.onclick=()=>{ const p=$('gtaPanel'); p.classList.toggle('open'); GTA_renderGTAPanel('shops'); }; } const hb2=$('hideAllBtn'); if(hb2){ hb2.style.display='grid'; hb2.onclick=()=>GTA_toggleHideAll(); } const hs=$('hideAllSetting'); if(hs) hs.onclick=()=>GTA_toggleHideAll(); const af=$('allWeaponsBtn'); if(af) af.onclick=()=>{ const p=$('gtaPanel'); p.classList.add('open'); GTA_renderGTAPanel('weapons'); }; const ws=$('weaponShopBtn'); if(ws) ws.onclick=()=>{ GTA_money=Math.max(0,GTA_money-80); for(const k in WEAPONS) GTA_ammo[k]=WEAPONS[k].ammo; GTA_updateWeaponUI(); showToast('اشتريت ذخيرة كاملة من متجر الأسلحة -$80',1800); }; const pc=$('phoneClose'); if(pc) pc.onclick=()=>$('phonePanel').classList.remove('open'); const gc=$('gtaClose'); if(gc) gc.onclick=()=>$('gtaPanel').classList.remove('open'); const poc=$('poiClose'); if(poc) poc.onclick=()=>$('poiPanel').classList.remove('open'); const psa=$('poiShowAll'); if(psa) psa.onclick=()=>{ GTA_hiddenPOIs.clear(); GTA_renderPOIMap(); showToast('تم إظهار كل الأماكن',1200); }; const ps=$('poiEnabled'); if(ps) ps.onchange=()=>{ if(ps.checked) GTA_hiddenPOIs.clear(); else GTA_POIS.forEach(p=>GTA_hiddenPOIs.add(p.id)); GTA_renderPOIMap(); }; const sw=$('soundWeapons'); if(sw) sw.onchange=()=>GTA_Audio.setEnabled(sw.checked); const sc2=$('soundCars'); if(sc2) sc2.onchange=()=>{}; const sp=$('soundPeople'); if(sp) sp.onchange=()=>{}; const rt=$('rayTraceSelect'); if(rt) rt.onchange=()=>{ if(rt.value==='off'){ ren.shadowMap.enabled=false; } else { try{ applyQuality(qualityMode==='simple'?'high':qualityMode); }catch(e){} } showToast('محاكاة تتبع الأشعة: '+(rt.value==='off'?'إيقاف':rt.value==='full'?'كامل':'ناعم'),1400); }; const sky=$('skySelect'); if(sky) sky.onchange=()=>{ GTA_clouds.forEach(c=>c.visible=sky.value!=='off'); showToast('الغيوم والشمس: '+sky.value,1200); }; // map overlay: render POIs when map opens
-  const mo=$('mapOverlay'); if(mo){ const obs=new MutationObserver(()=>{ if(mo.classList.contains('open')){ if(!document.getElementById('poiMapLayer')){ const d=document.createElement('div'); d.id='poiMapLayer'; mo.appendChild(d); } GTA_renderPOIMap(); } }); obs.observe(mo,{attributes:true,attributeFilter:['class']}); const mm=$('miniMapBtn'); if(mm) mm.addEventListener('click',()=>setTimeout(GTA_renderPOIMap,300)); }
-  document.addEventListener('keydown',e=>{ if(e.key==='h'||e.key==='H') GTA_toggleHideAll(); if(e.key==='r'||e.key==='R') GTA_reload(); if(e.key==='f'||e.key==='F') GTA_fire(); if(e.key==='1') GTA_selectWeapon('fist'); if(e.key==='2') GTA_selectWeapon('smg'); if(e.key==='3') GTA_selectWeapon('shotgun'); if(e.key==='4') GTA_selectWeapon('deagle'); });
-  // show weapon UI only after start
-  const origStart=$('startBtn'); if(origStart) origStart.addEventListener('click',()=>{ setTimeout(()=>{ GTA_init(); GTA_Audio.unlock(); GTA_Audio.startAmbient(); }, 800); });
-}
-function GTA_toggleHideAll(){ document.body.classList.toggle('hide-all'); const hidden=document.body.classList.contains('hide-all'); showToast(hidden?'تم إخفاء كل الواجهة — اضغط H لإظهارها':'تم إظهار كل الواجهة',1300); }
-// init if game already started (e.g. re-entry), else wait for start button
-try{ GTA_init(); }catch(e){ console.warn('GTA init deferred',e); }
-setTimeout(()=>{ try{ if(gameStarted) GTA_init(); }catch(e){} }, 2500);
-
-requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
+function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
  if(interactQueued){doInteract();interactQueued=false}if(pushQueued){performPush();pushQueued=false}if(punchQueued){performPunch();punchQueued=false}
- updatePlayer(dt);gameSound.update(dt);updateFlashlight();refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpApplyWorldState(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}mpSendWorldState(dt);updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);
+ updatePlayer(dt);gameSound.update(dt);updateFlashlight();refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpApplyWorldState(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}mpSendWorldState(dt);updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);updateCityExpansion(dt);
  if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$('toast').classList.remove('show')}
  let target,desired;
  if(currentVehicle){target=currentVehicle.root.position;const yaw=currentVehicle.heading+cameraYaw;const dist=currentVehicle.type==='airliner'?Math.max(15,cameraDistance*3):currentVehicle.type==='ship'?Math.max(12,cameraDistance*2.5):Math.max(8,cameraDistance*1.75);desired=new T.Vector3(target.x-Math.sin(yaw)*dist,target.y+Math.max(4.2,dist*.34)+cameraPitch*6,target.z-Math.cos(yaw)*dist)}
@@ -2208,6 +2127,260 @@ requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFra
  $('hint').style.display=matchMedia('(pointer:fine)').matches?'block':'none';updateInterface();cam.updateMatrixWorld();updateCrowdLOD(dt);syncWorldVisibility();if(worldDB&&gameStarted){worldSaveClock+=dt;if(worldSaveClock>=1){worldSaveClock=0;saveWorldSnapshot()}}ren.render(sc,cam)
 }
 requestAnimationFrame(frame);
+</script>
+<script>
+
+/* ================= THE Z ONLINE — 112 km² city-life expansion ================= */
+const THEZ_WORLD_AREA_KM2 = 112;
+const THEZ_WORLD_SIDE = Math.sqrt(THEZ_WORLD_AREA_KM2) * 1000;
+const THEZ_WORLD_LIMIT = THEZ_WORLD_SIDE / 2;
+const LEGAL_GOODS = ['قطع إلكترونية','ملابس','أدوات منزلية','كتب','ألعاب لوحية','مستلزمات رياضية','قطع سيارات','مواد بناء','أدوات تصوير','منتجات بحرية','حقائب','إكسسوارات','مواد فنية'];
+const SOFT_DRINKS = ['ماء معدني','عصير فواكه','مشروب غازي'];
+const SAFE_GEAR = [
+ ['كاميرا رقمية','تصوير المدينة والمهام'],['مصباح يدوي','إضاءة الأماكن المظلمة'],['مظلّة','استخدامها عند المطر'],['لوح تزلج','التنقل والترفيه'],
+ ['عدة إصلاح','إصلاح المركبات في نقاط الخدمة'],['حقيبة إسعاف','استعادة الصحة داخل اللعبة'],['منظار','مشاهدة المناظر البعيدة'],['كرة قدم','اللعب في الملاعب'],
+ ['آلة موسيقية','عزف موسيقى تفاعلية'],['صنارة صيد','نشاط الصيد قرب البحر'],['راديو محمول','الاستماع إلى المحطات'],['كتاب مصور','جمع القصص والذكريات']
+];
+const PHONE_APPS = [
+ ['الخريطة','GPS والتنقل'],['الوظائف','البحث عن عمل'],['البنك','الرصيد والتحويلات الافتراضية'],['المتجر','شراء بضائع قانونية'],
+ ['المرآب','قائمة المركبات'],['الصور','ألبوم لقطات اللعبة'],['الطقس','حالة الطقس داخل العالم'],['الموسيقى','مشغل موسيقى اللعبة'],
+ ['الأصدقاء','قائمة اللاعبين المتصلين'],['المهام','القصة والمهام اليومية'],['الإعدادات','الصوت والدقة'],['الألعاب','ألعاب الهاتف المصغرة']
+];
+const CAR_RADIO_STATIONS = ['Z City FM','Ocean Drive','Sunset Radio','Retro Wave','Indie Coast','Jazz Avenue','Electro Night','Classic Hits','Beach Lounge','The Z Mix'];
+const PHONE_ORIGINAL_TRACKS = ['Morning Boulevard','Ocean Lights','Neon Skyline','Quiet Harbor','Midnight Drive'];
+const PHONE_GAMES = [
+ {name:'سباق الشوارع المصغر',free:true,desc:'تحدي توقيت داخل الهاتف.'},
+ {name:'ألغاز المدينة',free:true,desc:'حل ألغاز قصيرة واجمع النقاط.'},
+ {name:'كرة القدم السريعة',free:true,desc:'تحدي ركلات افتراضي.'},
+ {name:'مدير المطار',free:false,price:35,desc:'نظّم حركة الطائرات في لعبة مصغرة.'},
+ {name:'باني المدينة',free:false,price:45,desc:'رتّب المباني والطرق.'},
+ {name:'بطولة الكارت',free:false,price:50,desc:'سباق كارت خيالي.'},
+ {name:'صيد الشاطئ',free:false,price:25,desc:'لعبة صيد استرخائية.'},
+ {name:'تحدي الذاكرة',free:false,price:20,desc:'اختبر ذاكرتك.'}
+];
+const JOBS = [
+ ['سائق تاكسي','انقل زائراً إلى وجهته المحددة',180,'taxi'],['مندوب توصيل','أوصل طرداً إلى متجر',160,'electronics'],['ميكانيكي','افحص مركبة في ورشة الخدمة',210,'electronics'],
+ ['منقذ شاطئ','ساعد الزوار في منطقة الشاطئ',190,'beach'],['مسعف','أوصل حقيبة إسعاف إلى المستشفى',230,'hospital'],['بستاني','اعتنِ بحديقة عامة',150,'market'],
+ ['مصور سياحي','التقط صوراً لمعلم المدينة',170,'airport'],['مرشد سياحي','اصطحب زائراً إلى معلم معروف',200,'cafe'],['عامل ميناء','انقل صندوقاً مدنياً إلى الميناء',220,'warehouse'],
+ ['موظف مطار','ساعد في تنظيم صالة الوصول',240,'airport'],['سائق حافلة','أوصل الركاب إلى محطة الحافلات',200,'supermarket'],['مساعد مكتبة','رتب الكتب وأعدها إلى المكتبة',155,'electronics']
+];
+const STORY_CHAPTERS = [
+ ['الفصل 1 — بداية جديدة','تصل إلى المدينة ومعك هاتف بقيمة 100 دولار وميزانية أولية. تعرّف على الحي وابحث عن أول وظيفة.'],
+ ['الفصل 2 — وجوه المدينة','تلتقي بسكان مختلفين وتكتشف قصصاً عن الميناء والأسواق والأحياء القديمة.'],
+ ['الفصل 3 — سر المستودعات','سبعة مستودعات قديمة تخفي رسائل ووثائق قصصية لا تظهر إلا في ساعات الليل داخل اللعبة.'],
+ ['الفصل 4 — مشروع الحي','اجمع المال من الوظائف القانونية واشترِ منزلاً أو متجراً صغيراً وطوّر الحي.'],
+ ['الفصل 5 — مدينة للجميع','نظّم مهرجاناً عاماً يجمع اللاعبين وسكان المدينة وافتح المطار الثاني ومناطق الشاطئ.']
+];
+const POI_DEFS = [
+ ['hospital','مستشفى',8,'#ff6c7c','H',true],['home','منزل',70,'#f3c46a','⌂',true],['grocery','بقالة',18,'#7ed8a7','G',true],
+ ['bank','بنك',8,'#86b7ff','B',true],['supermarket','سوق كبير',9,'#9de0ec','S',true],['gearshop','متجر معدات رياضية',5,'#c0a4ff','E',true],
+ ['warehouse','مستودع',10,'#d6ad7b','W',true],['electronics','متجر إلكترونيات',18,'#78c9f5','T',true],['construction','مبنى قيد الإنشاء',23,'#e6a66b','C',false],
+ ['skyscraper','ناطحة سحاب',5,'#b2c9ed','▥',true],['buytower','ناطحة سحاب للبيع',27,'#70e2d2','↗',true],['airport','مطار',2,'#70e4f2','✈',true],
+ ['beach','شاطئ',5,'#f1d18b','≈',false],['market','سوق شعبي',2,'#d9a7f0','M',true],['atm','جهاز صراف آلي',30,'#78d6c7','$',false],
+ ['cafe','مقهى',28,'#d6bd98','K',true],['gamingCafe','مقهى ألعاب',8,'#9c8dff','G',true],['correction','مركز إصلاحي',6,'#aab1c0','R',true],['club','نادي حي',30,'#ad9aff','★',true]
+];
+const poiColor = Object.fromEntries(POI_DEFS.map(d=>[d[0],d[3]]));
+function thezPoint(i,phase=0){
+ const city=((i+phase)%2===0)?-1100:1100;
+ const col=((i*7+phase*3)%9)-4,row=((i*5+phase*2)%9)-4;
+ const jitterX=((phase%3)-1)*4,jitterZ=(((phase+1)%3)-1)*4;
+ return {x:city+col*43+jitterX,z:row*43+jitterZ};
+}
+const cityPOIs=[];let poiSerial=0,interiorSerial=0;
+for(const def of POI_DEFS){
+ const [type,label,count,color,icon,enterable]=def;
+ for(let i=0;i<count;i++){
+  let p=thezPoint(i,poiSerial+1);
+  if(type==='airport'){p=i===0?{x:1630,z:-72}:{x:-3900,z:2550}}
+  if(type==='beach'){const coords=[{x:-1100,z:430},{x:-1100,z:-410},{x:1100,z:-410},{x:-3700,z:940},{x:3600,z:-940}];p=coords[i]}
+  if(type==='atm')p=thezPoint(i,poiSerial+5);
+  const poi={id:`poi_${type}_${i+1}`,type,label:`${label} ${i+1}`,x:p.x,z:p.z,color,icon,enterable:!!enterable&&['hospital','home','warehouse','skyscraper','cafe'].includes(type),open:true,phase:(i+poiSerial)%24,price: type==='home'?3500+(i%8)*400:type==='buytower'?18000+(i%9)*2200:type==='warehouse'&&i>=7?6500+(i%3)*700:0,storyLocked:type==='warehouse'&&i<7,buyable:type==='home'||type==='buytower'||(type==='warehouse'&&i>=7),owned:false,interiorIndex:enterable?interiorSerial++:-1};
+  cityPOIs.push(poi);
+ }
+ poiSerial++;
+}
+const POI_BY_ID=new Map(cityPOIs.map(p=>[p.id,p]));
+
+const THEZ_POI_SOLID_GRID=new Map(),THEZ_INTERIOR_SOLID_GRID=new Map(),THEZ_SOLID_CELL=100;
+function thezRegisterSolid(grid,b){const x0=Math.floor(b[0]/THEZ_SOLID_CELL),x1=Math.floor(b[1]/THEZ_SOLID_CELL),z0=Math.floor(b[2]/THEZ_SOLID_CELL),z1=Math.floor(b[3]/THEZ_SOLID_CELL);for(let gx=x0;gx<=x1;gx++)for(let gz=z0;gz<=z1;gz++){const k=gx+','+gz;let a=grid.get(k);if(!a)grid.set(k,a=[]);a.push(b)}}
+function thezGridBlocked(grid,x,z,y,pad){const gx=Math.floor(x/THEZ_SOLID_CELL),gz=Math.floor(z/THEZ_SOLID_CELL);for(let ox=-1;ox<=1;ox++)for(let oz=-1;oz<=1;oz++){const a=grid.get((gx+ox)+','+(gz+oz));if(!a)continue;for(const b of a)if(insideBox(x,z,b,pad)&&y<(b[4]||999)-.45)return true}return false}
+
+const poiCounts=Object.fromEntries(POI_DEFS.map(d=>[d[0],d[2]]));
+const COMMUNITY_GROUPS=Array.from({length:30},(_,i)=>({name:`نادي الحي ${String(i+1).padStart(2,'0')}`,focus:['الرياضة','الفنون','الموسيقى','البيئة','التطوع'][i%5]}));
+const VEHICLE_SHOWROOM_CATALOG=[
+ 'سيدان كلاسيكية','سيدان عائلية','سيدان فاخرة','كوبيه رياضية','سيارة سباق','سيارة كهربائية','سيارة هجينة','تاكسي المدينة','سيارة دورية','هاتشباك','ستيشن واغن','ميني فان','فان شحن','بيك أب خفيف','بيك أب ثقيل','شاحنة توصيل','شاحنة كبيرة','حافلة مدينة','حافلة سياحية','دراجة نارية','دراجة رياضية','دراجة هوائية','دراجة جبلية','دراجة مائية','قارب سريع','قارب صيد','سفينة سياحية'
+];
+let playerBank=Number(localStorage.getItem('thez_bank')||500);if(!Number.isFinite(playerBank)||playerBank<0)playerBank=500;
+let playerWallet=Number(localStorage.getItem('thez_wallet')||2500);if(!Number.isFinite(playerWallet)||playerWallet<0)playerWallet=2500;
+let playerOwned=JSON.parse(localStorage.getItem('thez_owned')||'[]');if(!Array.isArray(playerOwned))playerOwned=[];
+let playerInventory=JSON.parse(localStorage.getItem('thez_inventory')||'[]');if(!Array.isArray(playerInventory))playerInventory=[];
+let activeCityJob=null,selectedPoi=null,insidePoi=null,activeHubTab='jobs',phoneOwned=localStorage.getItem('thez_phone_owned')==='1';
+let equippedUtility='كاميرا رقمية';
+function saveCityProfile(){localStorage.setItem('thez_bank',String(playerBank));localStorage.setItem('thez_wallet',String(playerWallet));localStorage.setItem('thez_owned',JSON.stringify(playerOwned));localStorage.setItem('thez_inventory',JSON.stringify(playerInventory));localStorage.setItem('thez_phone_owned',phoneOwned?'1':'0')}
+function nearestCityPoi(x=player.x,z=player.z,maxDist=20,filter=null){let best=null,bd=maxDist;for(const p of cityPOIs){if(filter&&!filter(p))continue;const d=Math.hypot(p.x-x,p.z-z);if(d<bd){bd=d;best=p}}return best}
+function openPoiDetail(p){if(!p)return;selectedPoi=p;$('poiDetailTitle').textContent=p.label;$('poiDetailDescription').textContent=`${p.label} — ضمن منطقة ${cityName(p.x)}. ${p.type==='warehouse'&&p.storyLocked?'هذا مستودع قصصي لا يفتح إلا في الفترة الليلية داخل اللعبة.':p.buyable?'يمكن شراء هذا العقار بعملة اللعبة.':p.enterable?'يمكن دخول المبنى من بابه.':'موقع عام يمكن تحديده عبر GPS.'}`;
+ const actions=$('poiDetailActions');actions.innerHTML='';
+ const add=(label,fn)=>{const b=document.createElement('button');b.textContent=label;b.onclick=fn;actions.appendChild(b)};
+ add('تحديد GPS',()=>{setGpsDestination(p.x,p.z);$('poiDetailPanel').classList.remove('open');closeFullMap()});
+ if(p.enterable)add('دخول',()=>{enterCityInterior(p);$('poiDetailPanel').classList.remove('open')});
+ if(p.buyable)add(p.owned||playerOwned.includes(p.id)?'مملوك لك':`شراء — $${p.price.toLocaleString('en-US')}`,()=>buyCityProperty(p));
+ if(p.type==='atm'||p.type==='bank')add('الخدمات المالية',()=>{showWorldHub('business');$('poiDetailPanel').classList.remove('open')});
+ if(p.type==='cafe'||p.type==='grocery'||p.type==='supermarket'||p.type==='electronics')add('تصفح المتجر',()=>{showWorldHub('business');$('poiDetailPanel').classList.remove('open')});
+ $('worldToastInfo').textContent=`الإحداثيات: ${Math.round(p.x)} م، ${Math.round(p.z)} م`;$('poiDetailPanel').classList.add('open')
+}
+function buyCityProperty(p){if(playerOwned.includes(p.id)){showToast('هذا العقار مسجل بالفعل باسمك.');return}if(!p.buyable){showToast('هذا الموقع غير معروض للبيع.');return}if(playerWallet<p.price){showToast('رصيدك لا يكفي لشراء العقار.');return}playerWallet-=p.price;playerOwned.push(p.id);p.owned=true;saveCityProfile();renderWorldHub(activeHubTab);showToast(`مبروك! أصبح ${p.label} ملكاً لك.`)}
+const INTERIOR_ROOT={x:0,z:0};
+function buildPOIArchitecture(){
+ const sharedGeo=new T.BoxGeometry(1,1,1),roofGeo=new T.BoxGeometry(1,1,1),baseMat=new T.MeshStandardMaterial({color:0xffffff,roughness:.82}),roofMat=new T.MeshStandardMaterial({color:0x293748,roughness:.74});
+ const groups=new Map();for(const p of cityPOIs){if(p.type==='beach'||p.type==='atm'||p.type==='club')continue;let a=groups.get(p.type);if(!a)groups.set(p.type,a=[]);a.push(p)}
+ const dummy=new T.Object3D();
+ for(const [type,items] of groups){const mesh=new T.InstancedMesh(sharedGeo,baseMat,items.length),roofs=new T.InstancedMesh(roofGeo,roofMat,items.length);mesh.castShadow=true;mesh.receiveShadow=true;roofs.castShadow=true;
+  items.forEach((p,i)=>{let w=12,d=11,h=7;if(type==='home'){w=10;d=10;h=6.5}else if(type==='hospital'){w=18;d=16;h=18}else if(type==='bank'){w=15;d=14;h=11}else if(type==='supermarket'||type==='market'){w=18;d=16;h=8}else if(type==='warehouse'){w=20;d=18;h=11}else if(type==='electronics'||type==='grocery'||type==='gearshop'){w=13;d=12;h=8}else if(type==='construction'){w=19;d=18;h=18}else if(type==='skyscraper'){w=21;d=19;h=48}else if(type==='buytower'){w=18;d=17;h=28+(i%4)*5}else if(type==='airport'){w=35;d=25;h=12}else if(type==='cafe'||type==='gamingCafe'){w=11;d=10;h=6}else if(type==='correction'){w=19;d=15;h=13}
+   const bx=p.x+13,bz=p.z+13;dummy.position.set(bx,h/2-.42,bz);dummy.rotation.set(0,(i%4)*Math.PI/2,0);dummy.scale.set(w,h,d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,new T.Color(p.color));
+   dummy.position.set(bx,h-.4,bz);dummy.scale.set(w*1.035,.65,d*1.035);dummy.updateMatrix();roofs.setMatrixAt(i,dummy.matrix);
+   thezRegisterSolid(THEZ_POI_SOLID_GRID,[bx-w/2,bx+w/2,bz-d/2,bz+d/2,h]);
+  });mesh.instanceMatrix.needsUpdate=true;roofs.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;sc.add(mesh,roofs)
+ }
+}
+buildPOIArchitecture();
+function createInteriorRooms(){
+ const floorMat=new T.MeshStandardMaterial({color:0x8d8a82,roughness:.95}),wallMat=new T.MeshStandardMaterial({color:0xc6c1b4,roughness:.9}),trimMat=new T.MeshStandardMaterial({color:0x4a6274,roughness:.8}),lampMat=new T.MeshBasicMaterial({color:0xffdba1});
+ const enterable=cityPOIs.filter(p=>p.enterable),cols=10,spacing=34,originX=4050,originZ=4050,n=enterable.length;
+ const floorMesh=new T.InstancedMesh(new T.BoxGeometry(20,.2,20),floorMat,n);
+ const wallMesh=new T.InstancedMesh(new T.BoxGeometry(1,1,1),wallMat,n*4);
+ const counterMesh=new T.InstancedMesh(new T.BoxGeometry(5,1.2,1),trimMat,n);
+ const lampMesh=new T.InstancedMesh(new T.SphereGeometry(.24,7,5),lampMat,n);
+ const d=new T.Object3D();let wi=0;
+ enterable.forEach((p,k)=>{const i=p.interiorIndex>=0?p.interiorIndex:k,col=i%cols,row=Math.floor(i/cols),x=originX+col*spacing,z=originZ+row*spacing;p.interiorX=x;p.interiorZ=z;
+  d.position.set(x,-.16,z);d.scale.set(1,1,1);d.updateMatrix();floorMesh.setMatrixAt(k,d.matrix);
+  const walls=[[20,4,.35,0,2,-10],[20,4,.35,0,2,10],[.35,4,20,-10,2,0],[.35,4,20,10,2,0]];
+  for(const [w,h,dep,ox,oy,oz] of walls){d.position.set(x+ox,oy,z+oz);d.scale.set(w,h,dep);d.updateMatrix();wallMesh.setMatrixAt(wi++,d.matrix);thezRegisterSolid(THEZ_INTERIOR_SOLID_GRID,[x+ox-w/2,x+ox+w/2,z+oz-dep/2,z+oz+dep/2,h]);}
+  d.position.set(x,.65,z-5);d.scale.set(1,1,1);d.updateMatrix();counterMesh.setMatrixAt(k,d.matrix);
+  d.position.set(x,3.1,z);d.scale.set(1,1,1);d.updateMatrix();lampMesh.setMatrixAt(k,d.matrix);
+ });
+ floorMesh.receiveShadow=true;wallMesh.castShadow=true;wallMesh.receiveShadow=true;counterMesh.castShadow=true;
+ for(const m of[floorMesh,wallMesh,counterMesh,lampMesh])m.instanceMatrix.needsUpdate=true;
+ sc.add(floorMesh,wallMesh,counterMesh,lampMesh);
+}
+createInteriorRooms();
+const thezBaseBlockedAt=blockedAt;
+blockedAt=function(x,z,y=0,pad=.42){if(thezBaseBlockedAt(x,z,y,pad))return true;return insidePoi?thezGridBlocked(THEZ_INTERIOR_SOLID_GRID,x,z,y,pad):thezGridBlocked(THEZ_POI_SOLID_GRID,x,z,y,pad)};
+function enterCityInterior(p){if(!p?.enterable||!Number.isFinite(p.interiorX)){showToast('هذا المبنى لا يحتوي على مساحة داخلية في هذه النسخة.');return}if(p.storyLocked){const hour=Math.floor((worldTime/20)%24);if(!(hour>=20||hour<5)){showToast('هذا المستودع القصصي يفتح بين الساعة 20:00 و05:00 داخل وقت اللعبة.');return}}
+ if(insidePoi)return;insidePoi={poi:p,returnX:player.x,returnZ:player.z,returnHeading:player.heading};player.x=p.interiorX;player.z=p.interiorZ;player.y=0;player.vy=0;player.heading=0;player.grounded=true;playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.y=0;playerChar.root.visible=true;showToast(`دخلت ${p.label}. اضغط E للخروج.`,2200)
+}
+function exitCityInterior(){if(!insidePoi)return;const a=insidePoi;insidePoi=null;player.x=a.returnX;player.z=a.returnZ;player.y=0;player.heading=a.returnHeading;playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.y=player.heading;showToast('خرجت إلى الشارع.',1400)}
+function renderWorldHub(tab=activeHubTab){activeHubTab=tab;$('worldStats').innerHTML=`<span class="world-pill">النقد: $${playerWallet.toLocaleString('en-US')}</span><span class="world-pill">البنك: $${playerBank.toLocaleString('en-US')}</span><span class="world-pill">العقارات: ${playerOwned.length}</span><span class="world-pill">المهام: ${activeCityJob?'مهمة نشطة':'لا توجد مهمة'}</span><span class="world-pill">المساحة: 112 كم²</span>`;
+ document.querySelectorAll('.world-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));const body=$('worldHubBody');let cards=[];
+ if(tab==='jobs')cards=JOBS.map((j,i)=>`<article class="world-card"><h4>${j[0]}</h4><p>${j[1]}<br>المكافأة: $${j[2]}</p><button data-job="${i}">استلام المهمة</button></article>`).join('');
+ else if(tab==='properties'){const list=cityPOIs.filter(p=>p.buyable);cards=list.map(p=>`<article class="world-card"><h4>${p.label}</h4><p>${p.type==='home'?'منزل سكني':p.type==='buytower'?'عقار تجاري مرتفع':'مستودع تجاري'}<br>السعر: $${p.price.toLocaleString('en-US')}</p><button data-buy="${p.id}" ${playerOwned.includes(p.id)?'disabled':''}>${playerOwned.includes(p.id)?'مملوك':'شراء'}</button></article>`).join('');}
+ else if(tab==='business'){const goods=LEGAL_GOODS.map((g,i)=>`<article class="world-card"><h4>${g}</h4><p>بضاعة مدنية قانونية — السعر $${35+i*7}</p><button data-goods="${i}">شراء</button>${playerInventory.includes(g)?`<button data-sell-goods="${i}">بيع</button>`:''}</article>`).join('');cards=`<article class="world-card"><h4>الخدمات المصرفية</h4><p>توجد 8 بنوك و30 جهاز ATM في أحياء المدينة. هذه محاكاة مالية بعملة اللعبة فقط.</p><p>الحساب: $${playerBank.toLocaleString('en-US')}</p><button data-bank="1">عرض الخدمات</button><button data-deposit="100">إيداع $100</button><button data-withdraw="100">سحب $100</button></article>`+goods+SOFT_DRINKS.map((g,i)=>`<article class="world-card"><h4>${g}</h4><p>مشروب غير كحولي — $${5+i*2}</p><button data-drink="${i}">شراء</button></article>`).join('');}
+ else if(tab==='equipment')cards=SAFE_GEAR.map((g,i)=>`<article class="world-card"><h4>${g[0]}</h4><p>${g[1]}<br>معدة ترفيهية أو خدمية غير قتالية.</p><button data-gear="${i}">${equippedUtility===g[0]?'مجهزة':'تجهيز'}</button></article>`).join('');
+ else if(tab==='phone'){cards=`<article class="world-card"><h4>هاتف اللاعب</h4><p>هاتف المدينة الأول — السعر $100. يحتوي على 12 تطبيقاً.</p><button data-phonebuy="1" ${phoneOwned?'disabled':''}>${phoneOwned?'تم الشراء':'شراء الهاتف'}</button></article>`+PHONE_APPS.map((a,i)=>`<article class="world-card"><h4>${a[0]}</h4><p>${a[1]}</p><button data-app="${i}" ${!phoneOwned?'disabled':''}>فتح التطبيق</button></article>`).join('')+PHONE_GAMES.map((g,i)=>`<article class="world-card"><h4>لعبة: ${g.name}</h4><p>${g.free?'مجانية':`$${g.price}`} — ${g.desc}</p><button data-phonegame="${i}" ${!phoneOwned?'disabled':''}>${g.free?'تشغيل مجاناً':(playerInventory.includes('phonegame_'+i)?'تشغيل':'شراء / تشغيل')}</button></article>`).join('');}
+ else if(tab==='radio'){cards=CAR_RADIO_STATIONS.map((name,i)=>`<article class="world-card"><h4>محطة ${i+1} — ${name}</h4><p>محطة خيالية بأجواء موسيقية مختلفة داخل المدينة.</p><button data-radio="${i}">تشغيل المحطة</button></article>`).join('')+PHONE_ORIGINAL_TRACKS.map((name,i)=>`<article class="world-card"><h4>موسيقى الهاتف ${i+1} — ${name}</h4><p>لحن أصلي مولّد إلكترونياً داخل اللعبة.</p><button data-track="${i}">تشغيل اللحن</button></article>`).join('');}
+ else if(tab==='story')cards=STORY_CHAPTERS.map((s,i)=>`<article class="world-card"><h4>${s[0]}</h4><p>${s[1]}</p><button data-story="${i}">عرض الفصل</button></article>`).join('');
+ else {cards=`<article class="world-card"><h4>حجم العالم</h4><p>مربع لعب اسمي 10.58 × 10.58 كم، أي قرابة 112 كم². أجزاء الأطراف طبيعة وطرق استكشاف، وليست كلها كثافة عمرانية.</p></article>`+POI_DEFS.map(d=>`<article class="world-card"><h4>${d[1]} — ${d[2]}</h4><p>مواقع موزعة على الأحياء، وتظهر على الخريطة عند تفعيل الرموز.</p></article>`).join('')+`<article class="world-card"><h4>27 بطاقة مركبة</h4><p>قائمة معرض من 27 فئة/نسخة مبنية على قوالب المركبات الموجودة حالياً، وليست 27 نموذجاً ثلاثي الأبعاد مستقلاً.</p><p>${VEHICLE_SHOWROOM_CATALOG.join(' • ')}</p></article>`+`<article class="world-card"><h4>فتح المركبات المملوكة</h4><p>خمس وسائل خيالية وآمنة للمركبات التي تملكها: مفتاح إلكتروني، تطبيق الهاتف، بطاقة وكالة، مفتاح احتياطي، أو مساعدة ميكانيكي. لا توجد طريقة لفتح مركبات الآخرين.</p></article><article class="world-card"><h4>الحياة البرية</h4><p>${THEZ_ANIMAL_NAMES.join(' • ')}</p></article>`+`<article class="world-card"><h4>30 نادي حي</h4><p>${COMMUNITY_GROUPS.map(g=>g.name+' ('+g.focus+')').join(' • ')}</p></article>`;}
+ body.innerHTML=`<div class="world-grid">${cards}</div>`;
+ body.querySelectorAll('[data-job]').forEach(b=>b.onclick=()=>startCityJob(Number(b.dataset.job)));
+ body.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buyCityProperty(POI_BY_ID.get(b.dataset.buy)));
+ body.querySelectorAll('[data-goods]').forEach(b=>b.onclick=()=>buyCityItem(LEGAL_GOODS[Number(b.dataset.goods)],35+Number(b.dataset.goods)*7));
+ body.querySelectorAll('[data-sell-goods]').forEach(b=>b.onclick=()=>sellCityItem(LEGAL_GOODS[Number(b.dataset.sellGoods)],Math.floor((35+Number(b.dataset.sellGoods)*7)*.55)));
+ body.querySelectorAll('[data-deposit]').forEach(b=>b.onclick=()=>moveBankFunds('deposit',Number(b.dataset.deposit)));
+ body.querySelectorAll('[data-withdraw]').forEach(b=>b.onclick=()=>moveBankFunds('withdraw',Number(b.dataset.withdraw)));
+ body.querySelectorAll('[data-drink]').forEach(b=>b.onclick=()=>buyCityItem(SOFT_DRINKS[Number(b.dataset.drink)],5+Number(b.dataset.drink)*2));
+ body.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>{equippedUtility=SAFE_GEAR[Number(b.dataset.gear)][0];if(!playerInventory.includes(equippedUtility))playerInventory.push(equippedUtility);saveCityProfile();showToast(`تم تجهيز ${equippedUtility}.`);renderWorldHub('equipment')});
+ body.querySelector('[data-phonebuy]')?.addEventListener('click',()=>{if(playerWallet<100){showToast('لا تملك 100 دولار لشراء الهاتف.');return}playerWallet-=100;phoneOwned=true;saveCityProfile();renderWorldHub('phone');showToast('اشتريت الهاتف وفتحت تطبيقاته.')});
+ body.querySelectorAll('[data-app]').forEach(b=>b.onclick=()=>openPhoneApp(Number(b.dataset.app)));
+ body.querySelectorAll('[data-phonegame]').forEach(b=>b.onclick=()=>openPhoneGame(Number(b.dataset.phonegame)));
+ body.querySelectorAll('[data-story]').forEach(b=>b.onclick=()=>showToast(STORY_CHAPTERS[Number(b.dataset.story)][1],5000));
+ body.querySelector('[data-bank]')?.addEventListener('click',()=>showToast(`رصيدك الافتراضي: $${playerWallet}. لا توجد معاملات مالية حقيقية.`));
+ body.querySelectorAll('[data-radio]').forEach(b=>b.onclick=()=>playCityRadio(Number(b.dataset.radio)));
+ body.querySelectorAll('[data-track]').forEach(b=>b.onclick=()=>playPhoneTrack(Number(b.dataset.track)));
+}
+let cityAudioContext=null,cityMusicNodes=[];
+function stopCityMusic(){for(const n of cityMusicNodes){try{n.stop?.();n.disconnect?.()}catch(e){}}cityMusicNodes=[]}
+function playSynthSequence(index,station=false){try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx){showToast('الصوت الموسيقي غير مدعوم في هذا المتصفح.');return}cityAudioContext=cityAudioContext||new Ctx();cityAudioContext.resume();stopCityMusic();const scales=[[261.6,329.6,392,523.2],[220,261.6,329.6,440],[293.7,349.2,440,587.3],[196,246.9,293.7,392],[246.9,293.7,369.9,493.9]];const seq=scales[index%scales.length],now=cityAudioContext.currentTime;for(let i=0;i<16;i++){const osc=cityAudioContext.createOscillator(),gain=cityAudioContext.createGain();osc.type=station?'triangle':'sine';osc.frequency.value=seq[(i+(index%3))%seq.length]*(i%4===0?1:2);gain.gain.setValueAtTime(0,now+i*.32);gain.gain.linearRampToValueAtTime(.035,now+i*.32+.04);gain.gain.exponentialRampToValueAtTime(.0001,now+i*.32+.29);osc.connect(gain).connect(cityAudioContext.destination);osc.start(now+i*.32);osc.stop(now+i*.32+.31);cityMusicNodes.push(osc)}showToast(station?`تشغيل ${CAR_RADIO_STATIONS[index]}`:`تشغيل ${PHONE_ORIGINAL_TRACKS[index]}`,1700)}catch(e){showToast('تعذر تشغيل المقطع الموسيقي.',1700)}}
+function playCityRadio(i){if(!currentVehicle){showToast('اجلس داخل مركبة لتشغيل راديو السيارة.');return}playSynthSequence(i,true)}
+function playPhoneTrack(i){playSynthSequence(i,false)}
+function sellCityItem(name,price){const i=playerInventory.indexOf(name);if(i<0){showToast('لا تملك هذه البضاعة للبيع.');return}playerInventory.splice(i,1);playerWallet+=price;saveCityProfile();renderWorldHub('business');showToast(`بعت ${name} مقابل $${price}.`)}
+function moveBankFunds(direction,amount){if(direction==='deposit'){if(playerWallet<amount){showToast('النقد المتوفر لا يكفي للإيداع.');return}playerWallet-=amount;playerBank+=amount}else{if(playerBank<amount){showToast('رصيد الحساب لا يكفي للسحب.');return}playerBank-=amount;playerWallet+=amount}saveCityProfile();renderWorldHub('business');showToast(direction==='deposit'?`أودعت $${amount} في حسابك.`:`سحبت $${amount} من حسابك.`)}
+function buyCityItem(name,price){if(playerWallet<price){showToast('رصيدك غير كافٍ.');return}playerWallet-=price;if(!playerInventory.includes(name))playerInventory.push(name);saveCityProfile();renderWorldHub(activeHubTab);showToast(`تم شراء ${name}.`)}
+function startCityJob(i){const j=JOBS[i];if(!j)return;if(activeCityJob){showToast('أكمل المهمة الحالية أولاً.');return}const target=cityPOIs.filter(p=>p.type===j[3]);let poi=target.sort((a,b)=>Math.hypot(a.x-player.x,a.z-player.z)-Math.hypot(b.x-player.x,b.z-player.z))[0];if(!poi){showToast('لا يوجد هدف متاح حالياً.');return}activeCityJob={name:j[0],targetId:poi.id,reward:j[2],x:poi.x,z:poi.z};setGpsDestination(poi.x,poi.z);togglePanel('worldHubPanel',false);showToast(`بدأت مهمة ${j[0]}. اتبع GPS إلى ${poi.label}.`,3000)}
+function openPhoneApp(i){const names=PHONE_APPS[i];if(!names)return;showWorldHub(i===0?'catalog':i===1?'jobs':i===2?'business':i===3?'business':i===4?'catalog':i===10?'catalog':i===7?'radio':'story');showToast(`تم فتح تطبيق ${names[0]}.`,1400)}
+function openPhoneGame(i){const g=PHONE_GAMES[i];if(!g)return;if(!g.free&&!playerInventory.includes('phonegame_'+i)){if(playerWallet<g.price){showToast('رصيدك لا يكفي لشراء اللعبة.');return}playerWallet-=g.price;playerInventory.push('phonegame_'+i);saveCityProfile()}showToast(`بدأت لعبة ${g.name}: ${g.desc}`,2800);}
+function showWorldHub(tab='jobs'){renderWorldHub(tab);$('worldHubPanel').classList.add('open')}
+$('worldHubBtn').addEventListener('click',()=>showWorldHub('jobs'));
+$('phoneHubBtn').addEventListener('click',()=>showWorldHub('phone'));
+$('worldHubClose').addEventListener('click',()=>$('worldHubPanel').classList.remove('open'));
+$('poiDetailClose').addEventListener('click',()=>$('poiDetailPanel').classList.remove('open'));
+document.querySelectorAll('.world-tab').forEach(b=>b.addEventListener('click',()=>renderWorldHub(b.dataset.tab)));
+$('worldHubPanel').addEventListener('click',e=>{if(e.target===$('worldHubPanel'))$('worldHubPanel').classList.remove('open')});
+function updateCityExpansion(dt){if(activeCityJob){const d=Math.hypot(player.x-activeCityJob.x,player.z-activeCityJob.z);if(d<18){playerWallet+=activeCityJob.reward;const name=activeCityJob.name;activeCityJob=null;saveCityProfile();showToast(`أنجزت المهمة ${name}! حصلت على مكافأة $${JOBS.find(j=>j[0]===name)?.[2]||0}.`,3500);if($('worldHubPanel').classList.contains('open'))renderWorldHub(activeHubTab)}}}
+function nearestPoiFromMap(x,z,radius=42){let best=null,d0=radius;for(const p of cityPOIs){const d=Math.hypot(p.x-x,p.z-z);if(d<d0){best=p;d0=d}}return best}
+// Large map selection: show exact place details when a POI marker is tapped.
+const _thezMapPointerUp=largeCanvas.onpointerup;
+// Wrap the original interaction priority: a nearby enterable location is opened before NPC chat.
+const _thezBaseInteract=doInteract;
+doInteract=function(){if(insidePoi){exitCityInterior();return}const poi=nearestCityPoi(player.x,player.z,16,p=>p.enterable);if(poi){enterCityInterior(poi);return}_thezBaseInteract()};
+// Show/hide hub buttons after the multiplayer lobby has started.
+const _thezBaseStartClick=$('startBtn').onclick;
+const _thezOldGameStart=updateInterface;
+const _thezOriginalFrame=window.requestAnimationFrame;
+const THEZ_ANIMAL_NAMES=['كلب','قط','حصان','غزال','ثعلب','أرنب','بقرة','خروف','دجاجة','سلحفاة','نورس','سمكة'];
+function createCityAnimals(){
+ const palettes=[0x9a704d,0x77717a,0x8a5b37,0xb9a36e,0xc56d43,0xc4c0ad,0xf0eee5,0xd8d0ba,0xd7ad52,0x719c9b,0xf4f4f4,0x4c9bb2];
+ const animals=[];const matCache=palettes.map(c=>new T.MeshStandardMaterial({color:c,roughness:.9}));
+ for(let i=0;i<THEZ_ANIMAL_NAMES.length*2;i++){const kind=i%THEZ_ANIMAL_NAMES.length,cx=kind%2?-1100:1100,x=cx+((i*41)%360)-180,z=((i*67)%360)-180,group=new T.Group(),matl=matCache[kind];
+  const body=new T.Mesh(new T.SphereGeometry(kind===2||kind===3?1.0:.58,10,8),matl);body.scale.set(1.25,.8,.75);body.position.y=.62;group.add(body);
+  const head=new T.Mesh(new T.SphereGeometry(.35,9,7),matl);head.position.set(0,1.05,.65);group.add(head);
+  const legGeo=new T.BoxGeometry(.13,.55,.14);for(const lx of[-.34,.34])for(const lz of[-.28,.28]){const leg=new T.Mesh(legGeo,matl);leg.position.set(lx,.27,lz);group.add(leg)}
+  if(kind===2||kind===3||kind===4){const ear=new T.Mesh(new T.ConeGeometry(.13,.55,5),matl);ear.position.set(-.2,1.42,.7);group.add(ear);const ear2=ear.clone();ear2.position.x=.2;group.add(ear2)}
+  if(kind===10){const wing=new T.Mesh(new T.SphereGeometry(.42,8,6),matl);wing.scale.set(1.1,.18,.5);wing.position.set(.44,.92,0);group.add(wing)}
+  group.position.set(x,0,z);sc.add(group);animals.push({group,phase:i*.71,speed:.18+(i%4)*.05,heading:R()*Math.PI*2,kind})
+ }
+ return animals
+}
+const cityAnimals=createCityAnimals();
+function updateCityAnimals(dt){for(const a of cityAnimals){a.phase+=dt*a.speed;a.group.position.x+=Math.sin(a.phase)*dt*.32;a.group.position.z+=Math.cos(a.phase*.73)*dt*.32;a.group.rotation.y=a.heading+Math.sin(a.phase)*.08;}}
+// Add a simple island ground plane, highways and rural trees; 10.58 km square = 112 km².
+function build112KmWorld(){
+ const ground=new T.Mesh(new T.PlaneGeometry(THEZ_WORLD_SIDE,THEZ_WORLD_SIDE).rotateX(-Math.PI/2),new T.MeshStandardMaterial({color:0x496849,roughness:1}));ground.position.y=-.43;ground.receiveShadow=true;sc.add(ground);
+ const highwayMat=new T.MeshStandardMaterial({color:0x34383d,roughness:.95}),lineMat=new T.MeshBasicMaterial({color:0xe6c85d});
+ for(const z of[-3000,-1500,0,1500,3000]){const road=new T.Mesh(new T.BoxGeometry(THEZ_WORLD_SIDE,.12,18),highwayMat);road.position.set(0,-.32,z);sc.add(road);const line=new T.Mesh(new T.BoxGeometry(THEZ_WORLD_SIDE,.015,.22),lineMat);line.position.set(0,-.245,z);sc.add(line)}
+ for(const x of[-3000,-1500,0,1500,3000]){const road=new T.Mesh(new T.BoxGeometry(18,.12,THEZ_WORLD_SIDE),highwayMat);road.position.set(x,-.32,0);sc.add(road);const line=new T.Mesh(new T.BoxGeometry(.22,.015,THEZ_WORLD_SIDE),lineMat);line.position.set(x,-.245,0);sc.add(line)}
+ // Additional highway graph for routing throughout the expanded landmass.
+ const grid=[];for(let x=-5000;x<=5000;x+=500){const row=[];for(let z=-5000;z<=5000;z+=500)row.push(addRoadNode(x,z));grid.push(row)}
+ for(let i=0;i<grid.length;i++)for(let j=0;j<grid[i].length;j++){if(i+1<grid.length)connectRoad(grid[i][j],grid[i+1][j]);if(j+1<grid[i].length)connectRoad(grid[i][j],grid[i][j+1])}
+ connectRoad(closestRoadNode(-1000,0),closestRoadNode(-1100,0));connectRoad(closestRoadNode(1000,0),closestRoadNode(1100,0));
+ const trunkGeo=new T.CylinderGeometry(.18,.26,5,5).translate(0,2.5,0),leafGeo=new T.ConeGeometry(2.3,7,6).translate(0,7.2,0),trunkMat=new T.MeshStandardMaterial({color:0x6b4a2f}),leafMat=new T.MeshStandardMaterial({color:0x2b7c42});
+ const count=520,trunks=new T.InstancedMesh(trunkGeo,trunkMat,count),leaves=new T.InstancedMesh(leafGeo,leafMat,count),dummy=new T.Object3D();let made=0;
+ for(let i=0;i<count;i++){let x=ra(-5100,5100),z=ra(-5100,5100);if(Math.abs(x)<1450&&Math.abs(z)<700)continue;if(x>3950&&x<5000&&z>3950&&z<5000)continue;if(x<-4300&&x>-4500&&z>2450&&z<2750)continue;if(Math.abs(x%1500)<35||Math.abs(z%1500)<35)continue;dummy.position.set(x,0,z);dummy.rotation.y=R()*Math.PI*2;dummy.scale.setScalar(.75+R()*.65);dummy.updateMatrix();trunks.setMatrixAt(made,dummy.matrix);leaves.setMatrixAt(made,dummy.matrix);made++}
+ trunks.count=made;leaves.count=made;sc.add(trunks,leaves);
+ // A second small airport in the north-western district.
+ const runway=new T.Mesh(new T.BoxGeometry(720,.14,44),highwayMat);runway.position.set(-3900,-.27,2550);sc.add(runway);
+ const terminal=new T.Mesh(new T.BoxGeometry(88,13,34),new T.MeshStandardMaterial({color:0x9aa9ba,metalness:.25,roughness:.5}));terminal.position.set(-3900,6.5,2630);sc.add(terminal);
+ const roof=new T.Mesh(new T.BoxGeometry(94,1.2,40),new T.MeshStandardMaterial({color:0x33485d,metalness:.3}));roof.position.set(-3900,13.6,2630);sc.add(roof);
+ // Water overlays on the five beaches so the expanded land plane does not hide the sea edge.
+ const waterMat=new T.MeshPhongMaterial({color:0x087eaa,transparent:true,opacity:.91,specular:0x9edfff,shininess:90});
+ for(const b of BEACHES){const w=new T.Mesh(new T.PlaneGeometry(b.maxX-b.minX+70,b.waterMaxZ-b.waterMinZ).rotateX(-Math.PI/2),waterMat);w.position.set(b.cx,-.405,(b.waterMinZ+b.waterMaxZ)/2);sc.add(w)}
+}
+build112KmWorld();
+// 30 ATMs and all city markers appear on the map; POI markers can be hidden from Settings.
+const _thezOriginalDrawMap=drawMap;
+drawMap=function(ctx,w,h,cx,cz,zoom){
+ _thezOriginalDrawMap(ctx,w,h,cx,cz,zoom);
+ if(!mapPoiVisible)return;const tr=mapTransform(w,h,cx,cz,zoom);ctx.save();
+ for(const p of cityPOIs){const x=tr.x(p.x),y=tr.y(p.z);if(x<-12||y<-12||x>w+12||y>h+12)continue;const r=Math.max(3.2,Math.min(8,5.1*tr.scale));ctx.globalAlpha=.95;ctx.fillStyle=p.color;ctx.strokeStyle='#08111c';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();if(tr.scale>.22){ctx.fillStyle='#07111c';ctx.font=`bold ${Math.max(7,8*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.icon,x,y)}}
+ ctx.restore();
+};
+const _thezOpenMap=openFullMap;
+openFullMap=function(){mapState.open=true;mapState.cx=0;mapState.cz=0;mapState.zoom=.085;$('mapOverlay').classList.add('open');$('mapOverlay').setAttribute('aria-hidden','false');updateMaps()};
+// Five named coast destinations are included in the five-beach catalogue and map.
+function updateCityExpansion(dt){if(activeCityJob){const d=Math.hypot(player.x-activeCityJob.x,player.z-activeCityJob.z);if(d<18){playerWallet+=activeCityJob.reward;const name=activeCityJob.name;activeCityJob=null;saveCityProfile();showToast(`أنجزت المهمة ${name}! حصلت على مكافأة.`,3000);if($('worldHubPanel').classList.contains('open'))renderWorldHub(activeHubTab)}}updateCityAnimals(dt)}
+// Wrap start button listener so the two new city controls are visible once gameplay starts.
+$('startBtn').addEventListener('click',()=>{setTimeout(()=>{if(gameStarted){$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';renderWorldHub('jobs')}},250)});
+// Restore saved local economy and inventory in the top-level hub.
+$('worldStats').innerHTML=`<span class="world-pill">الرصيد: $${playerWallet.toLocaleString('en-US')}</span><span class="world-pill">المساحة: 112 كم²</span>`;
+
 </script>
 </body>
 </html>

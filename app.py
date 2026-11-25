@@ -49,7 +49,6 @@ ALLOWED_VEHICLES = {
     "motorcycle", "gangBike", "bicycle", "jetski", "fighter",
     "helicopter", "airliner", "seaplane", "boat", "ship",
 }
-ALLOWED_WEAPONS = {"fist","smg","shotgun","deagle","rifle","sniper","knife","bat","crowbar","hammer","katana","axe"}
 ALLOWED_ANIMATIONS = {
     "idle", "walk", "run", "wave", "dance", "sit", "jump", "jumpTuck", "jumpLong", "jumpSide",
     "land", "swim", "treadWater", "drive", "rideBike", "rideChopper",
@@ -127,8 +126,6 @@ def public_state(state: dict[str, Any]) -> dict[str, Any]:
         "vehicleType": state["vehicleType"],
         "vehicleColor": state["vehicleColor"],
         "vehicleSpeed": state["vehicleSpeed"],
-        "weapon": state.get("weapon", "fist"),
-        "health": state.get("health", 100),
     }
 
 
@@ -338,9 +335,9 @@ async def multiplayer_socket(websocket: WebSocket):
                     "name": name,
                     "gender": gender,
                     "character": character,
-                    "x": safe_number(packet.get("x"), -1100.0, -5000.0, 5000.0),
+                    "x": safe_number(packet.get("x"), -1100.0, -5300.0, 5300.0),
                     "y": safe_number(packet.get("y"), 0.0, -80.0, 800.0),
-                    "z": safe_number(packet.get("z"), 12.0, -5000.0, 5000.0),
+                    "z": safe_number(packet.get("z"), 12.0, -5300.0, 5300.0),
                     "heading": safe_number(packet.get("heading"), 0.0, -100.0, 100.0),
                     "anim": packet.get("anim") if isinstance(packet.get("anim"), str) and packet.get("anim") in ALLOWED_ANIMATIONS else "idle",
                     "ragdoll": bool(packet.get("ragdoll")),
@@ -355,30 +352,9 @@ async def multiplayer_socket(websocket: WebSocket):
                     "vehicleType": vehicle_type if in_vehicle else "",
                     "vehicleColor": vehicle_color if in_vehicle else "",
                     "vehicleSpeed": safe_number(packet.get("vehicleSpeed"), 0.0, -110.0, 110.0) if in_vehicle else 0.0,
-                    "weapon": packet.get("weapon") if isinstance(packet.get("weapon"), str) and packet.get("weapon") in ALLOWED_WEAPONS else "fist",
-                    "health": safe_number(packet.get("health"), 100.0, 0.0, 100.0),
                 }
                 clients[player_id]["state"] = state
                 await send_to_room(WORLD_ROOM, {"type": "player_update", "player": public_state(state)}, exclude=player_id)
-                continue
-
-            if packet_type in ("combat", "weapon", "combat_sound"):
-                # Relay combat / weapon / synced sound to everyone else - no trust in damage, clients apply locally.
-                weapon = str(packet.get("weapon", "fist"))[:20]
-                if weapon not in ALLOWED_WEAPONS:
-                    weapon = "fist"
-                payload = {
-                    "type": packet_type,
-                    "from": player_id,
-                    "action": str(packet.get("action", "shot"))[:20] if packet_type == "combat" else None,
-                    "weapon": weapon,
-                    "x": safe_number(packet.get("x"), 0.0, -5000.0, 5000.0),
-                    "y": safe_number(packet.get("y"), 0.0, -80.0, 800.0),
-                    "z": safe_number(packet.get("z"), 0.0, -5000.0, 5000.0),
-                    "heading": safe_number(packet.get("heading"), 0.0, -100.0, 100.0),
-                    "damage": safe_number(packet.get("damage"), 0.0, 0.0, 200.0),
-                }
-                await send_to_room(WORLD_ROOM, payload, exclude=player_id)
                 continue
 
             if packet_type == "world_state":
