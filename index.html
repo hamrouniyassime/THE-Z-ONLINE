@@ -433,16 +433,17 @@ function city(cx){
  [-200,-100,0,100,200].forEach(r=>{for(let t=-216;t<=216;t+=18)if(!nearX(t)&&!nearX(t+0))[-10.5,10.5].forEach(o=>{if(R()<.7){palm(cx+t,r+o);palm(cx+r+o,t)}})});
  for(let n=0;n<70;n++){const[x,z]=ring();palm(cx+x,z)}
  for(let n=0;n<45;n++){const[x,z]=ring();umb.push({x:cx+x,y:2.4,z,sx:1,sy:1,sz:1,c:pk(['#ff4f9a','#27d4e8','#ffd23f','#fff','#ff7a3d'])});umbP.push({x:cx+x,y:1.1,z})}}
-const CX=[3200]; // One south-east city; the old central city meshes are intentionally disabled.
+const CX=[-1100,1100];CX.forEach(city);
 
 /* ========= شاطئ فايس بيتش: رمال وأنشطة ومياه قابلة للسباحة ========= */
-const BEACH={id:'north-west-cove',cx:-4540,minX:-4850,maxX:-4230,sandMinZ:-390,sandMaxZ:-160,shoreZ:-160,waterMinZ:-160,waterMaxZ:270,dir:1};
+const BEACH={id:'vice-south',cx:-1100,minX:-1400,maxX:-800,sandMinZ:270,sandMaxZ:555,shoreZ:555,waterMinZ:555,waterMaxZ:1180,dir:1};
+// جميع الشواطئ تستخدم نفس حدود الرمل والماء وأنظمة السباحة والأنشطة.
 const BEACHES=[
  BEACH,
- {id:'south-west-bay',cx:-2820,minX:-3120,maxX:-2520,sandMinZ:1800,sandMaxZ:2050,shoreZ:2050,waterMinZ:2050,waterMaxZ:2450,dir:1},
- {id:'south-central-bay',cx:320,minX:20,maxX:620,sandMinZ:2150,sandMaxZ:2400,shoreZ:2400,waterMinZ:2400,waterMaxZ:2850,dir:1},
- {id:'south-east-bay',cx:2980,minX:2680,maxX:3280,sandMinZ:1780,sandMaxZ:2020,shoreZ:2020,waterMinZ:2020,waterMaxZ:2450,dir:1},
- {id:'east-cove',cx:4350,minX:4050,maxX:4650,sandMinZ:380,sandMaxZ:620,shoreZ:620,waterMinZ:620,waterMaxZ:1050,dir:1}
+ {id:'vice-north',cx:-1100,minX:-1400,maxX:-800,sandMinZ:-555,sandMaxZ:-270,shoreZ:-555,waterMinZ:-1180,waterMaxZ:-555,dir:-1},
+ {id:'ocean-north',cx:1100,minX:800,maxX:1400,sandMinZ:-555,sandMaxZ:-270,shoreZ:-555,waterMinZ:-1180,waterMaxZ:-555,dir:-1},
+ {id:'south-cove',cx:-3700,minX:-4000,maxX:-3400,sandMinZ:800,sandMaxZ:1085,shoreZ:1085,waterMinZ:1085,waterMaxZ:1680,dir:1},
+ {id:'east-bay',cx:3600,minX:3300,maxX:3900,sandMinZ:-1085,sandMaxZ:-800,shoreZ:-1085,waterMinZ:-1680,waterMaxZ:-1085,dir:-1}
 ];
 function beachZoneAt(x,z){return BEACHES.find(b=>x>=b.minX-35&&x<=b.maxX+35&&z>=b.waterMinZ&&z<=b.waterMaxZ||x>=b.minX&&x<=b.maxX&&z>=b.sandMinZ&&z<=b.sandMaxZ)||null}
 function isBeachSand(x,z){return BEACHES.some(b=>x>b.minX&&x<b.maxX&&z>=b.sandMinZ&&z<=b.sandMaxZ)}
@@ -470,7 +471,7 @@ function buildBeach(){
  const kiosk=new T.Group(),kioskBody=new T.Mesh(new T.BoxGeometry(9,4,6),new T.MeshStandardMaterial({color:0xf3e6c7,roughness:.9}));kioskBody.position.y=2;kiosk.add(kioskBody);const kioskRoof=new T.Mesh(new T.BoxGeometry(10,.35,7),red);kioskRoof.position.y=4.15;kiosk.add(kioskRoof);beachProp(kiosk,-880,0,324);
  const pier=new T.Mesh(new T.BoxGeometry(5,.22,82),wood);pier.position.set(-920,-.06,520);sc.add(pier);for(let z=490;z<560;z+=12)for(const x of[-922,-918]){const post=new T.Mesh(new T.CylinderGeometry(.12,.14,2.2,6),wood);post.position.set(x,-.9,z);sc.add(post)}
 }
-// Legacy beach mesh disabled; the island builder creates beaches at the reference-map coasts.
+buildBeach();
 function buildAdditionalBeach(zone){
  const mid=(zone.sandMinZ+zone.sandMaxZ)/2,depth=zone.sandMaxZ-zone.sandMinZ;
  const sand=new T.Mesh(new T.PlaneGeometry(600,depth).rotateX(-Math.PI/2),sandM);sand.position.set(zone.cx,-.20,mid);sc.add(sand);
@@ -494,7 +495,7 @@ function buildAdditionalBeach(zone){
  const waveMat=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.36});for(let i=0;i<5;i++){const wave=new T.Mesh(new T.PlaneGeometry(540,1.2),waveMat);wave.rotation.x=-Math.PI/2;wave.position.set(zone.cx,-.48,zone.shoreZ+zone.dir*(7+i*8));sc.add(wave);beachWaves.push({mesh:wave,phase:i*1.4+zone.cx*.0005,baseZ:zone.shoreZ,dir:zone.dir})}
  const pier=new T.Mesh(new T.BoxGeometry(5,.22,82),wood);pier.position.set(zone.cx+90,-.06,zone.shoreZ+zone.dir*35);sc.add(pier);for(let z=0;z<7;z++)for(const x of[zone.cx+87,zone.cx+93]){const post=new T.Mesh(new T.CylinderGeometry(.12,.14,2.2,6),wood);post.position.set(x,-.9,zone.shoreZ+zone.dir*(z*11+4));sc.add(post)}
 }
-// Legacy beach meshes disabled; see build112KmWorld().
+for(const zone of BEACHES.slice(1))buildAdditionalBeach(zone);
 inst(new T.CylinderGeometry(.25,.4,1,6).translate(0,.5,0),new T.MeshLambertMaterial({color:0x8a6a4a}),palmT);
 inst(new T.ConeGeometry(3.4,1.6,9,1,true).translate(0,.4,0),new T.MeshLambertMaterial({color:0x2f9a4a,side:T.DoubleSide}),palmC);
 inst(new T.CylinderGeometry(.12,.16,8,6).translate(0,4,0),new T.MeshStandardMaterial({color:0x40404a}),lampP);
@@ -502,7 +503,81 @@ inst(new T.BoxGeometry(.7,.25,1.2),new T.MeshBasicMaterial({color:0xffe1a8}),lam
 inst(new T.ConeGeometry(2.6,1,10),new T.MeshLambertMaterial({color:0xffffff}),umb);
 inst(new T.CylinderGeometry(.08,.08,2.4,5).translate(0,0,0),new T.MeshLambertMaterial({color:0xdddddd}),umbP);
 // تمت إزالة السيارات الصندوقية القديمة؛ سيتم وضع مركبات المعرض التفصيلية لاحقاً.
-// Obsolete central bridge, airport and suburb meshes removed; island landmarks are built below.
+// الجسر
+const BL=872,bg=new T.Group();sc.add(bg);
+const dk=cnv(512,176),dx=dk.getContext('2d');dx.fillStyle='#9a98a0';dx.fillRect(0,0,512,176);dx.fillStyle='#27272c';dx.fillRect(0,32,512,112);dx.fillStyle='#e8c32a';dx.fillRect(0,84,512,3);dx.fillRect(0,90,512,3);dx.fillStyle='#eee';dx.fillRect(0,36,512,3);dx.fillRect(0,137,512,3);for(let x=0;x<512;x+=128){dx.fillRect(x,59,64,3);dx.fillRect(x,114,64,3)}
+const dt=mkT(dk,1);dt.repeat.set(BL*2/64,1);
+const deck=new T.Mesh(new T.BoxGeometry(BL*2,1.4,22),new T.MeshStandardMaterial({color:0x6d6b73}));deck.position.y=-.7;bg.add(deck);
+const rd=new T.Mesh(new T.PlaneGeometry(BL*2,22).rotateX(-Math.PI/2),new T.MeshStandardMaterial({map:dt,roughness:.9}));rd.position.y=.03;bg.add(rd);
+const cm=new T.MeshStandardMaterial({color:0xd9d9e0,roughness:.6});
+[-10.8,10.8].forEach(z=>{const r=new T.Mesh(new T.BoxGeometry(BL*2,.9,.4),cm);r.position.set(0,.45,z);bg.add(r)});
+for(let x=-860;x<=860;x+=108){const p=new T.Mesh(new T.BoxGeometry(5,34,8),new T.MeshStandardMaterial({color:0x8d8b93}));p.position.set(x,-17,0);bg.add(p)}
+const TX=[-436,0,436],cp=[],TOP=95;
+TX.forEach(x=>{[-12.5,12.5].forEach(z=>{const l=new T.Mesh(new T.BoxGeometry(3.2,TOP+30,3.2),cm);l.position.set(x,(TOP-30)/2,z);bg.add(l)});[58,88].forEach(y=>{const b=new T.Mesh(new T.BoxGeometry(3,3,28),cm);b.position.set(x,y,0);bg.add(b)})});
+const spans=[[-BL,-436,-BL],[-436,0,-218],[0,436,218],[436,BL,BL]];
+spans.forEach(([a,b,v])=>{const lo=(a==-BL||b==BL)?6:10;[-12.5,12.5].forEach(z=>{let px=null;for(let x=a;x<=b+.1;x+=6){const k=a==-BL?(x-v)/(b-v):b==BL?(x-v)/(a-v):(x-v)/((b-a)/2),y=lo+(TOP-lo)*k*k;
+ if(px){cp.push(px[0],px[1],z,x,y,z)}px=[x,y];if(x%12==0&&Math.abs(x-a)>8&&Math.abs(x-b)>8)cp.push(x,y,z,x,.5,z)}})});
+const cg=new T.BufferGeometry();cg.setAttribute('position',new T.Float32BufferAttribute(cp,3));bg.add(new T.LineSegments(cg,new T.LineBasicMaterial({color:0xf0f0f8})));
+{const L=[],H=[];for(let x=-BL;x<=BL;x+=30)[-10.3,10.3].forEach(z=>{L.push({x,y:0,z});H.push({x,y:8,z})});
+ inst(new T.CylinderGeometry(.12,.16,8,6).translate(0,4,0),new T.MeshStandardMaterial({color:0x40404a}),L);inst(new T.BoxGeometry(1.2,.25,.7),new T.MeshBasicMaterial({color:0xffe1a8}),H)}
+
+
+/* ========= توسعة أوشن هايتس: مطار دولي قابل للاستخدام ========= */
+const AIRPORT={cx:1580,cz:0,minX:1280,maxX:2040,minZ:-270,maxZ:270};
+function airportMesh(geo,material,x,y,z,ry=0){const m=new T.Mesh(geo,material);m.position.set(x,y,z);m.rotation.y=ry;m.receiveShadow=true;m.castShadow=true;sc.add(m);return m}
+const airportRoadMat=new T.MeshStandardMaterial({color:0x292d35,roughness:.95});
+const runwayMat=new T.MeshStandardMaterial({color:0x343940,roughness:.94});
+const runwayMarkMat=new T.MeshBasicMaterial({color:0xf0f0e9});
+const airportConcrete=new T.MeshStandardMaterial({color:0x8b9098,roughness:.9});
+// apron + long runway + taxiways
+airportMesh(new T.PlaneGeometry(820,560).rotateX(-Math.PI/2),airportConcrete,1580,-.22,0);
+airportMesh(new T.BoxGeometry(650,.12,58),runwayMat,1640,-.06,0);
+airportMesh(new T.BoxGeometry(520,.10,20),airportRoadMat,1440,-.02,78);
+airportMesh(new T.BoxGeometry(22,.10,300),airportRoadMat,1360,-.01,-20);
+airportMesh(new T.BoxGeometry(22,.10,300),airportRoadMat,1905,-.01,-20);
+for(let x=1340;x<=1940;x+=28){airportMesh(new T.BoxGeometry(12,.018,.38),runwayMarkMat,x,.012,0)}
+for(const x of[1335,1348,1932,1945])for(const z of[-18,-9,0,9,18])airportMesh(new T.BoxGeometry(1.2,.02,2.4),runwayMarkMat,x,.015,z);
+for(let x=1320;x<=1900;x+=40){for(const z of[-31,31]){const lamp=new T.Mesh(new T.SphereGeometry(.38,8,6),new T.MeshBasicMaterial({color:0xfff1b0}));lamp.position.set(x,.65,z);sc.add(lamp)}}
+// terminal and gates
+airportMesh(new T.BoxGeometry(150,12,34),new T.MeshStandardMaterial({color:0xd7dce5,roughness:.65}),1470,6,145);
+airportMesh(new T.BoxGeometry(154,1.1,38),new T.MeshStandardMaterial({color:0x3c536b}),1470,12.4,145);
+airportMesh(new T.BoxGeometry(18,38,18),new T.MeshStandardMaterial({color:0x75889b}),1375,19,198);
+airportMesh(new T.BoxGeometry(18,4,18),new T.MeshStandardMaterial({color:0xb7c4d4}),1375,39,198);
+for(let x of[1405,1440,1475,1510,1545]){airportMesh(new T.BoxGeometry(2,3,9),new T.MeshStandardMaterial({color:0x71b6d6,transparent:true,opacity:.7}),x,5,127)}
+// Hangars around the apron
+for(const [x,z] of[[1620,-118],[1745,-118],[1870,-118],[1620,112],[1745,112]]){
+ airportMesh(new T.BoxGeometry(76,16,48),new T.MeshStandardMaterial({color:0xc4cbd2,roughness:.8}),x,8,z);
+ airportMesh(new T.BoxGeometry(78,2,50),new T.MeshStandardMaterial({color:0x59616c}),x,16.5,z);
+ airportMesh(new T.BoxGeometry(34,12,.8),new T.MeshStandardMaterial({color:0x48525e}),x,6,z+24.2);
+}
+// airport boundary/access roads
+airportMesh(new T.BoxGeometry(700,.08,12),airportRoadMat,1600,.01,220);
+airportMesh(new T.BoxGeometry(12,.08,350),airportRoadMat,1265,.01,45);airportMesh(new T.BoxGeometry(12,.08,120),airportRoadMat,1280,.01,260);
+
+/* حي أوشن نورث السكني: مساحة توسعة تقارب مساحة قلب المدينة الشرقية */
+const suburbGroundMat=new T.MeshStandardMaterial({color:0x758b61,roughness:1});
+const suburbSideMat=new T.MeshStandardMaterial({color:0xb6b6ae,roughness:.95});
+const suburbRoadMat=new T.MeshStandardMaterial({color:0x30343a,roughness:.96});
+airportMesh(new T.PlaneGeometry(820,300).rotateX(-Math.PI/2),suburbGroundMat,1640,-.24,430);
+const suburbXs=[1280,1400,1520,1640,1760,1880,2000],suburbZs=[320,420,520];
+for(const z of suburbZs){airportMesh(new T.BoxGeometry(760,.08,12),suburbRoadMat,1640,.005,z);airportMesh(new T.BoxGeometry(760,.025,1.1),suburbSideMat,1640,.045,z-9);airportMesh(new T.BoxGeometry(760,.025,1.1),suburbSideMat,1640,.045,z+9)}
+for(const x of suburbXs){airportMesh(new T.BoxGeometry(12,.08,220),suburbRoadMat,x,.006,420);airportMesh(new T.BoxGeometry(1.1,.025,220),suburbSideMat,x-9,.045,420);airportMesh(new T.BoxGeometry(1.1,.025,220),suburbSideMat,x+9,.045,420)}
+const suburbHouseM=['#d9c7a4','#d4dbe3','#b9d1cc','#dfb9a8','#e6dfc9'].map(c=>new T.MeshStandardMaterial({color:c,roughness:.9}));
+const suburbRoofM=['#8b5144','#555d68','#a06d43','#4c6c5c'].map(c=>new T.MeshStandardMaterial({color:c,roughness:.92}));
+const suburbWindowM=new T.MeshStandardMaterial({color:0x7db6ce,roughness:.22,metalness:.15});
+for(let ix=0;ix<suburbXs.length-1;ix++)for(const zc of[370,470]){
+ const x=(suburbXs[ix]+suburbXs[ix+1])/2+ra(-8,8),z=zc+ra(-5,5),w=ra(27,42),d=ra(25,34),h=ra(9,16);
+ const body=new T.Mesh(new T.BoxGeometry(w,h,d),pk(suburbHouseM));body.position.set(x,h/2,z);body.castShadow=true;body.receiveShadow=true;sc.add(body);
+ const roof=new T.Mesh(new T.ConeGeometry(Math.max(w,d)*.72,ra(3,5),4),pk(suburbRoofM));roof.position.set(x,h+1.5,z);roof.rotation.y=Math.PI/4;roof.castShadow=true;sc.add(roof);
+ const win1=new T.Mesh(new T.BoxGeometry(3,2.4,.12),suburbWindowM),win2=win1.clone();win1.position.set(x-w*.22,h*.58,z+d/2+.08);win2.position.set(x+w*.22,h*.58,z+d/2+.08);sc.add(win1,win2);
+ boxes.push([x-w/2-1,x+w/2+1,z-d/2-1,z+d/2+1,h+4]);
+}
+// مباني المطار والهنغارات كعوائق تصادمية مستقلة
+boxes.push([1395,1545,128,162,13],[1366,1384,189,207,41]);
+for(const [x,z] of[[1620,-118],[1745,-118],[1870,-118],[1620,112],[1745,112]])boxes.push([x-38,x+38,z-24,z+24,18]);
+const marinaDeckMat=new T.MeshStandardMaterial({color:0x74634f,roughness:.94});airportMesh(new T.BoxGeometry(420,.75,130),marinaDeckMat,1180,-.02,-345);for(const x of[990,1050,1110,1170,1230,1290,1350,1380])for(const z of[-400,-290])airportMesh(new T.BoxGeometry(1.4,4,1.4),new T.MeshStandardMaterial({color:0x514536}),x,-2,z);
+
+
 const Q=Math.PI/2;const spin=[];function H(g,m,v){
  const mk=(geo,p,x=0,y=0,z=0,rx=0,ry=0,rz=0,s)=>{const o=new T.Mesh(geo,m[p]);o.position.set(x,y,z);o.rotation.set(rx,ry,rz);if(s)o.scale.set(s[0],s[1],s[2]);o.castShadow=true;g.add(o);return o};
  const grp=(x,y,z,a,k)=>{const q=new T.Group();q.position.set(x,y,z);g.add(q);spin.push({o:q,a,k});return q};
@@ -940,8 +1015,8 @@ function randomCharacterCfg(){
  return {g,hair:g==='f'?pk(['long','pony','short','spiky']):pk(['short','buzz','spiky','short','bald']),hc:pk(hairColors),skin:pk(skinColors),eye:pk(['#34251d','#31526a','#171717','#4d382e']),shirt:pk(shirtColors),pants:pk(pantColors),shoe:pk(shoeColors),beard:g==='m'&&R()<.24,glasses:R()<.16,skirt:g==='f'&&R()<.35};
 }
 function showToast(message,duration=2300){const t=$('toast');t.textContent=message;t.classList.add('show');toastTimer=duration/1000}
-function cityName(x){return x>1950?'المدينة الساحلية':x<-1100?'قرى ومزارع الجزيرة': 'مرتفعات الجبل والغابات'}
-function inCity(x,z,s=295){return (x>2050-s&&x<4400+s&&z>150-s&&z<1950+s)}
+function cityName(x){return x>3900?'مناطق العقارات الداخلية':x<-700?'فايس بيتش — المدينة الغربية':x>700?'أوشن هايتس — المدينة الشرقية':'الجسر الكبير'}
+function inCity(x,z,s=295){return (Math.abs(x+1100)<s&&Math.abs(z)<s)||(Math.abs(x-1100)<Math.max(s,850)&&Math.abs(z)<Math.max(s,520))||(x>1240&&x<2040&&z>295&&z<565)}
 function walkZone(x,z){return Number.isFinite(x)&&Number.isFinite(z)&&Math.abs(x)<=5291&&Math.abs(z)<=5291}
 function insideBox(x,z,b,pad=0){return x>b[0]-pad&&x<b[1]+pad&&z>b[2]-pad&&z<b[3]+pad}
 function groundAt(x,z){let h=0;for(const b of boxes)if(insideBox(x,z,b,-.03)&&b[4])h=Math.max(h,b[4]);return h}
@@ -957,10 +1032,26 @@ function initCrowdBatches(){
  for(const [key,geo] of specs){const mesh=new T.InstancedMesh(geo,crowdMat(0xffffff),2600);mesh.count=0;mesh.frustumCulled=false;mesh.castShadow=false;mesh.receiveShadow=false;mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);sc.add(mesh);crowdBatches[key]={mesh,y:key==='torso'?1.22:key==='head'?1.70:key==='hair'?1.88:key==='legs'?.53:.10,color:key==='torso'?'shirt':key==='head'?'skin':key==='hair'?'hc':key==='legs'?'pants':'shoe'};}
 }
 function makeWalkerRoute(cx,startX,startZ){
- const rows=[150,450,750,1050,1350,1650],cols=[2150,2450,2750,3050,3350,3650,3950,4250];
- const nearest=(a,v)=>a.reduce((best,n)=>Math.abs(n-v)<Math.abs(best-v)?n:best,a[0]);
- if(R()<.7){const row=nearest(rows,startZ),side=startZ<row?-14:14,z=row+side,span=ra(150,420),x1=Math.max(2190,Math.min(4210,startX-span)),x2=Math.max(2190,Math.min(4210,startX+span));return [[x1,z],[x2,z]]}
- const col=nearest(cols,startX),side=startX<col?-14:14,x=col+side,span=ra(140,360),z1=Math.max(180,Math.min(1770,startZ-span)),z2=Math.max(180,Math.min(1770,startZ+span));return [[x,z1],[x,z2]];
+ const zone=beachZoneAt(startX,startZ);
+ if(zone){const water=isBeachWater(startX,startZ),xA=Math.max(zone.minX+35,Math.min(zone.maxX-35,startX-55)),xB=Math.max(zone.minX+35,Math.min(zone.maxX-35,startX+55));
+  let zA,zB;if(water){zA=zone.dir>0?Math.min(zone.waterMaxZ-35,zone.waterMinZ+48):Math.max(zone.waterMinZ+35,zone.waterMaxZ-48);zB=zone.dir>0?Math.min(zone.waterMaxZ-45,zA+125):Math.max(zone.waterMinZ+45,zA-125)}else{zA=zone.dir>0?zone.sandMinZ+35:zone.sandMaxZ-35;zB=zone.dir>0?zone.sandMaxZ-35:zone.sandMinZ+35}
+  return [[xA,zA],[xB,zA],[xB,zB],[xA,zB]]}
+ if(cx===1100&&startZ>295&&startZ<565){
+  const xs=[1280,1400,1520,1640,1760,1880,2000],zs=[320,420,520];
+  const a=xs[1+(R()*(xs.length-2)|0)],b=xs[1+(R()*(xs.length-2)|0)],c=zs[R()*zs.length|0],d=zs[R()*zs.length|0];
+  const x1=a+(R()<.5?-8.5:8.5),x2=b+(R()<.5?-8.5:8.5),z1=c+(R()<.5?-8.5:8.5),z2=d+(R()<.5?-8.5:8.5);
+  let pts=[[x1,z1],[x2,z1],[x2,z2],[x1,z2]];
+  if(Math.abs(x1-x2)<15)pts=[[xs[1],z1],[xs[xs.length-2],z1],[xs[xs.length-2],z2],[xs[1],z2]];
+  if(Math.abs(z1-z2)<15)pts=[[x1,zs[0]],[x2,zs[0]],[x2,zs[2]],[x1,zs[2]]];
+  let near=0,nd=Infinity;pts.forEach((v,i)=>{const q=Math.hypot(v[0]-startX,v[1]-startZ);if(q<nd){nd=q;near=i}});return pts.slice(near).concat(pts.slice(0,near));
+ }
+ const xs=[-200,-150,-100,-50,0,50,100,150,200],zs=xs;
+ const a=xs[1+(R()*(xs.length-2)|0)],b=xs[1+(R()*(xs.length-2)|0)],c=zs[1+(R()*(zs.length-2)|0)],d=zs[1+(R()*(zs.length-2)|0)];
+ const x1=cx+a+(R()<.5?-8.8:8.8),x2=cx+b+(R()<.5?-8.8:8.8),z1=c+(R()<.5?-8.8:8.8),z2=d+(R()<.5?-8.8:8.8);
+ let pts=[[x1,z1],[x2,z1],[x2,z2],[x1,z2]];
+ if(Math.abs(x1-x2)<15)pts=[[cx-158,z1],[cx+158,z1],[cx+158,z2],[cx-158,z2]];
+ if(Math.abs(z1-z2)<15)pts=[[x1,-158],[x2,-158],[x2,158],[x1,158]];
+ let near=0,nd=Infinity;pts.forEach((v,i)=>{const q=Math.hypot(v[0]-startX,v[1]-startZ);if(q<nd){nd=q;near=i}});return pts.slice(near).concat(pts.slice(0,near));
 }
 
 function registerPedestrian(ch,cfg,x,z,scale=1,id=null,cx=null){
@@ -981,18 +1072,21 @@ function beachResidentSpawn(zone,i){
  return {role:'swim',x:zone.minX+30+(swimIndex%10)*59,z:waterZ};
 }
 function spawnPedestrians(){
- const rows=[150,450,750,1050,1350,1650],cols=[2150,2450,2750,3050,3350,3650,3950,4250];
- for(let i=0;i<RESIDENTS_PER_CITY;i++){
-  let x=3200,z=1570,tries=0;
-  do{
-   if(R()<.68){const road=pk(rows);x=ra(2200,4200);z=road+(R()<.5?-14:14)}
-   else{const road=pk(cols);x=road+(R()<.5?-14:14);z=ra(180,1770)}
-   x+=ra(-2,2);z+=ra(-2,2);tries++;
-  }while(tries<70&&blockedAt(x,z,0,.7));
-  if(blockedAt(x,z,0,.7)){x=2200+(i%6)*390;z=180+Math.floor(i/6%5)*290}
-  const cfg=randomCharacterCfg(),p=registerPedestrian(null,cfg,x,z,.88+R()*.22,`resident_city_${i}`,3200);
-  p.path=makeWalkerRoute(3200,x,z);p.pause=R()<.16?.4+R()*1.5:0;p.gesture=R()<.08?'wave':'walk';pedestrians.push(p);
- }
+ for(let ci=0;ci<CX.length;ci++){const cx=CX[ci];for(let i=0;i<RESIDENTS_PER_CITY;i++){
+  let x,z,tries=0,role=null,beachZone=null;
+  if(ci===0&&i<150){beachZone=BEACH;const q=beachResidentSpawn(beachZone,i);role=q.role;x=q.x;z=q.z}
+  else if(ci===0&&i<300){beachZone=BEACHES[1];const q=beachResidentSpawn(beachZone,i-150);role=q.role;x=q.x;z=q.z}
+  else if(ci===1&&i<150){beachZone=BEACHES[2];const q=beachResidentSpawn(beachZone,i);role=q.role;x=q.x;z=q.z}
+  else{do{
+    const expanded=ci===1&&i>=Math.round(RESIDENTS_PER_CITY*.62);
+    if(expanded){const subX=[1280,1400,1520,1640,1760,1880,2000],subZ=[320,420,520];x=pk(subX)+(R()<.5?-8.7:8.7)+ra(-1.1,1.1);z=pk(subZ)+(R()<.5?-8.7:8.7)+ra(-1.1,1.1)}
+    else{const rx=roads[1+(R()*7|0)]+(R()<.5?-8.8:8.8),rz=roads[1+(R()*7|0)]+(R()<.5?-8.8:8.8);x=cx+rx;z=rz}
+    x+=ra(-2.0,2.0);z+=ra(-2.0,2.0);tries++;
+   }while(tries<16&&blockedAt(x,z,0,.55));}
+  const cfg=randomCharacterCfg(),p=registerPedestrian(null,cfg,x,z,.88+R()*.22,`resident_${ci}_${i}`,cx);
+  if(role){p.beachRole=role;p.beachZoneId=beachZone?.id||BEACH.id;p.pause=role==='sit'?60:role==='play'?R()*1.2:0;if(role==='play')p.scale=.72;p.speed=role==='jog'?1.65:role==='swim'?.7:.85+R()*.3;p.path=makeWalkerRoute(cx,x,z);p.gesture=role==='sit'?'sit':role==='play'?'beachPlay':'walk';p.swimBob=R()*6;}
+  pedestrians.push(p);
+ }}
  initCrowdBatches();
 }
 spawnPedestrians();
@@ -1113,27 +1207,27 @@ function spawnTraffic(){
  }
 }
 
-// Legacy two-city traffic spawn removed; the new island city spawns its own 100 vehicles.
+spawnTraffic();
 
 /* ========= طائرات ومراكب قابلة للقيادة ========= */
 function addSpecialVehicle(type,color,x,y,z,heading=0,variant=0){const v=createTrafficVehicle(type,color,Math.abs(x)>700?1100:-1100,'special',0,0,1,{id:`special_${type}_${traffic.length}`,x,z,y,heading,variant});traffic.push(v);return v}
 // Airport fleet: all aircraft are parked on apron stands and can be boarded.
-addSpecialVehicle('airliner','#f3f4f7',-4050,0,-1400,Math.PI/2,0);
-addSpecialVehicle('airliner','#e7edf5',-3300,0,-1400,Math.PI/2,1);
-addSpecialVehicle('fighter','#778493',-4050,0,-1580,Math.PI/2,0);
-addSpecialVehicle('fighter','#53677f',-3800,0,-1580,Math.PI/2,1);
-addSpecialVehicle('fighter','#727b86',-3550,0,-1580,Math.PI/2,2);
-addSpecialVehicle('helicopter','#277b50',-4050,0,-1200,Math.PI/2,0);
-addSpecialVehicle('helicopter','#3b6f9a',-3300,0,-1200,Math.PI/2,1);
-addSpecialVehicle('seaplane','#f0c62c',-4580,0,-430,Math.PI,0);
-// Marina fleet beside the south-east city port.
-addSpecialVehicle('jetski','#f47723',4480,0,2630,Math.PI/2,0);
-addSpecialVehicle('jetski','#19a3cf',4580,0,2580,Math.PI/2,0);
-addSpecialVehicle('boat','#f1f3f6',4380,0,2450,Math.PI/2,0);
-addSpecialVehicle('boat','#2d82bb',4610,0,2380,Math.PI/2,1);
-addSpecialVehicle('ship','#203d66',4750,0,2500,Math.PI/2,1);
+addSpecialVehicle('airliner','#f3f4f7',1760,0,-85,Math.PI/2,0);
+addSpecialVehicle('airliner','#e7edf5',1930,0,65,Math.PI/2,1);
+addSpecialVehicle('fighter','#778493',1470,0,-55,Math.PI/2,0);
+addSpecialVehicle('fighter','#53677f',1585,0,-55,Math.PI/2,1);
+addSpecialVehicle('fighter','#727b86',1700,0,-55,Math.PI/2,2);
+addSpecialVehicle('helicopter','#277b50',1440,0,85,Math.PI/2,0);
+addSpecialVehicle('helicopter','#3b6f9a',1585,0,85,Math.PI/2,1);
+addSpecialVehicle('seaplane','#f0c62c',1840,0,185,Math.PI,0);
+// Beach / marina fleet from the same supplied vehicle catalogue.
+addSpecialVehicle('jetski','#f47723',1040,0,-400,Math.PI/2,0);
+addSpecialVehicle('jetski','#19a3cf',1100,0,-400,Math.PI/2,0);
+addSpecialVehicle('boat','#f1f3f6',1180,0,-400,Math.PI/2,0);
+addSpecialVehicle('boat','#2d82bb',1260,0,-400,Math.PI/2,1);
+addSpecialVehicle('ship','#203d66',1350,0,-395,Math.PI/2,1);
 // Freeze the shared ambient fleet size; later local mission/police vehicles are not part of this baseline.
-let MP_BASE_TRAFFIC_COUNT=traffic.length;
+const MP_BASE_TRAFFIC_COUNT=traffic.length;
 const vehicleFarMesh=new T.InstancedMesh(new T.BoxGeometry(1.9,.68,4.0),new T.MeshStandardMaterial({color:0xffffff,roughness:.85}),1200);vehicleFarMesh.count=0;vehicleFarMesh.frustumCulled=false;vehicleFarMesh.castShadow=false;sc.add(vehicleFarMesh);
 
 function ensureTrafficVisual(car){if(!car.root)buildTrafficVisual(car);return car.root}
@@ -1149,6 +1243,12 @@ let destination=null,routePoints=[],routeWorldLine=null,gpsRepathClock=0;
 const roadNodes=[],roadLookup=new Map();
 function addRoadNode(x,z){const key=Math.round(x)+','+Math.round(z);if(roadLookup.has(key))return roadLookup.get(key);const n={x,z,edges:[]};roadLookup.set(key,n);roadNodes.push(n);return n}
 function connectRoad(a,b){if(!a||!b)return;const cost=Math.hypot(a.x-b.x,a.z-b.z);a.edges.push({node:b,cost});b.edges.push({node:a,cost})}
+for(const cx of CX){const grid=roads.map(r=>roads.map(q=>addRoadNode(cx+r,q)));for(let i=0;i<roads.length;i++)for(let j=0;j<roads.length;j++){if(i<roads.length-1)connectRoad(grid[i][j],grid[i+1][j]);if(j<roads.length-1)connectRoad(grid[i][j],grid[i][j+1])}}
+// Airport access road and taxiway network in the expanded eastern city.
+const airportXs=[1280,1380,1480,1580,1680,1780,1880,1980],airportZs=[-200,-100,0,100,200];const airportGrid=airportXs.map(x=>airportZs.map(z=>addRoadNode(x,z)));for(let i=0;i<airportGrid.length;i++)for(let j=0;j<airportGrid[i].length;j++){if(i<airportGrid.length-1)connectRoad(airportGrid[i][j],airportGrid[i+1][j]);if(j<airportGrid[i].length-1)connectRoad(airportGrid[i][j],airportGrid[i][j+1])}connectRoad(closestRoadNode(1300,0),airportGrid[0][2]);
+const suburbGrid=suburbXs.map(x=>suburbZs.map(z=>addRoadNode(x,z)));for(let i=0;i<suburbGrid.length;i++)for(let j=0;j<suburbGrid[i].length;j++){if(i<suburbGrid.length-1)connectRoad(suburbGrid[i][j],suburbGrid[i+1][j]);if(j<suburbGrid[i].length-1)connectRoad(suburbGrid[i][j],suburbGrid[i][j+1])}for(let i=0;i<suburbGrid.length;i++)connectRoad(airportGrid[Math.min(i,airportGrid.length-1)][4],suburbGrid[i][0]);
+const marinaLine=[-200,-270,-330,-400].map(z=>addRoadNode(1180,z));for(let i=0;i<marinaLine.length-1;i++)connectRoad(marinaLine[i],marinaLine[i+1]);connectRoad(closestRoadNode(1180,-200),marinaLine[0]);for(const x of[980,1080,1180,1280,1380])connectRoad(addRoadNode(x,-400),marinaLine[3]);
+const bridgeNodes=[];for(let x=-900;x<=900;x+=50)bridgeNodes.push(addRoadNode(x,0));for(let i=0;i<bridgeNodes.length-1;i++)connectRoad(bridgeNodes[i],bridgeNodes[i+1]);
 function closestRoadNode(x,z){let best=roadNodes[0],bd=Infinity;for(const n of roadNodes){const d=(n.x-x)**2+(n.z-z)**2;if(d<bd){bd=d;best=n}}return best}
 function findRoadPath(sx,sz,tx,tz){
  const start=closestRoadNode(sx,sz),goal=closestRoadNode(tx,tz),dist=new Map([[start,0]]),prev=new Map(),open=[start],done=new Set();
@@ -1184,8 +1284,8 @@ function drawMap(ctx,w,h,cx,cz,zoom){
  ctx.strokeStyle='#292f36';ctx.lineWidth=Math.max(2,18*tr.scale);for(const v of[-3000,-1500,0,1500,3000]){ctx.beginPath();ctx.moveTo(tr.x(-5291),tr.y(v));ctx.lineTo(tr.x(5291),tr.y(v));ctx.stroke();ctx.beginPath();ctx.moveTo(tr.x(v),tr.y(-5291));ctx.lineTo(tr.x(v),tr.y(5291));ctx.stroke()}
  // Expanded airport district
  rect(1240,314,2040,326,'#282e35');rect(1240,414,2040,426,'#282e35');rect(1240,514,2040,526,'#282e35');for(const x of[1280,1400,1520,1640,1760,1880,2000])rect(x-6,310,x+6,530,'#282e35');
- rect(1315,-29,1965,29,'#343a43');ctx.strokeStyle='#f0f0e9';ctx.lineWidth=Math.max(1,2*tr.scale);ctx.setLineDash([7*tr.scale,7*tr.scale]);ctx.beginPath();ctx.moveTo(tr.x(-4120),tr.y(-1515));ctx.lineTo(tr.x(-3180),tr.y(-1515));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffffffb8';ctx.font=`bold ${Math.max(8,11*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.fillText('OCEAN INTERNATIONAL AIRPORT',tr.x(-3650),tr.y(-1510));
- if(mapPoiVisible){const ax=tr.x(-3650),ay=tr.y(-1450),sz=Math.max(23,38*tr.scale);if(airportMapSvg.complete&&airportMapSvg.naturalWidth)ctx.drawImage(airportMapSvg,ax-sz/2,ay-sz/2,sz,sz);else{ctx.fillStyle='#7be8ff';ctx.beginPath();ctx.arc(ax,ay,Math.max(5,9*tr.scale),0,Math.PI*2);ctx.fill()}}
+ rect(1315,-29,1965,29,'#343a43');ctx.strokeStyle='#f0f0e9';ctx.lineWidth=Math.max(1,2*tr.scale);ctx.setLineDash([7*tr.scale,7*tr.scale]);ctx.beginPath();ctx.moveTo(tr.x(1320),tr.y(0));ctx.lineTo(tr.x(1960),tr.y(0));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffffffb8';ctx.font=`bold ${Math.max(8,11*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.fillText('OCEAN INTERNATIONAL AIRPORT',tr.x(1630),tr.y(-48));
+ if(mapPoiVisible){const ax=tr.x(1630),ay=tr.y(-72),sz=Math.max(23,38*tr.scale);if(airportMapSvg.complete&&airportMapSvg.naturalWidth)ctx.drawImage(airportMapSvg,ax-sz/2,ay-sz/2,sz,sz);else{ctx.fillStyle='#7be8ff';ctx.beginPath();ctx.arc(ax,ay,Math.max(5,9*tr.scale),0,Math.PI*2);ctx.fill()}}
  // Long bridge across the sea
  rect(-872,-11,872,11,'#41464e');ctx.strokeStyle='#e5c85e';ctx.lineWidth=Math.max(1,1.2*tr.scale);ctx.setLineDash([8*tr.scale,8*tr.scale]);ctx.beginPath();ctx.moveTo(tr.x(-870),tr.y(0));ctx.lineTo(tr.x(870),tr.y(0));ctx.stroke();ctx.setLineDash([]);
  // District labels
@@ -1224,7 +1324,7 @@ $('poiEnabled').checked=mapPoiVisible;
 $('poiEnabled').addEventListener('change',e=>{mapPoiVisible=!!e.target.checked;localStorage.setItem('thez_poi_visible',mapPoiVisible?'1':'0');updateMaps()});
 $('airportClose').addEventListener('click',hideAirportPanel);
 $('airportReturnMap').addEventListener('click',hideAirportPanel);
-$('airportGps').addEventListener('click',()=>{setGpsDestination(-3650,-1450);hideAirportPanel();closeFullMap()});
+$('airportGps').addEventListener('click',()=>{setGpsDestination(1630,0);hideAirportPanel();closeFullMap()});
 function performSocialEmote(kind){
  if(!gameStarted||currentVehicle||vehicleTransition||playerDeath||player.ragdoll){showToast('اخرج من المركبة وانتظر حتى تنتهي الحركة الحالية.');return}
  if(!['wave','dance','sit'].includes(kind))return;
@@ -1241,7 +1341,7 @@ applyQuality(qualityMode,false);gameSound.applyUi();
 
 const signals=[];
 function makeSignal(x,z){const pole=new T.Mesh(new T.CylinderGeometry(.09,.12,5.2,8),mat(0x343943));pole.position.set(x,2.6,z);sc.add(pole);const box=new T.Mesh(new T.BoxGeometry(.55,1.45,.42),mat(0x171b24));box.position.set(x,5.35,z);sc.add(box);const red=new T.Mesh(new T.SphereGeometry(.16,10,8),new T.MeshStandardMaterial({color:0x511010,emissive:0x220000}));const amber=new T.Mesh(new T.SphereGeometry(.16,10,8),new T.MeshStandardMaterial({color:0x51400b,emissive:0x201600}));const green=new T.Mesh(new T.SphereGeometry(.16,10,8),new T.MeshStandardMaterial({color:0x0c401b,emissive:0x001800}));red.position.set(x,5.78,z+.23);amber.position.set(x,5.34,z+.23);green.position.set(x,4.9,z+.23);sc.add(red,amber,green);signals.push({red,amber,green})}
-for(const x of[2150,2750,3350,3950])for(const z of[820,1420,2020])makeSignal(x+8.8,z+8.8);
+for(const cx of CX)for(const x of[-50,50])for(const z of[-50,50])makeSignal(cx+x+8.8,z+8.8);
 function updateSignals(){const phase=worldTime%24,horiz=phase<10,vert=phase>=12&&phase<22,yellow=phase>=10&&phase<12||phase>=22;for(const s of signals){s.red.material.color.set(horiz?0x511010:0xff2020);s.red.material.emissive.set(horiz?0x220000:0xff0808);s.green.material.color.set(horiz?0x20ed62:0x0c401b);s.green.material.emissive.set(horiz?0x05b52e:0x001800);s.amber.material.color.set(yellow?0xffbf28:0x51400b);s.amber.material.emissive.set(yellow?0xe88c05:0x201600)}}
 function buildPedestrianSpatial(){const map=new Map();for(const p of allPedestrians()){const k=Math.floor(p.x/14)+','+Math.floor(p.z/14);let a=map.get(k);if(!a)map.set(k,a=[]);a.push(p)}return map}
 function addPoliceSiren(car){
@@ -2082,8 +2182,8 @@ const POI_DEFS = [
 const poiColor = Object.fromEntries(POI_DEFS.map(d=>[d[0],d[3]]));
 // Four planned POI districts. Each building occupies one parcel between streets.
 const THEZ_POI_DISTRICTS=[
- {cx:2500,cz:650},{cx:3500,cz:650},
- {cx:2500,cz:1550},{cx:3500,cz:1550}
+ {cx:-3500,cz:-3500},{cx:3500,cz:-3500},
+ {cx:-3500,cz:3500},{cx:3500,cz:3500}
 ];
 let thezPoiLotSerial=0;
 function thezPoiDimensions(type,i=0){
@@ -2095,8 +2195,8 @@ function thezPoiDimensions(type,i=0){
  else if(type==='warehouse'){w=20;d=18;h=11}
  else if(type==='electronics'||type==='grocery'||type==='gearshop'){w=13;d=12;h=8}
  else if(type==='construction'){w=19;d=18;h=18}
- else if(type==='skyscraper'){w=40;d=36;h=96+(i%5)*24}
- else if(type==='buytower'){w=24;d=22;h=54+(i%4)*15}
+ else if(type==='skyscraper'){w=21;d=19;h=48}
+ else if(type==='buytower'){w=18;d=17;h=28+(i%4)*5}
  else if(type==='cafe'||type==='gamingCafe'){w=11;d=10;h=6}
  else if(type==='correction'){w=19;d=15;h=13}
  return {w,d,h};
@@ -2114,8 +2214,8 @@ for(const def of POI_DEFS){
  const [type,label,count,color,icon,enterable]=def;
  for(let i=0;i<count;i++){
   let p=thezPoint(i,poiSerial+1,type);
-  if(type==='airport'){p=i===0?{x:-3650,z:-1450}:{x:2400,z:-1000}}
-  if(type==='beach'){const coords=[{x:-4540,z:-270},{x:-2820,z:1900},{x:320,z:2250},{x:2980,z:1900},{x:4350,z:500}];p=coords[i]}
+  if(type==='airport'){p=i===0?{x:1470,z:110}:{x:-3900,z:2630}}
+  if(type==='beach'){const coords=[{x:-1100,z:430},{x:-1100,z:-410},{x:1100,z:-410},{x:-3700,z:940},{x:3600,z:-940}];p=coords[i]}
   // ATMs use the already allocated parcel marker; do not consume a second lot.
   const poi={id:`poi_${type}_${i+1}`,type,label:`${label} ${i+1}`,x:p.x,z:p.z,buildingX:p.buildingX,buildingZ:p.buildingZ,color,icon,enterable:!!enterable&&['hospital','home','warehouse','skyscraper','cafe'].includes(type),open:true,phase:(i+poiSerial)%24,price: type==='home'?3500+(i%8)*400:type==='buytower'?18000+(i%9)*2200:type==='warehouse'&&i>=7?6500+(i%3)*700:0,storyLocked:type==='warehouse'&&i<7,buyable:type==='home'||type==='buytower'||(type==='warehouse'&&i>=7),owned:false,interiorIndex:enterable?interiorSerial++:-1};
   cityPOIs.push(poi);
@@ -2316,300 +2416,46 @@ function createCityAnimals(){
  return animals
 }
 const cityAnimals=createCityAnimals();
-
-// Forest life: mounted horse riders and cyclists travel on gentle looping trails.
-function createTrailRiders(){
- const riders=[],skin=['#d5a17e','#e8b890','#b77b58','#f0c6a0'],shirts=['#3a6d9a','#8b5840','#4c8057','#d3a44c'];
- function makeHorse(){const g=new T.Group(),coat=new T.MeshStandardMaterial({color:pk([0x8a5a36,0x6f4934,0xb28b5e,0x47352c]),roughness:.95}),mane=new T.MeshStandardMaterial({color:0x33251e,roughness:1});
-  const body=new T.Mesh(new T.BoxGeometry(1.9,1.15,3.1),coat);body.position.y=1.45;g.add(body);
-  const neck=new T.Mesh(new T.BoxGeometry(.78,1.55,.78),coat);neck.position.set(0,2.05,1.2);neck.rotation.x=-.32;g.add(neck);
-  const head=new T.Mesh(new T.BoxGeometry(.58,.82,.72),coat);head.position.set(0,2.62,1.58);g.add(head);
-  const muzzle=new T.Mesh(new T.BoxGeometry(.52,.34,.36),coat);muzzle.position.set(0,2.34,1.92);g.add(muzzle);
-  const maneMesh=new T.Mesh(new T.BoxGeometry(.82,.22,1.15),mane);maneMesh.position.set(0,2.75,1.05);g.add(maneMesh);
-  const legs=[];for(const x of[-.62,.62])for(const z of[-1.05,1.05]){const leg=new T.Mesh(new T.BoxGeometry(.24,1.0,.26),coat);leg.position.set(x,.65,z);g.add(leg);legs.push(leg)}
-  const tail=new T.Mesh(new T.ConeGeometry(.22,.95,7),mane);tail.position.set(0,1.38,-1.9);tail.rotation.x=-.25;g.add(tail);return{g,legs};
- }
- for(let i=0;i<7;i++){const horse=makeHorse(),rider=createCharacter({g:i%2?'m':'f',hair:i%2?'short':'pony',hc:'#2a211c',skin:pk(skin),eye:'#34251d',shirt:pk(shirts),pants:'#27374a',shoe:'#252525',beard:false,glasses:i%3===0,skirt:false});horse.g.add(rider.root);rider.root.position.set(0,2.7,-.25);rider.root.scale.setScalar(.78);rider.root.rotation.x=-.08;sc.add(horse.g);const path=[[-1200,-2000],[-750,-1500],[-300,-1250],[250,-1450],[620,-1900],[250,-2250],[-450,-2250]];riders.push({group:horse.g,legs:horse.legs,rider,path,t:i/7,speed:.000055+R()*.00002,phase:i*.8,type:'horse'})}
- function makeBikeRider(i){const g=new T.Group(),metal=new T.MeshStandardMaterial({color:0x68747d,metalness:.55,roughness:.4}),rubber=new T.MeshStandardMaterial({color:0x17191b,roughness:1}),rim=new T.MeshStandardMaterial({color:0xb8c4c9,metalness:.6,roughness:.35});
-  const wheels=[];for(const z of[-1.12,1.12]){const w=new T.Mesh(new T.TorusGeometry(.48,.075,8,24),rubber);w.rotation.y=Math.PI/2;w.position.set(0,.55,z);g.add(w);const h=new T.Mesh(new T.TorusGeometry(.36,.025,6,18),rim);h.rotation.y=Math.PI/2;h.position.set(0,.55,z);g.add(h);wheels.push(w,h)}
-  const tube=(a,b,r=.055)=>{const d=new T.Vector3(...b).sub(new T.Vector3(...a)),m=new T.Mesh(new T.CylinderGeometry(r,r,d.length(),7),metal);m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());g.add(m)};
-  tube([0,.55,-1.12],[0,1.0,0]);tube([0,1,0],[0,.55,1.12]);tube([0,.55,-1.12],[0,.55,1.12]);tube([0,1,0],[0,.55,-1.12]);tube([0,1,0],[0,.55,1.12]);
-  const rider=createCharacter({g:i%2?'m':'f',hair:'short',hc:'#211711',skin:pk(skin),eye:'#34251d',shirt:pk(shirts),pants:'#25364e',shoe:'#202329',beard:false,glasses:false,skirt:false});g.add(rider.root);rider.root.position.set(0,.92,0);rider.root.scale.setScalar(.73);rider.root.rotation.x=-.22;sc.add(g);
-  const path=[[-1800,-1050],[-1350,-650],[-750,-400],[-200,-560],[300,-950],[100,-1400],[-500,-1600],[-1200,-1450]];riders.push({group:g,rider,path,wheels,t:i/8,speed:.00007+R()*.000025,phase:i,type:'bike'});
- }
- for(let i=0;i<8;i++)makeBikeRider(i);
- return riders;
-}
-const forestTrailRiders=createTrailRiders();
-function updateForestTrailRiders(dt){for(const r of forestTrailRiders){r.t=(r.t+r.speed*dt*60)%1;const n=r.path.length-1,q=r.t*n,i=Math.floor(q),f=q-i,a=r.path[i],b=r.path[(i+1)%r.path.length];
-  const x=a[0]+(b[0]-a[0])*f,z=a[1]+(b[1]-a[1])*f,dx=b[0]-a[0],dz=b[1]-a[1];r.group.position.set(x,0,z);r.group.rotation.y=Math.atan2(dx,dz);
-  if(r.type==='horse'){for(let k=0;k<r.legs.length;k++)r.legs[k].rotation.x=Math.sin(worldTime*5+r.phase+k*Math.PI/2)*.35;r.rider.update(worldTime,dt,'rideBike',0)}
-  else{for(const w of r.wheels)w.rotation.x+=dt*3;r.rider.update(worldTime,dt,'rideBicycle',0)}
- }}
-
-function updateCityAnimals(dt){for(const a of cityAnimals){a.phase+=dt*a.speed;a.group.position.x+=Math.sin(a.phase)*dt*.32;a.group.position.z+=Math.cos(a.phase*.73)*dt*.32;a.group.rotation.y=a.heading+Math.sin(a.phase)*.08;}updateForestTrailRiders(dt);for(const s of islandShips){s.g.position.y=-.1+Math.sin(worldTime*1.1+s.phase)*.11;s.g.rotation.y=Math.sin(worldTime*.18+s.phase)*.012;}}
-// THE Z ONLINE — Reference island layout. The uploaded map image is also used
-// as the in-game map texture; the playable 3D landscape below follows its layout.
-const THEZ_ISLAND_POLYGON=[
- [-1539,-2195],
- [-1366,-2265],
- [-1090,-2335],
- [-814,-2440],
- [-469,-2545],
- [-159,-2475],
- [117,-2545],
- [428,-2510],
- [704,-2370],
- [980,-2300],
- [1256,-2125],
- [1601,-2020],
- [1946,-1915],
- [2360,-1810],
- [2774,-1705],
- [3119,-1565],
- [3395,-1390],
- [3602,-1110],
- [3809,-760],
- [4016,-375],
- [4223,11],
- [4361,431],
- [4499,851],
- [4465,1201],
- [4327,1551],
- [4085,1831],
- [3740,2006],
- [3326,2146],
- [2912,2195],
- [2498,2111],
- [2153,2041],
- [1774,2041],
- [1394,2111],
- [1014,2216],
- [635,2286],
- [221,2426],
- [-159,2531],
- [-538,2636],
- [-918,2706],
- [-1297,2671],
- [-1642,2566],
- [-1953,2426],
- [-2264,2321],
- [-2574,2216],
- [-2885,2111],
- [-3126,1901],
- [-3333,1621],
- [-3471,1306],
- [-3540,956],
- [-3609,606],
- [-3747,361],
- [-3954,151],
- [-4196,11],
- [-4437,-165],
- [-4644,-375],
- [-4713,-550],
- [-4541,-900],
- [-4265,-1180],
- [-3989,-1425],
- [-3713,-1635],
- [-3437,-1810],
- [-3092,-1950],
- [-2747,-2055],
- [-2402,-2125],
- [-2057,-2160],
- [-1711,-2174]
-];
-function pointInIsland(x,z){let inside=false;for(let i=0,j=THEZ_ISLAND_POLYGON.length-1;i<THEZ_ISLAND_POLYGON.length;j=i++){
- const a=THEZ_ISLAND_POLYGON[i],b=THEZ_ISLAND_POLYGON[j];if(((a[1]>z)!==(b[1]>z))&&(x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1]+1e-9)+a[0]))inside=!inside;
- }return inside;
-}
-const _thezRectWalkZone=walkZone;
-walkZone=function(x,z){return _thezRectWalkZone(x,z)&&pointInIsland(x,z)};
-function makeIslandShape(points,material,y=-.44){
- const shape=new T.Shape();points.forEach((p,i)=>{const xx=p[0],yy=-p[1];if(i===0)shape.moveTo(xx,yy);else shape.lineTo(xx,yy)});shape.closePath();
- const geometry=new T.ShapeGeometry(shape,96),pos=geometry.attributes.position,uv=new Float32Array(pos.count*2);
- // Shape coordinates are world X and -Z. Map them to the exact supplied 1536x857 island image.
- for(let i=0;i<pos.count;i++){uv[i*2]=(pos.getX(i)+5300)/10600;uv[i*2+1]=(pos.getY(i)+3000)/6000}
- geometry.setAttribute('uv',new T.BufferAttribute(uv,2));
- const mesh=new T.Mesh(geometry,material);mesh.rotation.x=-Math.PI/2;mesh.position.y=y;mesh.receiveShadow=true;sc.add(mesh);return mesh;
-}
-function makeRibbon(points,width,y,material,segments){
- const curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(p[0],y,p[1])),false,'catmullrom',.18);
- const samples=curve.getPoints(segments||Math.max(36,points.length*18)),verts=[],uv=[],idx=[];
- for(let i=0;i<samples.length;i++){
-  const t=curve.getTangentAt(i/(samples.length-1)).normalize(),side=new T.Vector3(t.z,0,-t.x).normalize().multiplyScalar(width/2),a=samples[i].clone().add(side),b=samples[i].clone().sub(side);
-  verts.push(a.x,a.y,a.z,b.x,b.y,b.z);uv.push(0,i/(samples.length-1),1,i/(samples.length-1));
-  if(i<samples.length-1){const n=i*2;idx.push(n,n+1,n+2,n+1,n+3,n+2)}
- }
- const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(verts,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(idx);geo.computeVertexNormals();
- const mesh=new T.Mesh(geo,material);mesh.receiveShadow=true;sc.add(mesh);return mesh;
-}
-function makeRoad(points,width=18){
- makeRibbon(points,width,-.20,new T.MeshStandardMaterial({color:0x343940,roughness:.97}),Math.max(50,points.length*24));
- makeRibbon(points,.45,-.105,new T.MeshBasicMaterial({color:0xd9c98c}),Math.max(50,points.length*24));
- const nodes=points.map(p=>addRoadNode(p[0],p[1]));for(let i=0;i<nodes.length-1;i++)connectRoad(nodes[i],nodes[i+1]);
-}
-function bridgeAt(x,z,length=190,angle=0){
- const deck=new T.Mesh(new T.BoxGeometry(length,1.7,25),new T.MeshStandardMaterial({color:0x777f83,roughness:.82}));deck.position.set(x,.45,z);deck.rotation.y=angle;deck.castShadow=deck.receiveShadow=true;sc.add(deck);
- const railMat=new T.MeshStandardMaterial({color:0xbac2c5,metalness:.42,roughness:.45});
- for(const side of[-1,1]){const rail=new T.Mesh(new T.BoxGeometry(length,1.7,.65),railMat);rail.position.set(x,1.65,z+side*11.5);rail.rotation.y=angle;sc.add(rail);
-  for(let t=-length/2;t<=length/2;t+=24){const post=new T.Mesh(new T.BoxGeometry(.65,2.5,.65),railMat);post.position.set(x+Math.cos(angle)*t,1.3,z+Math.sin(angle)*t+side*11.5);sc.add(post)}}
- const a=addRoadNode(x-Math.cos(angle)*length*.55,z-Math.sin(angle)*length*.55),b=addRoadNode(x+Math.cos(angle)*length*.55,z+Math.sin(angle)*length*.55);connectRoad(a,b);
-}
-function buildPineForest(roadRoutes=[]){
- const trunkGeo=new T.CylinderGeometry(.28,.42,5.2,6).translate(0,2.6,0),leafGeo1=new T.ConeGeometry(2.5,7,7).translate(0,6.2,0),leafGeo2=new T.ConeGeometry(1.8,5.8,7).translate(0,9,0);
- const trunkMat=new T.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new T.MeshStandardMaterial({color:0x245d37,roughness:1}),leafMat2=new T.MeshStandardMaterial({color:0x397c45,roughness:1});
- const N=1500,trunks=new T.InstancedMesh(trunkGeo,trunkMat,N),lower=new T.InstancedMesh(leafGeo1,leafMat,N),upper=new T.InstancedMesh(leafGeo2,leafMat2,N),d=new T.Object3D();let n=0,tries=0;
- const excluded=[[-3650,-1450,900,600],[-2850,1750,1450,1050],[3150,1050,1650,1150],[1100,0,1050,600],[4200,2400,950,650]];
- const rivers=[[-900,-2450],[-600,-1800],[-250,-1200],[200,-700],[580,-250],[400,400],[50,1050],[-300,1750],[-500,2420]];
- while(n<N&&tries<N*8){tries++;const x=ra(-5150,5100),z=ra(-2850,2850);if(!pointInIsland(x,z))continue;
-  if(excluded.some(a=>Math.abs(x-a[0])<a[2]&&Math.abs(z-a[1])<a[3]))continue;
-  if(Math.hypot(x-450,z+650)<790||Math.hypot(x,z+2250)<650)continue;
-  if(rivers.some((p,i)=>i&&Math.hypot(x-(p[0]+rivers[i-1][0])/2,z-(p[1]+rivers[i-1][1])/2)<105))continue;
-  const nearRoad=roadRoutes.some(route=>route.slice(1).some((b,i)=>{const a=route[i],dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1))),px=a[0]+t*dx,pz=a[1]+t*dz;return Math.hypot(x-px,z-pz)<48}));if(nearRoad)continue;
-  d.position.set(x,0,z);d.rotation.y=R()*Math.PI*2;const sca=.72+R()*.78;d.scale.set(sca,sca,sca);d.updateMatrix();trunks.setMatrixAt(n,d.matrix);lower.setMatrixAt(n,d.matrix);upper.setMatrixAt(n,d.matrix);n++;
- }
- trunks.count=lower.count=upper.count=n;trunks.instanceMatrix.needsUpdate=lower.instanceMatrix.needsUpdate=upper.instanceMatrix.needsUpdate=true;sc.add(trunks,lower,upper);
-}
-function buildMountain(){
- const rock=new T.MeshStandardMaterial({color:0x82906e,roughness:1}),grass=new T.MeshStandardMaterial({color:0x7b9858,roughness:1}),snow=new T.MeshStandardMaterial({color:0xd9dfd0,roughness:.95});
- const base=new T.Mesh(new T.ConeGeometry(880,650,11,5),rock);base.position.set(250,315,-2300);base.scale.set(1.1,1,.82);base.castShadow=true;base.receiveShadow=true;sc.add(base);
- const shoulder=new T.Mesh(new T.ConeGeometry(570,430,10,4),grass);shoulder.position.set(-220,210,-2210);shoulder.rotation.z=.1;shoulder.castShadow=true;sc.add(shoulder);
- const peak=new T.Mesh(new T.ConeGeometry(260,280,9,3),snow);peak.position.set(300,760,-2350);peak.castShadow=true;sc.add(peak);
- for(let i=0;i<90;i++){const a=R()*Math.PI*2,r=ra(650,1200),x=250+Math.cos(a)*r,z=-2300+Math.sin(a)*r*.65;if(pointInIsland(x,z)&&Math.hypot(x-250,z+2300)>780){const tree=new T.Mesh(new T.ConeGeometry(ra(3,6),ra(10,18),6),new T.MeshStandardMaterial({color:pk([0x2a663d,0x36784a,0x486f3f])}));tree.position.set(x,tree.geometry.parameters.height/2,z);sc.add(tree)}}
-}
-function buildMainAirport(){
- const x=-3650,z=-1450,asphalt=new T.MeshStandardMaterial({color:0x333940,roughness:.94}),concrete=new T.MeshStandardMaterial({color:0x9ba3aa,roughness:.9}),white=new T.MeshBasicMaterial({color:0xf4f2e7});
- const apron=new T.Mesh(new T.BoxGeometry(970,.12,520),concrete);apron.position.set(x,-.22,z);sc.add(apron);
- const runway=new T.Mesh(new T.BoxGeometry(900,.18,72),asphalt);runway.position.set(x,-.12,z-65);runway.rotation.y=-.17;runway.receiveShadow=true;sc.add(runway);
- for(let i=-390;i<=390;i+=38){const stripe=new T.Mesh(new T.BoxGeometry(19,.025,1.6),white);stripe.position.set(x+i,-.015,z-65);stripe.rotation.y=-.17;sc.add(stripe)}
- const terminal=new T.Mesh(new T.BoxGeometry(205,17,54),new T.MeshStandardMaterial({color:0xd1d7dc,metalness:.18,roughness:.58}));terminal.position.set(x+30,8.5,z+180);terminal.castShadow=true;sc.add(terminal);
- const glass=new T.Mesh(new T.BoxGeometry(190,9,.8),new T.MeshStandardMaterial({color:0x69a9c2,metalness:.25,roughness:.2,transparent:true,opacity:.83}));glass.position.set(x+30,8,z+207.5);sc.add(glass);
- const hangarMat=new T.MeshStandardMaterial({color:0xc2c8ca,roughness:.9});for(const [dx,dz] of[[-270,175],[-260,-185],[270,175],[280,-185]]){const h=new T.Mesh(new T.BoxGeometry(112,26,82),hangarMat);h.position.set(x+dx,13,z+dz);h.castShadow=true;sc.add(h);boxes.push([x+dx-56,x+dx+56,z+dz-41,z+dz+41,26])}
- boxes.push([x-470,x+470,z-105,z-25,1],[x-72,x+132,z+150,z+210,18]);
- // Airliner and regional plane models parked at the terminal apron.
- function plane(px,pz,scale,color){const g=new T.Group(),bodyMat=new T.MeshStandardMaterial({color,metalness:.16,roughness:.42}),wingMat=new T.MeshStandardMaterial({color:0xe4e8ec,metalness:.1,roughness:.5});
-  const fus=new T.Mesh(new T.CylinderGeometry(4.1*scale,4.1*scale,86*scale,12),bodyMat);fus.rotation.x=Math.PI/2;fus.position.y=5*scale;g.add(fus);
-  const nose=new T.Mesh(new T.ConeGeometry(4.1*scale,13*scale,12),bodyMat);nose.rotation.x=-Math.PI/2;nose.position.set(0,5*scale,49*scale);g.add(nose);
-  const wing=new T.Mesh(new T.BoxGeometry(95*scale,2.2*scale,15*scale),wingMat);wing.position.set(0,4*scale,-2*scale);g.add(wing);
-  const tail=new T.Mesh(new T.BoxGeometry(30*scale,1.8*scale,8*scale),wingMat);tail.position.set(0,8*scale,-37*scale);g.add(tail);
-  const fin=new T.Mesh(new T.BoxGeometry(2*scale,16*scale,14*scale),bodyMat);fin.position.set(0,12*scale,-38*scale);g.add(fin);
-  for(const side of[-1,1]){const eng=new T.Mesh(new T.CylinderGeometry(3*scale,3*scale,15*scale,10),new T.MeshStandardMaterial({color:0x626a72,metalness:.5}));eng.rotation.x=Math.PI/2;eng.position.set(side*25*scale,2*scale,0);g.add(eng)}
-  g.position.set(px,0,pz);g.rotation.y=Math.PI;sc.add(g);return g;}
- islandPlanes=[plane(x-190,z+42,1,0xf2f4f5),plane(x+190,z-6,.63,0xe6e9ed)];
-}
-function buildFarmsAndVillage(){
- const fieldMat=new T.MeshStandardMaterial({color:0x967b4a,roughness:1}),cropMat=new T.MeshStandardMaterial({color:0x4c8d3f,roughness:1}),houseMat=[0xd8c8a5,0xc9d2c3,0xe1d1bd,0xbfc9c6].map(c=>new T.MeshStandardMaterial({color:c,roughness:.95})),roofMat=new T.MeshStandardMaterial({color:0x9b6046,roughness:.9});
- const fieldCenters=[[-3650,1700],[-3000,1950],[-2450,2250],[-2050,1500],[-3320,1050],[-2550,1150],[-1750,2200],[-1250,1750],[-3900,2050],[-2850,2550]];
- for(let fi=0;fi<fieldCenters.length;fi++){const [x,z]=fieldCenters[fi],w=ra(170,280),d=ra(110,185),base=new T.Mesh(new T.PlaneGeometry(w,d).rotateX(-Math.PI/2),fieldMat);base.position.set(x,-.12,z);base.rotation.y=ra(-.2,.2);sc.add(base);
-  const count=Math.floor(w/9)*Math.floor(d/10),geo=new T.BoxGeometry(.75,1.1,.75),crop=new T.InstancedMesh(geo,cropMat,count),o=new T.Object3D();let k=0;for(let a=-w/2+8;a<w/2-5;a+=9)for(let b=-d/2+7;b<d/2-5;b+=10){o.position.set(x+a,.42,z+b);o.rotation.y=base.rotation.y;o.scale.set(.8+R()*.5,.7+R()*.65,.8);o.updateMatrix();crop.setMatrixAt(k++,o.matrix)}crop.count=k;sc.add(crop);
- }
- // Rural homes around a compact village square in the south-west, away from fields and river.
- for(let i=0;i<28;i++){const x=-3650+(i%7)*135+ra(-18,18),z=1280+Math.floor(i/7)*145+ra(-15,15),w=ra(28,42),d=ra(24,36),h=ra(12,19);if(!pointInIsland(x,z))continue;
-  const body=new T.Mesh(new T.BoxGeometry(w,h,d),pk(houseMat));body.position.set(x,h/2,z);body.castShadow=body.receiveShadow=true;sc.add(body);
-  const roof=new T.Mesh(new T.ConeGeometry(Math.max(w,d)*.72,6,4),roofMat);roof.position.set(x,h+2,z);roof.rotation.y=Math.PI/4;roof.castShadow=true;sc.add(roof);boxes.push([x-w/2-2,x+w/2+2,z-d/2-2,z+d/2+2,h+7]);
- }
-}
-function buildSouthEastCityAndPort(){
- const x0=2050,z0=800,roadMat=new T.MeshStandardMaterial({color:0x33383e,roughness:.95}),lineMat=new T.MeshBasicMaterial({color:0xe9d79a});
- for(let z=150;z<=1950;z+=300){const r=new T.Mesh(new T.BoxGeometry(2300,.13,17),roadMat);r.position.set(3250,-.2,z);sc.add(r);const l=new T.Mesh(new T.BoxGeometry(2300,.02,.6),lineMat);l.position.set(3250,-.1,z);sc.add(l)}
- for(let x=2150;x<=4250;x+=300){const r=new T.Mesh(new T.BoxGeometry(17,.13,1900),roadMat);r.position.set(x,-.2,1050);sc.add(r)}
- // The 312 POI buildings form the urban blocks; no duplicate random buildings are scattered over them.
-
- // Waterfront container docks directly east/south of the city skyline.
- const dockX=4220,dockZ=2410,dockMat=new T.MeshStandardMaterial({color:0x796f60,roughness:.93}),containerColors=[0x9f5144,0x3c7898,0xb68b49,0x55765d].map(c=>new T.MeshStandardMaterial({color:c,roughness:.86}));
- for(const [x,z,w,d] of[[3900,2230,540,24],[4160,2460,24,410],[4450,2240,440,24]]){const q=new T.Mesh(new T.BoxGeometry(w,1.6,d),dockMat);q.position.set(x,.05,z);sc.add(q)}
- for(let i=0;i<26;i++){const x=3920+(i%7)*73,z=2110+Math.floor(i/7)*70,h=ra(12,19),c=new T.Mesh(new T.BoxGeometry(58,h,23),pk(containerColors));c.position.set(x,h/2,z);c.castShadow=true;sc.add(c);boxes.push([x-29,x+29,z-12,z+12,h])}
- // Small and large ships in the harbour; simple low-poly hulls with cabins and masts.
- const ships=[];function ship(x,z,scale,color){const g=new T.Group(),hull=new T.Mesh(new T.BoxGeometry(35*scale,8*scale,112*scale),new T.MeshStandardMaterial({color,roughness:.45,metalness:.12}));hull.position.y=2*scale;g.add(hull);const bow=new T.Mesh(new T.ConeGeometry(17.5*scale,28*scale,4),new T.MeshStandardMaterial({color,roughness:.45}));bow.rotation.x=Math.PI/2;bow.rotation.y=Math.PI/4;bow.position.set(0,2*scale,68*scale);g.add(bow);const cabin=new T.Mesh(new T.BoxGeometry(22*scale,19*scale,30*scale),new T.MeshStandardMaterial({color:0xe1e7e8,roughness:.5}));cabin.position.set(0,14*scale,-18*scale);g.add(cabin);const mast=new T.Mesh(new T.CylinderGeometry(.5*scale,.7*scale,27*scale,6),new T.MeshStandardMaterial({color:0x454b50}));mast.position.set(0,36*scale,-23*scale);g.add(mast);g.position.set(x,-.1,z);sc.add(g);ships.push({g,phase:R()*6.28});return g}
- ship(4070,2450,1.6,0x253f56);ship(4450,2200,1.05,0xe7e9e7);ship(3880,2600,.72,0x9a634b);islandShips=ships;
-}
-let islandPlanes=[],islandShips=[];
-function spawnSouthEastCityTraffic(){
- const rows=[150,450,750,1050,1350,1650],cols=[2150,2750,3350,3950,4250];
- const palette=['#e63946','#f1faee','#1d3557','#ffd166','#06d6a0','#24252a','#9d4edd','#4cc9f0','#d5d5d5'];
- const types=['sedan','taxi','sport','truck','van','pickup','motorcycle','gangBike','bicycle'];let serial=0;
- // 60 cars on six east-west roads: five in each of the two traffic directions.
- for(let ri=0;ri<rows.length;ri++)for(const dir of[1,-1])for(let j=0;j<5;j++){
-  const lane=rows[ri]+(dir>0?-4.2:4.2),t=(dir>0?-840:840)+dir*j*420,type=types[(serial*5+ri)%types.length],color=type==='taxi'?'#e8bd2a':palette[(serial+ri)%palette.length];
-  const car=createTrafficVehicle(type,color,3200,'x',lane,t,dir,{id:`island_city_traffic_${serial++}`,x:3200+t,z:lane,heading:dir>0?Math.PI/2:-Math.PI/2,baseZ:0,span:1040,routeCity:3200});traffic.push(car);buildTrafficVisual(car);
- }
- // 30 cars and motorcycles on five north-south roads.
- for(let ci=0;ci<cols.length;ci++)for(const dir of[1,-1])for(let j=0;j<3;j++){
-  const lane=cols[ci]+(dir>0?-4.2:4.2),baseZ=1050,t=(dir>0?-650:650)+dir*j*650,type=(serial%4===0?'motorcycle':types[(serial*3+ci)%types.length]),color=palette[(serial+3)%palette.length];
-  const car=createTrafficVehicle(type,color,3200,'z',lane-3200,t,dir,{id:`island_city_traffic_${serial++}`,x:lane,z:baseZ+t,heading:dir>0?0:Math.PI,baseZ,span:820,routeCity:3200});traffic.push(car);buildTrafficVisual(car);
- }
- // Ten parked vehicles occupy curb-side bays rather than the middle of the lanes.
- for(let i=0;i<10;i++){
-  const row=rows[Math.floor(i/2)%rows.length],x=2350+(i%2)*1450+(i%3)*65,z=row+(i%2===0?15:-15),type=i%4===0?'motorcycle':i%5===0?'truck':'sedan',color=palette[i%palette.length];
-  const car=createTrafficVehicle(type,color,3200,'parked',0,0,1,{id:`island_city_parked_${i}`,x,z,heading:i%2?Math.PI/2:-Math.PI/2,routeCity:3200});traffic.push(car);buildTrafficVisual(car);
- }
-}
+function updateCityAnimals(dt){for(const a of cityAnimals){a.phase+=dt*a.speed;a.group.position.x+=Math.sin(a.phase)*dt*.32;a.group.position.z+=Math.cos(a.phase*.73)*dt*.32;a.group.rotation.y=a.heading+Math.sin(a.phase)*.08;}}
+// Add a simple island ground plane, highways and rural trees; 10.58 km square = 112 km².
 function build112KmWorld(){
- const islandGroundTexture=new T.TextureLoader().load('/world-map.webp',t=>{t.encoding=T.sRGBEncoding;t.needsUpdate=true});
- const grassMat=new T.MeshStandardMaterial({color:0xffffff,map:islandGroundTexture,roughness:1,side:T.DoubleSide}),shoreMat=new T.MeshStandardMaterial({color:0xc8b47f,roughness:1}),seaMat=new T.MeshPhongMaterial({color:0x2689b0,specular:0x8dd8ee,shininess:85,transparent:true,opacity:.88});
- makeIslandShape(THEZ_ISLAND_POLYGON,grassMat,-.45);
- const shorePts=THEZ_ISLAND_POLYGON.map(p=>new T.Vector3(p[0],.015,p[1]));const coastGeo=new T.BufferGeometry().setFromPoints(shorePts);sc.add(new T.LineLoop(coastGeo,new T.LineBasicMaterial({color:0xe6d6a2,linewidth:2})));
- // Natural coastline beaches, small coves and the reference-image lake.
- for(const [x,z,w,d,rot] of[[-4540,-270,620,245,-.25],[-2820,1900,560,260,.18],[320,2250,700,250,-.12],[2980,1900,640,260,.12],[4350,500,470,250,-.32]]){const beach=new T.Mesh(new T.PlaneGeometry(w,d).rotateX(-Math.PI/2),shoreMat);beach.position.set(x,-.16,z);beach.rotation.y=rot;sc.add(beach)}
- // Beach details: shade canopies, lounge chairs and short wooden piers at all five coves.
- for(const [bx,bz] of[[-4540,-270],[-2820,1900],[320,2250],[2980,1900],[4350,500]]){
-  for(let i=0;i<4;i++){const x=bx-180+i*120,z=bz+(i%2?36:-36),col=[0xff6a8b,0x39b8d2,0xf0c44f,0xf4eee2][i],pole=new T.Mesh(new T.CylinderGeometry(.09,.11,2.15,7),new T.MeshStandardMaterial({color:0xe7dfd0})),canopy=new T.Mesh(new T.ConeGeometry(3.1,.8,12),new T.MeshStandardMaterial({color:col,roughness:.8}));pole.position.set(x,1.05,z);canopy.position.set(x,2.35,z);sc.add(pole,canopy);const chair=new T.Mesh(new T.BoxGeometry(1,.16,2),new T.MeshStandardMaterial({color:0xe9e5d8,roughness:.9}));chair.position.set(x+12,.22,z+5);chair.rotation.y=.18;sc.add(chair)}
-  const pier=new T.Mesh(new T.BoxGeometry(5,.28,42),new T.MeshStandardMaterial({color:0x9b744d,roughness:.9}));pier.position.set(bx+225,-.02,bz+75);sc.add(pier);
- }
- const lake=new T.Mesh(new T.PlaneGeometry(1450,890).rotateX(-Math.PI/2),seaMat);lake.position.set(650,-.285,-650);lake.rotation.y=-.18;sc.add(lake);
- const riverMat=new T.MeshPhongMaterial({color:0x298bb5,specular:0xb2e7f6,shininess:115,transparent:true,opacity:.93});
- makeRibbon([[-1500,-2800],[-1120,-2200],[-650,-1670],[-430,-1120],[80,-750],[470,-300],[390,280],[10,820],[-350,1390],[-250,1980],[380,2600]],72,-.25,riverMat,180);
- makeRibbon([[-460,-1150],[-900,-780],[-1360,-360],[-1670,160],[-1580,730],[-1250,1190]],43,-.245,riverMat,110);
- // Bridge network connects airport, mountain trails, village farms and the south-east city.
- bridgeAt(-250,-930,205,0);bridgeAt(-1510,390,190,0);bridgeAt(-720,1110,180,-.12);bridgeAt(560,1500,205,0);bridgeAt(1080,400,190,.22);
- // Winding roads that mirror the reference image rather than a square motorway grid.
- const roadRoutes=[
-  [[-3650,-1450],[-2900,-1300],[-2200,-950],[-1450,-680],[-850,-380],[0,-80],[850,360],[1600,850],[2450,1320],[3300,1700]],
-  [[-3500,1500],[-2900,1150],[-2350,920],[-1700,1120],[-1200,1580],[-600,1830],[100,1740],[600,1500]],
-  [[200,-2300],[620,-1900],[950,-1450],[1080,-900],[900,-250],[1250,350],[1800,900],[2450,1320]],
-  [[-3650,-1450],[-4100,-900],[-4300,-280],[-4150,400],[-3750,900]],
-  [[2700,1320],[3200,1050],[3800,1040],[4300,1360],[4650,1840]]
- ];roadRoutes.forEach((r,i)=>makeRoad(r,i===0?23: i===2?17:14));
- buildMountain();buildMainAirport();buildFarmsAndVillage();buildSouthEastCityAndPort();buildPineForest(roadRoutes);
- // Small regional airstrip on the north-eastern coast (the international airport remains NW).
- {const ax=2400,az=-1000,asphalt=new T.MeshStandardMaterial({color:0x41464b,roughness:.96}),mark=new T.MeshBasicMaterial({color:0xf4f1e8});
-  const strip=new T.Mesh(new T.BoxGeometry(510,.12,42),asphalt);strip.position.set(ax,-.2,az);sc.add(strip);
-  for(let x=-220;x<=220;x+=32){const dash=new T.Mesh(new T.BoxGeometry(14,.02,1.2),mark);dash.position.set(ax+x,-.12,az);sc.add(dash)}
-  const hangar=new T.Mesh(new T.BoxGeometry(76,14,52),new T.MeshStandardMaterial({color:0xc9d0d2,roughness:.85}));hangar.position.set(ax+95,7,az+80);sc.add(hangar);boxes.push([ax+57,ax+133,az+54,az+106,14]);
-  const apron=new T.Mesh(new T.BoxGeometry(180,.08,110),new T.MeshStandardMaterial({color:0x969da0,roughness:.9}));apron.position.set(ax+70,-.24,az+55);sc.add(apron);
- }
- // The open spawn plaza is retained at the server's fixed shared-world spawn.
- const hubX=100,hubZ=1900,plazaMat=new T.MeshStandardMaterial({color:0x777e82,roughness:.94});
- const plaza=new T.Mesh(new T.BoxGeometry(150,.16,150),plazaMat);plaza.position.set(hubX,-.24,hubZ);plaza.receiveShadow=true;sc.add(plaza);
- const plazaInset=new T.Mesh(new T.BoxGeometry(108,.025,108),new T.MeshStandardMaterial({color:0x9a9d99,roughness:1}));plazaInset.position.set(hubX,-.145,hubZ);sc.add(plazaInset);
- const beacon=new T.Mesh(new T.CylinderGeometry(.55,.8,6,8),new T.MeshStandardMaterial({color:0x26465b,emissive:0x164056,emissiveIntensity:.65}));beacon.position.set(hubX+44,2.8,hubZ+42);sc.add(beacon);
- makeRoad([[100,1975],[100,1840],[-120,1785],[-420,1660]],12);
- // Reuse route graph for the island roads and add a few links around the city grid.
- for(let x=2150;x<=4250;x+=300){for(let z=150;z<=1950;z+=300)addRoadNode(x,z)}
- for(let x=2150;x<=4250;x+=300)for(let z=150;z<=1950;z+=300){const a=roadLookup.get(Math.round(x)+','+Math.round(z));const b=roadLookup.get(Math.round(x+300)+','+Math.round(z));const c=roadLookup.get(Math.round(x)+','+Math.round(z+300));if(b)connectRoad(a,b);if(c)connectRoad(a,c)}
- spawnSouthEastCityTraffic();
- // Keep the 112 km² simulation boundary, but only the shaped island is walkable.
- const waterFar=new T.Mesh(new T.PlaneGeometry(14000,14000).rotateX(-Math.PI/2),seaMat);waterFar.position.y=-.53;sc.add(waterFar);
+ const ground=new T.Mesh(new T.PlaneGeometry(THEZ_WORLD_SIDE,THEZ_WORLD_SIDE).rotateX(-Math.PI/2),new T.MeshStandardMaterial({color:0x496849,roughness:1}));ground.position.y=-.43;ground.receiveShadow=true;sc.add(ground);
+ const highwayMat=new T.MeshStandardMaterial({color:0x34383d,roughness:.95}),lineMat=new T.MeshBasicMaterial({color:0xe6c85d});
+ for(const z of[-3000,-1500,0,1500,3000]){const road=new T.Mesh(new T.BoxGeometry(THEZ_WORLD_SIDE,.12,18),highwayMat);road.position.set(0,-.32,z);sc.add(road);const line=new T.Mesh(new T.BoxGeometry(THEZ_WORLD_SIDE,.015,.22),lineMat);line.position.set(0,-.245,z);sc.add(line)}
+ for(const x of[-3000,-1500,0,1500,3000]){const road=new T.Mesh(new T.BoxGeometry(18,.12,THEZ_WORLD_SIDE),highwayMat);road.position.set(x,-.32,0);sc.add(road);const line=new T.Mesh(new T.BoxGeometry(.22,.015,THEZ_WORLD_SIDE),lineMat);line.position.set(x,-.245,0);sc.add(line)}
+ // Additional highway graph for routing throughout the expanded landmass.
+ const grid=[];for(let x=-5000;x<=5000;x+=500){const row=[];for(let z=-5000;z<=5000;z+=500)row.push(addRoadNode(x,z));grid.push(row)}
+ for(let i=0;i<grid.length;i++)for(let j=0;j<grid[i].length;j++){if(i+1<grid.length)connectRoad(grid[i][j],grid[i+1][j]);if(j+1<grid[i].length)connectRoad(grid[i][j],grid[i][j+1])}
+ connectRoad(closestRoadNode(-1000,0),closestRoadNode(-1100,0));connectRoad(closestRoadNode(1000,0),closestRoadNode(1100,0));
+ const trunkGeo=new T.CylinderGeometry(.18,.26,5,5).translate(0,2.5,0),leafGeo=new T.ConeGeometry(2.3,7,6).translate(0,7.2,0),trunkMat=new T.MeshStandardMaterial({color:0x6b4a2f}),leafMat=new T.MeshStandardMaterial({color:0x2b7c42});
+ const count=520,trunks=new T.InstancedMesh(trunkGeo,trunkMat,count),leaves=new T.InstancedMesh(leafGeo,leafMat,count),dummy=new T.Object3D();let made=0;
+ for(let i=0;i<count;i++){let x=ra(-5100,5100),z=ra(-5100,5100);if(Math.abs(x)<1450&&Math.abs(z)<700)continue;if(Math.abs(x%1500)<35||Math.abs(z%1500)<35)continue;if(THEZ_POI_DISTRICTS.some(d=>Math.abs(x-d.cx)<470&&Math.abs(z-d.cz)<570))continue;if(Math.abs(x+2500)<105&&Math.abs(z+2500)<105)continue;dummy.position.set(x,0,z);dummy.rotation.y=R()*Math.PI*2;dummy.scale.setScalar(.75+R()*.65);dummy.updateMatrix();trunks.setMatrixAt(made,dummy.matrix);leaves.setMatrixAt(made,dummy.matrix);made++}
+ trunks.count=made;leaves.count=made;sc.add(trunks,leaves);
+ // Dedicated open-air arrival plaza: intentionally no building or roof around spawn.
+ const hubX=-2500,hubZ=-2500;
+ const plaza=new T.Mesh(new T.BoxGeometry(170,.16,170),new T.MeshStandardMaterial({color:0x777d82,roughness:.94}));plaza.position.set(hubX,-.29,hubZ);plaza.receiveShadow=true;sc.add(plaza);
+ const plazaInset=new T.Mesh(new T.BoxGeometry(118,.025,118),new T.MeshStandardMaterial({color:0x8b9094,roughness:1}));plazaInset.position.set(hubX,-.19,hubZ);sc.add(plazaInset);
+ const hubRoadA=new T.Mesh(new T.BoxGeometry(500,.12,12),highwayMat);hubRoadA.position.set(-2750,-.32,hubZ);sc.add(hubRoadA);
+ const hubRoadB=new T.Mesh(new T.BoxGeometry(12,.12,500),highwayMat);hubRoadB.position.set(hubX,-.32,-2750);sc.add(hubRoadB);
+ const hubRing=new T.Mesh(new T.TorusGeometry(25,.32,8,48),new T.MeshBasicMaterial({color:0x58d5e8}));hubRing.rotation.x=Math.PI/2;hubRing.position.set(hubX,-.13,hubZ);sc.add(hubRing);
+ const hubBeacon=new T.Mesh(new T.CylinderGeometry(.45,.7,6,8),new T.MeshStandardMaterial({color:0x263b52,emissive:0x173448,emissiveIntensity:.8}));hubBeacon.position.set(hubX+42,2.8,hubZ+42);sc.add(hubBeacon);
+ // A second small airport in the north-western district.
+ const runway=new T.Mesh(new T.BoxGeometry(720,.14,44),highwayMat);runway.position.set(-3900,-.27,2550);sc.add(runway);
+ const terminal=new T.Mesh(new T.BoxGeometry(88,13,34),new T.MeshStandardMaterial({color:0x9aa9ba,metalness:.25,roughness:.5}));terminal.position.set(-3900,6.5,2630);sc.add(terminal);
+ const roof=new T.Mesh(new T.BoxGeometry(94,1.2,40),new T.MeshStandardMaterial({color:0x33485d,metalness:.3}));roof.position.set(-3900,13.6,2630);sc.add(roof);
+ // Water overlays on the five beaches so the expanded land plane does not hide the sea edge.
+ const waterMat=new T.MeshPhongMaterial({color:0x087eaa,transparent:true,opacity:.91,specular:0x9edfff,shininess:90});
+ for(const b of BEACHES){const w=new T.Mesh(new T.PlaneGeometry(b.maxX-b.minX+70,b.waterMaxZ-b.waterMinZ).rotateX(-Math.PI/2),waterMat);w.position.set(b.cx,-.405,(b.waterMinZ+b.waterMaxZ)/2);sc.add(w)}
 }
 build112KmWorld();
-MP_BASE_TRAFFIC_COUNT=traffic.length; // Include the island airport fleet, port boats and the new city traffic in multiplayer snapshots.
-// Use the exact user-provided island image as the in-game map texture.
-const THEZ_REFERENCE_MAP=new Image();THEZ_REFERENCE_MAP.decoding='async';THEZ_REFERENCE_MAP.onload=()=>updateMaps();THEZ_REFERENCE_MAP.src='/world-map.webp';
-function drawMap(ctx,w,h,cx,cz,zoom){
- const tr=mapTransform(w,h,cx,cz,zoom);ctx.save();ctx.fillStyle='#367f9c';ctx.fillRect(0,0,w,h);
- const left=tr.x(-5300),top=tr.y(-3000),mw=tr.scale*10600,mh=tr.scale*6000;
- if(THEZ_REFERENCE_MAP.complete&&THEZ_REFERENCE_MAP.naturalWidth){ctx.drawImage(THEZ_REFERENCE_MAP,left,top,mw,mh)}
- else{ctx.fillStyle='#7c9d5d';ctx.beginPath();THEZ_ISLAND_POLYGON.forEach((p,i)=>{const x=tr.x(p[0]),y=tr.y(p[1]);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.closePath();ctx.fill();ctx.strokeStyle='#e2d1a2';ctx.lineWidth=Math.max(2,8*tr.scale);ctx.stroke()}
- // map labels stay clear at full-map zoom; hide them on the tiny minimap.
- if(tr.scale>.035){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 ${Math.max(8,Math.min(18,17*tr.scale))}px system-ui`;ctx.lineWidth=3;ctx.strokeStyle='#1c342b';ctx.fillStyle='#fff';
-  const labels=[['المطار الدولي',-3650,-1450],['مطار إقليمي',2400,-1000],['الجبل والغابات',250,-2300],['البحيرة',650,-650],['القرى والمزارع',-3000,1750],['المدينة الرئيسية',3000,1550],['الميناء',4200,2400]];
-  for(const [name,x,z] of labels){ctx.strokeText(name,tr.x(x),tr.y(z));ctx.fillText(name,tr.x(x),tr.y(z))}}
- if(mapPoiVisible){for(const p of cityPOIs){const x=tr.x(p.x),y=tr.y(p.z);if(x<-12||y<-12||x>w+12||y>h+12)continue;const r=Math.max(2.7,Math.min(8,5.1*tr.scale));ctx.globalAlpha=.96;ctx.fillStyle=p.color;ctx.strokeStyle='#08111c';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();if(tr.scale>.20){ctx.fillStyle='#07111c';ctx.font=`bold ${Math.max(7,8*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.icon,x,y)}}}
- if(routePoints.length>1){ctx.strokeStyle='#24e3ff';ctx.lineWidth=Math.max(2,4*tr.scale);ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();routePoints.forEach((p,i)=>{const x=tr.x(p.x),y=tr.y(p.z);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke()}
- if(destination){const x=tr.x(destination.x),y=tr.y(destination.z);ctx.fillStyle='#ff4d91';ctx.beginPath();ctx.arc(x,y,Math.max(4,7*tr.scale),0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke()}
- const px=tr.x(player.x),py=tr.y(player.z);ctx.save();ctx.translate(px,py);ctx.rotate(Math.PI-player.heading);ctx.fillStyle='#fff';ctx.strokeStyle='#0c2130';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(7,8);ctx.lineTo(0,5);ctx.lineTo(-7,8);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();ctx.restore();
-}
-// POI markers are already composited by the reference-map renderer above.
+// 30 ATMs and all city markers appear on the map; POI markers can be hidden from Settings.
+const _thezOriginalDrawMap=drawMap;
+drawMap=function(ctx,w,h,cx,cz,zoom){
+ _thezOriginalDrawMap(ctx,w,h,cx,cz,zoom);
+ if(!mapPoiVisible)return;const tr=mapTransform(w,h,cx,cz,zoom);ctx.save();
+ for(const p of cityPOIs){const x=tr.x(p.x),y=tr.y(p.z);if(x<-12||y<-12||x>w+12||y>h+12)continue;const r=Math.max(3.2,Math.min(8,5.1*tr.scale));ctx.globalAlpha=.95;ctx.fillStyle=p.color;ctx.strokeStyle='#08111c';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();if(tr.scale>.22){ctx.fillStyle='#07111c';ctx.font=`bold ${Math.max(7,8*tr.scale)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.icon,x,y)}}
+ ctx.restore();
+};
 const _thezOpenMap=openFullMap;
 openFullMap=function(){mapState.open=true;mapState.cx=0;mapState.cz=0;mapState.zoom=.085;$('mapOverlay').classList.add('open');$('mapOverlay').setAttribute('aria-hidden','false');updateMaps()};
 // Five named coast destinations are included in the five-beach catalogue and map.
@@ -2618,6 +2464,92 @@ function updateCityExpansion(dt){if(activeCityJob){const d=Math.hypot(player.x-a
 $('startBtn').addEventListener('click',()=>{setTimeout(()=>{if(gameStarted){$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';renderWorldHub('jobs')}},250)});
 // Restore saved local economy and inventory in the top-level hub.
 $('worldStats').innerHTML=`<span class="world-pill">الرصيد: $${playerWallet.toLocaleString('en-US')}</span><span class="world-pill">المساحة: 112 كم²</span>`;
+
+// ===== THE Z ISLAND: خريطة الجزيرة مطابقة للصورة (مدينة/مطار/جبل/بحيرة/أنهار/قرى/مزارع/ميناء) =====
+(function(){
+const S=2.35,OX=688,OY=384,CZ=3500,Y0=-.12;
+const W=(p)=>[(p[0]-OX)*S,CZ+(p[1]-OY)*S];
+const land=[[80,310],[130,262],[200,205],[290,145],[400,115],[455,125],[490,160],[490,110],[545,95],[600,70],[660,55],[740,48],[840,58],[920,100],[960,140],[1000,155],[1100,185],[1150,230],[1190,290],[1195,340],[1178,372],[1215,420],[1250,470],[1268,520],[1245,545],[1232,590],[1150,640],[1045,665],[965,692],[900,722],[850,650],[800,612],[750,650],[690,690],[620,712],[540,727],[470,712],[462,672],[410,662],[330,640],[270,600],[240,540],[200,450],[188,380],[140,350],[80,332]];
+const lake=[[640,300],[720,265],[840,258],[930,285],[905,322],[825,332],[745,372],[692,392],[650,360]];
+const rivers=[[[498,100],[560,172],[575,250],[600,300],[640,345]],[[640,345],[600,385],[545,440],[505,520],[485,610],[470,690]]];
+const inPoly=(x,y,P)=>{let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
+const nearRiver=(x,y,w)=>rivers.some(r=>r.some((p,i)=>{if(!i)return false;const q=r[i-1],dx=p[0]-q[0],dy=p[1]-q[1],t=Math.max(0,Math.min(1,((x-q[0])*dx+(y-q[1])*dy)/(dx*dx+dy*dy)));return Math.hypot(x-q[0]-t*dx,y-q[1]-t*dy)<w}));
+const city=[840,375,1255,640],air=[[150,285],[420,140]],farm=[300,440,500,590];
+const inCityBox=(x,y)=>x>city[0]&&x<city[2]&&y>city[1]&&y<city[3];
+const inFarm=(x,y)=>x>farm[0]&&x<farm[2]&&y>farm[1]&&y<farm[3];
+const nearAir=(x,y)=>x<460&&y<330&&(y-285)/(x-150)*-1<1&&Math.abs((y-(285-(x-150)*.537)))<60;
+const g=new T.Group();sc.add(g);
+const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.9},o||{}));
+const flat=(pts,col,y,sc2)=>{const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length,cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;const s=new T.Shape();pts.forEach((p,i)=>{const q=W([cx+(p[0]-cx)*(sc2||1),cy+(p[1]-cy)*(sc2||1)]);i?s.lineTo(q[0],-q[1]):s.moveTo(q[0],-q[1])});const m=new T.Mesh(new T.ShapeGeometry(s).rotateX(-Math.PI/2),col.isMaterial?col:M(col));m.position.y=y;m.receiveShadow=true;g.add(m);return m};
+// بحر + شاطئ + عشب + بحيرة + أنهار
+const sea=new T.Mesh(new T.PlaneGeometry(5200,3200).rotateX(-Math.PI/2),new T.MeshPhongMaterial({color:0x2f7fae,specular:0x9edfff,shininess:80}));sea.position.set(0,-.2,CZ);g.add(sea);
+flat(land,0xe3cf9a,Y0-.03,1.012);flat(land,0x78a94a,Y0,.985);
+const water=new T.MeshPhongMaterial({color:0x2f7fae,specular:0xbfeaff,shininess:80});
+flat(lake,water,Y0+.02,1);
+rivers.forEach(r=>{for(let i=1;i<r.length;i++){const a=W(r[i-1]),b=W(r[i]),L=Math.hypot(b[0]-a[0],b[1]-a[1]);const m=new T.Mesh(new T.BoxGeometry(L+40,.1,70),water);m.position.set((a[0]+b[0])/2,Y0+.02,(a[1]+b[1])/2);m.rotation.y=-Math.atan2(b[1]-a[1],b[0]-a[0]);g.add(m)}});
+// الجبل والتلال
+const mtn=new T.Mesh(new T.ConeGeometry(340,230,10),M(0x6f9a4a,{flatShading:true}));const mp=W([760,100]);mtn.position.set(mp[0],105,mp[1]);g.add(mtn);
+const cap=new T.Mesh(new T.ConeGeometry(110,70,10),M(0x9a9a8e,{flatShading:true}));cap.position.set(mp[0],215,mp[1]);g.add(cap);
+for(const h of[[690,95,150,50],[860,115,130,40],[470,225,160,38],[355,310,140,32],[780,375,120,30]]){const q=W(h),m=new T.Mesh(new T.SphereGeometry(h[2],14,8,0,Math.PI*2,0,Math.PI/2),M(0x8dba5c));m.scale.y=h[3]/h[2];m.position.set(q[0],Y0,q[1]);g.add(m)}
+// طرق وجسور
+const road=M(0x3a3e44),dash=new T.MeshBasicMaterial({color:0xe9d36a});const roads=[];
+const addRoad=(pts,w)=>{const wp=pts.map(W);roads.push(wp);for(let i=1;i<wp.length;i++){const a=wp[i-1],b=wp[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),ang=-Math.atan2(b[1]-a[1],b[0]-a[0]);const m=new T.Mesh(new T.BoxGeometry(L+w*.6,.14,w),road);m.position.set((a[0]+b[0])/2,Y0+.06,(a[1]+b[1])/2);m.rotation.y=ang;m.receiveShadow=true;g.add(m);const d=new T.Mesh(new T.BoxGeometry(L,.02,.35),dash);d.position.set(m.position.x,Y0+.14,m.position.z);d.rotation.y=ang;g.add(d)}};
+addRoad([[370,258],[500,330],[650,388],[800,440],[880,470]],16);
+addRoad([[880,470],[960,420],[1010,380],[1010,300],[960,265],[900,235]],12);
+addRoad([[880,470],[820,520],[800,600],[740,640]],10);
+addRoad([[490,205],[545,210],[620,185],[700,150],[860,185],[960,265]],10);
+addRoad([[400,620],[480,600],[600,560],[700,520],[800,490]],9);
+addRoad([[260,360],[330,390],[420,470],[470,540],[480,600]],7);
+for(const b of[[565,205,60],[650,390,70],[480,600,50]]){const q=W(b),br=new T.Mesh(new T.BoxGeometry(b[2]*S*.55,2,18),M(0x8a8f95));br.position.set(q[0],Y0+.9,q[1]);br.rotation.y=-.5;g.add(br)}
+const dam=new T.Mesh(new T.BoxGeometry(120,12,22),M(0xb9bcc0));const dq=W([965,268]);dam.position.set(dq[0],5,dq[1]);dam.rotation.y=.8;g.add(dam);
+// المدينة (ناطحات سحاب + مباني + شوارع)
+const cg=new T.BoxGeometry(1,1,1).translate(0,.5,0),CN=900,towers=new T.InstancedMesh(cg,M(0xffffff,{roughness:.35,metalness:.3}),CN),d=new T.Object3D(),col=new T.Color();
+const pal=[0x5b8fd6,0x7fb4e8,0x9cc3e0,0xc8734a,0xb7b0a4,0x4f6fa8,0xd9d4c8,0x3f77b0];let n=0;
+for(let gx=city[0]+10;gx<city[2]-10&&n<CN;gx+=22)for(let gy=city[1]+10;gy<city[3]-10&&n<CN;gy+=20){if(!inPoly(gx,gy,land)||nearRiver(gx,gy,18))continue;const cxn=(gx-city[0])/(city[2]-city[0]),cyn=(gy-city[1])/(city[3]-city[1]),core=Math.max(0,1-Math.hypot(cxn-.55,cyn-.35)*2.2),a=W([gx,gy]);if(Math.random()<.14)continue;const w=20+Math.random()*24,hgt=(8+Math.random()*16)+core*(90+Math.random()*130);d.position.set(a[0],Y0,a[1]);d.scale.set(w,hgt,w*(.8+Math.random()*.4));d.updateMatrix();towers.setMatrixAt(n,d.matrix);col.setHex(core>.35?pal[(Math.random()*3|0)+(Math.random()<.4?4:0)]:pal[3+(Math.random()*5|0)]);towers.setColorAt(n,col);n++}
+towers.count=n;towers.castShadow=true;g.add(towers);
+for(let i=0;i<=8;i++){const a=W([city[0]+i*(city[2]-city[0])/8,city[1]+5]),r1=new T.Mesh(new T.BoxGeometry(10,.12,(city[3]-city[1])*S),road);r1.position.set(a[0],Y0+.05,CZ+((city[1]+city[3])/2-OY)*S);g.add(r1)}
+for(let i=0;i<=7;i++){const a=W([city[0]+5,city[1]+i*(city[3]-city[1])/7]),r1=new T.Mesh(new T.BoxGeometry((city[2]-city[0])*S,.12,10),road);r1.position.set((((city[0]+city[2])/2)-OX)*S,Y0+.05,a[1]);g.add(r1)}
+// الميناء: أرصفة وسفن كبيرة وصغيرة
+const dockM=M(0x8d9298);for(const p of[[880,700,95,24],[930,725,150,26],[990,690,70,22],[1190,570,90,18]]){const q=W(p),m=new T.Mesh(new T.BoxGeometry(p[2]*S,2.2,p[3]*S),dockM);m.position.set(q[0],Y0+.9,q[1]);g.add(m)}
+const crane=new T.Mesh(new T.BoxGeometry(6,50,6),M(0xd1503a));const cq=W([905,690]);crane.position.set(cq[0],25,cq[1]);g.add(crane);
+const ships=[];const mkShip=(big,x,y,hc)=>{const s=new T.Group(),L=big?150:42;const h=new T.Mesh(new T.BoxGeometry(L,big?14:6,big?30:12),M(hc));h.position.y=big?7:3;s.add(h);const c=new T.Mesh(new T.BoxGeometry(L*.2,big?20:7,big?24:9),M(0xeeeeee));c.position.set(-L*.3,big?22:9,0);s.add(c);if(big)for(let i=0;i<6;i++){const k=new T.Mesh(new T.BoxGeometry(14,10,24),M([0xd1503a,0x3a7bd1,0xe0b030][i%3]));k.position.set(L*.35-i*17,19,0);s.add(k)}const q=W([x,y]);s.position.set(q[0],-.1,q[1]);s.userData={x0:q[0],z0:q[1],ph:Math.random()*6,big};g.add(s);ships.push(s)};
+mkShip(1,1000,745,0x2f4f7a);mkShip(1,1085,760,0x8a2f2f);mkShip(1,1180,700,0x2f7a4f);mkShip(0,960,640,0xeeeeee);mkShip(0,1100,690,0xd1a030);mkShip(0,1230,640,0x3a7bd1);mkShip(0,830,730,0xeeeeee);
+// المطار: مدرج + مبنى + طائرات
+const a0=W(air[0]),a1=W(air[1]),rl=Math.hypot(a1[0]-a0[0],a1[1]-a0[1]),ra2=-Math.atan2(a1[1]-a0[1],a1[0]-a0[0]);
+const rw=new T.Mesh(new T.BoxGeometry(rl,.16,60),M(0x44484d));rw.position.set((a0[0]+a1[0])/2,Y0+.08,(a0[1]+a1[1])/2);rw.rotation.y=ra2;g.add(rw);
+const rd=new T.Mesh(new T.BoxGeometry(rl*.92,.02,1.2),dash);rd.position.copy(rw.position);rd.position.y=Y0+.18;rd.rotation.y=ra2;g.add(rd);
+const apron=new T.Mesh(new T.BoxGeometry(260,.14,150),M(0x6b6f74));const ap=W([310,265]);apron.position.set(ap[0],Y0+.07,ap[1]);apron.rotation.y=ra2;g.add(apron);
+const term=new T.Mesh(new T.BoxGeometry(150,18,50),M(0xb8c6d8,{metalness:.3}));const tp=W([385,200]);term.position.set(tp[0],9,tp[1]);term.rotation.y=ra2;g.add(term);
+const mkPlane=(x,z,r,col)=>{const p=new T.Group(),f=new T.Mesh(new T.CylinderGeometry(4,3,48,10).rotateZ(Math.PI/2),M(col));p.add(f);const wg=new T.Mesh(new T.BoxGeometry(12,1,64),M(col));p.add(wg);const t=new T.Mesh(new T.BoxGeometry(8,10,1.2),M(0xcc3030));t.position.set(-20,6,0);p.add(t);p.position.set(x,5,z);p.rotation.y=r;g.add(p);return p};
+mkPlane(ap[0]-40,ap[1]+10,ra2,0xf2f2f2);mkPlane(ap[0]+30,ap[1]-30,ra2+.3,0xdfe9f5);const flyer=mkPlane(a0[0],a0[1],ra2,0xffffff);
+// مزارع وقرى
+const fm=[0x5f9a3a,0x7ab24a,0x4f8a34,0x8a6a40];for(let i=0;i<7;i++){const fx=farm[0]+(i%3)*72+10,fy=farm[1]+(i/3|0)*60+10,q=W([fx+30,fy+22]),f=new T.Mesh(new T.BoxGeometry(60*S,.12,44*S),M(fm[i%4]));f.position.set(q[0],Y0+.04,q[1]);g.add(f);for(let k=0;k<7;k++){const rr=new T.Mesh(new T.BoxGeometry(60*S,.18,2.5),M(0x3d7a2a));rr.position.set(q[0],Y0+.1,q[1]-44*S/2+k*(44*S/7)+6);g.add(rr)}}
+const hm=M(0xb3714d),rf=M(0x8f3a2a),hg=new T.BoxGeometry(14,8,12),hc=[];
+const village=(cx,cy,rx,ry,k)=>{for(let i=0;i<k;i++){const x=cx+(Math.random()-.5)*rx*2,y=cy+(Math.random()-.5)*ry*2;if(!inPoly(x,y,land)||nearRiver(x,y,24)||inPoly(x,y,lake))continue;const q=W([x,y]),h=new T.Mesh(hg,hm);h.position.set(q[0],Y0+4,q[1]);h.rotation.y=Math.random()*3;g.add(h);const r=new T.Mesh(new T.ConeGeometry(11,6,4),rf);r.position.set(q[0],Y0+11,q[1]);r.rotation.y=h.rotation.y+Math.PI/4;g.add(r)}};
+village(420,430,70,50,22);village(660,505,70,30,18);village(285,420,25,25,6);village(1020,200,35,25,5);
+// أشجار كثيفة في كل مكان (InstancedMesh)
+const TN=5200,tr=new T.InstancedMesh(new T.CylinderGeometry(.5,.8,6,5).translate(0,3,0),M(0x6b4a2f),TN),lv=new T.InstancedMesh(new T.ConeGeometry(5,15,6).translate(0,12,0),M(0x2c7a3d,{flatShading:true}),TN);let tn=0;
+for(let k=0;k<30000&&tn<TN;k++){const x=70+Math.random()*1200,y=45+Math.random()*700;if(!inPoly(x,y,land)||inPoly(x,y,lake)||nearRiver(x,y,20)||inCityBox(x,y)||inFarm(x,y)||nearAir(x,y)||x<460&&y<330&&x<430&&y>(285-(x-150)*.54)-70&&y<(285-(x-150)*.54)+70)continue;
+ const forest=Math.sin(x*.021)*Math.cos(y*.027)+Math.random()*.9>.15;if(!forest)continue;const q=W([x,y]);d.position.set(q[0],Y0,q[1]);d.rotation.y=Math.random()*6;d.scale.setScalar(.7+Math.random()*.9);d.updateMatrix();tr.setMatrixAt(tn,d.matrix);lv.setMatrixAt(tn,d.matrix);tn++}
+tr.count=lv.count=tn;g.add(tr,lv);
+// حياة: سيارات/شاحنات/دراجات نارية على الطرق، خيول مع ركاب، دراجات هوائية ونارية في الغابات
+const mover=[],box=(w,h,l,c)=>{const m=new T.Mesh(new T.BoxGeometry(l,h,w),M(c));m.position.y=h/2+.2;return m};
+const mkCar=(t)=>{const o=new T.Group(),c=[0xd33,0x39d,0xeee,0x333,0xe9b030,0x3a3][Math.random()*6|0];if(t==='truck'){o.add(box(5,5,14,0xdddddd));const cb=box(5,4,5,c);cb.position.x=8;o.add(cb)}else if(t==='moto'){o.add(box(1.2,2,5,c))}else{o.add(box(4,2.2,9,c));const r=box(3.2,1.6,4.5,0x223344);r.position.y=3;o.add(r)}g.add(o);return o};
+const mkRider=(t)=>{const o=new T.Group();if(t==='horse'){const b=box(2.4,3,7,0x7a4a26);b.position.y=3;o.add(b);const h=box(1.4,3,2.4,0x6a3a1c);h.position.set(4,5.4,0);o.add(h);for(const[a,z]of[[-2.4,-.9],[-2.4,.9],[2.4,-.9],[2.4,.9]]){const l=box(.6,3,.6,0x5a3216);l.position.set(a,.3,z);o.add(l)}const p=box(1.4,3.4,1.2,0x2a5a9a);p.position.set(0,6.4,0);o.add(p)}else{const b=box(.6,1.8,5,t==='bicycle'?0x2a9a4a:0x222222);b.position.y=1.4;o.add(b);const p=box(1.3,3,1.2,0xd1503a);p.position.set(0,3.6,0);o.add(p)}g.add(o);return o};
+const lens=roads.map(r=>{let L=0;const s=[0];for(let i=1;i<r.length;i++){L+=Math.hypot(r[i][0]-r[i-1][0],r[i][1]-r[i-1][1]);s.push(L)}return{L,s}});
+const at=(ri,t)=>{const r=roads[ri],q=lens[ri],u=((t%q.L)+q.L)%q.L;let i=1;while(i<r.length-1&&q.s[i]<u)i++;const k=(u-q.s[i-1])/(q.s[i]-q.s[i-1]||1);return[r[i-1][0]+(r[i][0]-r[i-1][0])*k,r[i-1][1]+(r[i][1]-r[i-1][1])*k,Math.atan2(r[i][1]-r[i-1][1],r[i][0]-r[i-1][0])]};
+for(let i=0;i<46;i++){const t=['car','car','car','truck','moto'][i%5],o=mkCar(t);mover.push({o,ri:i%roads.length,u:Math.random()*lens[i%roads.length].L,v:(18+Math.random()*16)*(i%2?1:-1)})}
+for(let i=0;i<26;i++){const t=['horse','bicycle','moto'][i%3],o=mkRider(t);let x,y,k=0;do{x=100+Math.random()*1100;y=60+Math.random()*680;k++}while(k<400&&(!inPoly(x,y,land)||inPoly(x,y,lake)||nearRiver(x,y,22)||inCityBox(x,y)||nearAir(x,y)));const q=W([x,y]);mover.push({o,wander:1,x:q[0],z:q[1],a:Math.random()*6,v:t==='horse'?7:t==='bicycle'?5:14,home:[q[0],q[1]]})}
+let tt=0,last=performance.now();
+(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+ for(const m of mover){if(m.wander){m.a+=(Math.random()-.5)*dt*2;let nx=m.x+Math.cos(m.a)*m.v*dt,nz=m.z+Math.sin(m.a)*m.v*dt;const px=(nx/S)+OX,py=((nz-CZ)/S)+OY;if(!inPoly(px,py,land)||inPoly(px,py,lake)||nearRiver(px,py,20)||inCityBox(px,py)||Math.hypot(nx-m.home[0],nz-m.home[1])>380){m.a+=Math.PI*.75;nx=m.x;nz=m.z}m.x=nx;m.z=nz;m.o.position.set(nx,Y0,nz);m.o.rotation.y=-m.a;m.o.position.y=Y0+Math.abs(Math.sin(tt*m.v))*.3}else{m.u+=m.v*dt;const p=at(m.ri,m.u);m.o.position.set(p[0],Y0+.1,p[1]+(m.v>0?3.2:-3.2));m.o.rotation.y=-p[2]+(m.v>0?0:Math.PI)}}
+ for(const s of ships){const u=s.userData;s.position.x=u.x0+Math.sin(tt*.06+u.ph)*(u.big?40:160);s.position.z=u.z0+Math.cos(tt*.05+u.ph)*(u.big?6:40);s.rotation.y=-Math.cos(tt*.06+u.ph)*.15+(u.big?0:Math.PI);s.position.y=-.1+Math.sin(tt*1.2+u.ph)*.25}
+ const f=(tt*.035)%1;flyer.position.set(a0[0]+(a1[0]-a0[0])*f,5+Math.max(0,f-.55)*420,a0[1]+(a1[1]-a0[1])*f)})(last);
+// زر الانتقال إلى الجزيرة (المدينة تحت اليمين)
+const btn=document.createElement('button');btn.textContent='🏝️ الجزيرة';btn.style.cssText='position:fixed;top:calc(80px + env(safe-area-inset-top,0px));right:18px;z-index:61;padding:10px 14px;border:0;border-radius:12px;background:#fff;color:#111;font-weight:800;cursor:pointer';
+btn.onclick=()=>{const q=W([960,560]);player.x=q[0];player.z=q[1];if(typeof showToast==='function')showToast('وصلت إلى جزيرة THE Z — المدينة',2200)};document.body.appendChild(btn);
+window.THEZ_ISLAND={teleport:(px,py)=>{const q=W([px,py]);player.x=q[0];player.z=q[1]},spots:{city:[960,560],airport:[300,250],mountain:[760,150],farms:[400,520],harbor:[900,690]}};
+})();
 
 </script>
 </body>
