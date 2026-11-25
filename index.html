@@ -151,6 +151,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <div id="hud"><div class="hud-box"><strong id="areaName">فايس بيتش</strong><span id="statusLine">استكشف المدينة</span><span id="nearLine">WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج</span></div></div>
 <div id="toast"></div>
 <button id="miniMapBtn" aria-label="فتح الخريطة"><canvas id="miniMapCanvas" width="300" height="300"></canvas><span id="mapTag">GPS • الخريطة</span></button>
+<button id="soundToggleBtn" aria-label="تشغيل/إيقاف الصوت" style="position:fixed;z-index:13;top:calc(10px + env(safe-area-inset-top,0px));left:134px;width:46px;height:46px;border:1px solid #ffffff65;border-radius:14px;background:#071725dc;box-shadow:0 8px 28px #0008;display:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:#fff">🔊</button>
 <div id="mapOverlay" aria-hidden="true">
  <canvas id="largeMap" width="1000" height="1000"></canvas>
  <div id="mapHeader"><div class="map-title">خريطة المدينة • GPS</div><div class="map-actions"><button class="map-action" id="mapZoomIn" aria-label="تكبير">＋</button><button class="map-action" id="mapZoomOut" aria-label="تصغير">−</button><button class="map-action" id="mapRecenter" aria-label="موقعي">◎</button><button class="map-action" id="mapClose" aria-label="إغلاق">×</button></div></div>
@@ -705,7 +706,11 @@ function createCharacterRagdoll(ch,options={}){
  for(const def of RAG_PARTS){
   const pivot=P[def.pivot];if(!pivot)continue;
   const pos=getWorldPoint(pivot,[0,def.off,0]),q=getWorldQuat(pivot);
-  const rbDesc=RAPIER.RigidBodyDesc.dynamic().setTranslation(pos.x,pos.y,pos.z).setRotation({x:q.x,y:q.y,z:q.z,w:q.w}).setLinearDamping(.10).setAngularDamping(1.85).setCanSleep(false).setCcdEnabled(true);
+  /* Torso/head get extra angular damping so the spine-neck spherical joints (which
+     carry no hard angle limit in this Rapier build) settle into a natural pose
+     instead of free-spinning into unnatural twists after impact. */
+  const angDamp=(def.key==='torso'||def.key==='head')?3.1:1.85;
+  const rbDesc=RAPIER.RigidBodyDesc.dynamic().setTranslation(pos.x,pos.y,pos.z).setRotation({x:q.x,y:q.y,z:q.z,w:q.w}).setLinearDamping(.10).setAngularDamping(angDamp).setCanSleep(false).setCcdEnabled(true);
   const body=ragdollWorld.createRigidBody(rbDesc);let cd;
   if(def.shape==='box')cd=RAPIER.ColliderDesc.cuboid(def.size[0]*scale,def.size[1]*scale,def.size[2]*scale);
   else if(def.shape==='ball')cd=RAPIER.ColliderDesc.ball(def.size[0]*scale);
@@ -825,6 +830,237 @@ function stepRagdollPhysics(dt){
 }
 initRagdollPhysics();
 
+/* ========= محرك الصوت: Web Audio ثلاثي الأبعاد، كل الأصوات مُولَّدة إجرائياً =========
+   لا ملفات mp3 خارجية (موثوقية بلا اتصال إنترنت): كل صوت (بحر، طيور، ناس، محركات،
+   أسلحة، اصطدامات، خطوات) يُبنى بمذبذبات وضوضاء مرشّحة بدقة صوتية واقعية، ويُموضع
+   في الفضاء ثلاثي الأبعاد حول المستمع (الكاميرا) عبر PannerNode الحقيقي. */
+const SFX=(()=>{
+ let actx=null,master=null,musicGain=null,unlocked=false,enabled=true;
+ const loops=new Map(); // key -> {panner,gain,nodes,stop}
+ function ctx(){return actx}
+ function unlock(){
+  if(unlocked)return;unlocked=true;
+  try{actx=new (window.AudioContext||window.webkitAudioContext)();
+   master=actx.createGain();master.gain.value=enabled?1:0;master.connect(actx.destination);
+   if(actx.listener){if(actx.listener.forwardX)actx.listener.upY.setValueAtTime(1,actx.currentTime),actx.listener.upZ.setValueAtTime(0,actx.currentTime)}
+  }catch(e){console.warn('تعذّر تشغيل محرك الصوت:',e);actx=null}
+ }
+ function setEnabled(v){enabled=!!v;if(master)master.gain.setTargetAtTime(enabled?1:0,actx.currentTime,.05)}
+ function isEnabled(){return enabled}
+ function makeNoiseBuffer(seconds=1,color='white'){
+  const sr=actx.sampleRate,len=Math.max(1,Math.floor(sr*seconds)),buf=actx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  let last=0;
+  for(let i=0;i<len;i++){const w=Math.random()*2-1;if(color==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.2}else if(color==='pink'){last=last*.98+w*.02;d[i]=(last+w*.35)}else d[i]=w}
+  return buf;
+ }
+ let noiseWhite=null,noiseBrown=null,noisePink=null;
+ function getNoise(color){if(color==='brown'){if(!noiseBrown)noiseBrown=makeNoiseBuffer(2.4,'brown');return noiseBrown}if(color==='pink'){if(!noisePink)noisePink=makeNoiseBuffer(2.4,'pink');return noisePink}if(!noiseWhite)noiseWhite=makeNoiseBuffer(2.4,'white');return noiseWhite}
+ /* 3D موضع: مستمع عند موضع الكاميرا، اتجاهه نحو اللاعب. يُستدعى كل إطار. */
+ function updateListener(){
+  if(!actx||!actx.listener)return;const l=actx.listener,p=cam.position,t=actx.currentTime;
+  const fwd=new T.Vector3();cam.getWorldDirection(fwd);
+  if(l.positionX){l.positionX.setTargetAtTime(p.x,t,.05);l.positionY.setTargetAtTime(p.y,t,.05);l.positionZ.setTargetAtTime(p.z,t,.05);
+   l.forwardX.setTargetAtTime(fwd.x,t,.05);l.forwardY.setTargetAtTime(fwd.y,t,.05);l.forwardZ.setTargetAtTime(fwd.z,t,.05);
+   l.upX.setTargetAtTime(0,t,.05);l.upY.setTargetAtTime(1,t,.05);l.upZ.setTargetAtTime(0,t,.05);
+  }else{l.setPosition(p.x,p.y,p.z);l.setOrientation(fwd.x,fwd.y,fwd.z,0,1,0)}
+ }
+ function makePanner(x,y,z,refDist=8,maxDist=240){
+  const p=actx.createPanner();p.panningModel='HRTF';p.distanceModel='inverse';p.refDistance=refDist;p.maxDistance=maxDist;p.rolloffFactor=1;
+  if(p.positionX){p.positionX.value=x;p.positionY.value=y;p.positionZ.value=z}else p.setPosition(x,y,z);
+  return p;
+ }
+ /* ---- صوت لحظي (one-shot) في موضع ثلاثي الأبعاد ---- */
+ function oneShot(build,x,y,z,vol=1,refDist=8,maxDist=240){
+  if(!actx||!enabled)return;
+  try{
+   const panner=makePanner(x,y,z,refDist,maxDist),g=actx.createGain();g.gain.value=vol;
+   panner.connect(g);g.connect(master);
+   build(panner,actx.currentTime);
+  }catch(e){}
+ }
+ /* ---- حلقة صوت مستمرة مرتبطة بجسم متحرك (محرك سيارة، أمواج، إلخ) ---- */
+ function startLoop(key,build,x,y,z,refDist=10,maxDist=260){
+  if(!actx)return null;
+  if(loops.has(key))return loops.get(key);
+  const panner=makePanner(x,y,z,refDist,maxDist),g=actx.createGain();g.gain.value=0;
+  panner.connect(g);g.connect(master);
+  const handle={panner,gain:g,nodes:[],x,y,z};
+  build(handle,actx.currentTime);
+  loops.set(key,handle);
+  return handle;
+ }
+ function moveLoop(key,x,y,z){
+  const h=loops.get(key);if(!h)return;h.x=x;h.y=y;h.z=z;
+  const p=h.panner,t=actx.currentTime;
+  if(p.positionX){p.positionX.setTargetAtTime(x,t,.08);p.positionY.setTargetAtTime(y,t,.08);p.positionZ.setTargetAtTime(z,t,.08)}else p.setPosition(x,y,z);
+ }
+ function stopLoop(key,fade=.25){
+  const h=loops.get(key);if(!h)return;loops.delete(key);
+  try{const t=actx.currentTime;h.gain.gain.cancelScheduledValues(t);h.gain.gain.setTargetAtTime(0,t,fade*.4);
+   setTimeout(()=>{for(const n of h.nodes)try{n.stop&&n.stop()}catch(e){}try{h.panner.disconnect()}catch(e){}},fade*1000+300);
+  }catch(e){}
+ }
+ function hasLoop(key){return loops.has(key)}
+
+ /* ===================== أصوات محددة ===================== */
+
+ // خطوة قدم: نقرة قصيرة مرشّحة، تختلف حسب السطح (إسفلت/عشب/رمل/خشب)
+ function footstep(x,y,z,surface='asphalt',heavy=false){
+  oneShot((panner,t)=>{
+   const dur=.085,buf=getNoise(surface==='grass'?'pink':'white'),src=actx.createBufferSource();src.buffer=buf;
+   const bp=actx.createBiquadFilter();
+   if(surface==='grass'){bp.type='bandpass';bp.frequency.value=1500;bp.Q.value=.7}
+   else if(surface==='sand'){bp.type='lowpass';bp.frequency.value=900;bp.Q.value=.5}
+   else if(surface==='wood'){bp.type='bandpass';bp.frequency.value=2200;bp.Q.value=2.2}
+   else{bp.type='bandpass';bp.frequency.value=heavy?650:1100;bp.Q.value=1.1}
+   const g=actx.createGain();g.gain.setValueAtTime(heavy?.42:.22,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+   src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+dur+.02);
+  },x,y,z,1,2,40);
+ }
+ // طرقعة ارتطام جسدي (لكمة/سقوط/راغدول) - ضربة غليظة + صفعة لحم
+ function thud(x,y,z,strength=1){
+  oneShot((panner,t)=>{
+   const osc=actx.createOscillator();osc.type='sine';osc.frequency.setValueAtTime(140,t);osc.frequency.exponentialRampToValueAtTime(48,t+.14);
+   const og=actx.createGain();og.gain.setValueAtTime(Math.min(1,.5*strength),t);og.gain.exponentialRampToValueAtTime(.001,t+.17);
+   osc.connect(og);og.connect(panner);osc.start(t);osc.stop(t+.18);
+   const buf=getNoise('pink'),src=actx.createBufferSource();src.buffer=buf;const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=900;bp.Q.value=.9;
+   const ng=actx.createGain();ng.gain.setValueAtTime(Math.min(.8,.4*strength),t);ng.gain.exponentialRampToValueAtTime(.001,t+.09);
+   src.connect(bp);bp.connect(ng);ng.connect(panner);src.start(t);src.stop(t+.1);
+  },x,y,z,1,3,70);
+ }
+ // صدمة سيارة قوية: معدن + زجاج محتمل
+ function carCrash(x,y,z,strength=1){
+  oneShot((panner,t)=>{
+   const buf=getNoise('white'),src=actx.createBufferSource();src.buffer=buf;const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1400;bp.Q.value=.6;
+   const g=actx.createGain();g.gain.setValueAtTime(Math.min(1,.65*strength),t);g.gain.exponentialRampToValueAtTime(.001,t+.32);
+   src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+.34);
+   const osc=actx.createOscillator();osc.type='sawtooth';osc.frequency.setValueAtTime(110,t);osc.frequency.exponentialRampToValueAtTime(35,t+.25);
+   const og=actx.createGain();og.gain.setValueAtTime(Math.min(.7,.4*strength),t);og.gain.exponentialRampToValueAtTime(.001,t+.3);
+   osc.connect(og);og.connect(panner);osc.start(t);osc.stop(t+.32);
+  },x,y,z,1,4,150);
+ }
+ // بوق سيارة (كلاكس)
+ function carHorn(x,y,z,duration=.35){
+  oneShot((panner,t)=>{
+   const o1=actx.createOscillator();o1.type='sawtooth';o1.frequency.value=370;
+   const o2=actx.createOscillator();o2.type='sawtooth';o2.frequency.value=440;
+   const lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1600;
+   const g=actx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.38,t+.02);g.gain.setValueAtTime(.38,t+duration-.05);g.gain.linearRampToValueAtTime(0,t+duration);
+   o1.connect(lp);o2.connect(lp);lp.connect(g);g.connect(panner);o1.start(t);o2.start(t);o1.stop(t+duration+.02);o2.stop(t+duration+.02);
+  },x,y,z,1,6,180);
+ }
+ // طيور تغرد (نقرات ترددية صاعدة قصيرة عشوائية)
+ function birdChirp(x,y,z){
+  oneShot((panner,t)=>{
+   const notes=2+Math.floor(Math.random()*3);
+   for(let i=0;i<notes;i++){
+    const dt0=i*.09+Math.random()*.03,o=actx.createOscillator();o.type='sine';
+    const f0=2200+Math.random()*1400;o.frequency.setValueAtTime(f0,t+dt0);o.frequency.exponentialRampToValueAtTime(f0*1.4,t+dt0+.05);
+    const g=actx.createGain();g.gain.setValueAtTime(0,t+dt0);g.gain.linearRampToValueAtTime(.09,t+dt0+.012);g.gain.exponentialRampToValueAtTime(.001,t+dt0+.09);
+    o.connect(g);g.connect(panner);o.start(t+dt0);o.stop(t+dt0+.1);
+   }
+  },x,y,z,1,3,55);
+ }
+ // همهمة ناس (ثرثرة خلفية خافتة جداً، ضوضاء وردية مفلترة بصوتيات تشبه الكلام)
+ function crowdMurmur(x,y,z){
+  oneShot((panner,t)=>{
+   const dur=.5+Math.random()*.6,buf=getNoise('pink'),src=actx.createBufferSource();src.buffer=buf;src.loop=false;
+   const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.setValueAtTime(600,t);bp.frequency.linearRampToValueAtTime(380+Math.random()*500,t+dur);bp.Q.value=2.4;
+   const g=actx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+.08);g.gain.linearRampToValueAtTime(0,t+dur);
+   src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+dur+.02);
+  },x,y,z,1,4,30);
+ }
+ // أمواج البحر: حلقة مستمرة من ضوضاء بنية مفلترة تتموج بالحجم (مد وجزر)
+ function startOceanLoop(key,x,y,z){
+  return startLoop(key,(h,t)=>{
+   const src=actx.createBufferSource();src.buffer=getNoise('brown');src.loop=true;
+   const lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=650;
+   const lfo=actx.createOscillator();lfo.type='sine';lfo.frequency.value=.11;
+   const lfoGain=actx.createGain();lfoGain.gain.value=.16;
+   lfo.connect(lfoGain);lfoGain.connect(h.gain.gain);
+   src.connect(lp);lp.connect(h.gain);
+   h.gain.gain.value=.001;h.gain.gain.setTargetAtTime(.22,t,1.4);
+   src.start(t);lfo.start(t);h.nodes.push(src,lfo);
+  },x,y,z,30,520);
+ }
+ // محرك سيارة: تردد أساسي يتغير حسب السرعة (RPM)، مع نبضة خفيفة لصوت المكابس
+ function startEngineLoop(key,x,y,z){
+  return startLoop(key,(h,t)=>{
+   const osc=actx.createOscillator();osc.type='sawtooth';osc.frequency.value=55;
+   const lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=420;
+   const noiseSrc=actx.createBufferSource();noiseSrc.buffer=getNoise('brown');noiseSrc.loop=true;
+   const noiseGain=actx.createGain();noiseGain.gain.value=.05;
+   osc.connect(lp);lp.connect(h.gain);noiseSrc.connect(noiseGain);noiseGain.connect(h.gain);
+   h.gain.gain.value=0;osc.start(t);noiseSrc.start(t);h.nodes.push(osc,noiseSrc);h._osc=osc;h._lp=lp;
+  },x,y,z,4,90);
+ }
+ function updateEngineLoop(key,speed,maxSpeed=18){
+  const h=loops.get(key);if(!h||!h._osc)return;const t=actx.currentTime,q=Math.min(1,Math.abs(speed)/maxSpeed);
+  const freq=48+q*170;h._osc.frequency.setTargetAtTime(freq,t,.08);h._lp.frequency.setTargetAtTime(380+q*1400,t,.08);
+  h.gain.gain.setTargetAtTime(Math.min(.3,.07+q*.22),t,.15);
+ }
+ // رياح طبيعية خافتة مستمرة في الخلفية (أجواء عامة)
+ function startWindLoop(){
+  return startLoop('__wind',(h,t)=>{
+   const src=actx.createBufferSource();src.buffer=getNoise('pink');src.loop=true;
+   const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=.4;
+   src.connect(bp);bp.connect(h.gain);h.gain.gain.value=.05;src.start(t);h.nodes.push(src);
+  },0,2,0,999,2000);
+ }
+ // أصوات الأسلحة: كل سلاح له بصمة صوتية مختلفة
+ function gunshot(weaponKey,x,y,z){
+  oneShot((panner,t)=>{
+   if(weaponKey==='pistol'){ // نسر الصحراء: طقة حادة قوية قصيرة
+    const buf=getNoise('white'),src=actx.createBufferSource();src.buffer=buf;const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1900;bp.Q.value=.5;
+    const g=actx.createGain();g.gain.setValueAtTime(.85,t);g.gain.exponentialRampToValueAtTime(.001,t+.14);
+    src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+.15);
+    const o=actx.createOscillator();o.type='square';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(60,t+.08);
+    const og=actx.createGain();og.gain.setValueAtTime(.5,t);og.gain.exponentialRampToValueAtTime(.001,t+.09);
+    o.connect(og);og.connect(panner);o.start(t);o.stop(t+.1);
+   }else if(weaponKey==='shotgun'){ // شوتغن: دوي عميق واسع مع أزيز
+    const buf=getNoise('white'),src=actx.createBufferSource();src.buffer=buf;const bp=actx.createBiquadFilter();bp.type='lowpass';bp.frequency.setValueAtTime(2400,t);bp.frequency.exponentialRampToValueAtTime(300,t+.4);
+    const g=actx.createGain();g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+.42);
+    src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+.44);
+    const o=actx.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(30,t+.3);
+    const og=actx.createGain();og.gain.setValueAtTime(.7,t);og.gain.exponentialRampToValueAtTime(.001,t+.32);
+    o.connect(og);og.connect(panner);o.start(t);o.stop(t+.34);
+   }else if(weaponKey==='smg'){ // رشاش: طقطقة معدنية سريعة حادة
+    const buf=getNoise('white'),src=actx.createBufferSource();src.buffer=buf;const bp=actx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=1.1;
+    const g=actx.createGain();g.gain.setValueAtTime(.62,t);g.gain.exponentialRampToValueAtTime(.001,t+.07);
+    src.connect(bp);bp.connect(g);g.connect(panner);src.start(t);src.stop(t+.08);
+    const o=actx.createOscillator();o.type='square';o.frequency.setValueAtTime(310,t);o.frequency.exponentialRampToValueAtTime(90,t+.05);
+    const og=actx.createGain();og.gain.setValueAtTime(.3,t);og.gain.exponentialRampToValueAtTime(.001,t+.055);
+    o.connect(og);og.connect(panner);o.start(t);o.stop(t+.06);
+   }
+  },x,y,z,1,6,260);
+ }
+ function emptyClick(x,y,z){
+  oneShot((panner,t)=>{
+   const o=actx.createOscillator();o.type='square';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(400,t+.03);
+   const g=actx.createGain();g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.04);
+   o.connect(g);g.connect(panner);o.start(t);o.stop(t+.05);
+  },x,y,z,1,2,20);
+ }
+ function reloadSound(x,y,z){
+  oneShot((panner,t)=>{
+   for(let i=0;i<2;i++){const dt0=i*.18,o=actx.createOscillator();o.type='square';o.frequency.setValueAtTime(260+i*90,t+dt0);
+    const g=actx.createGain();g.gain.setValueAtTime(.22,t+dt0);g.gain.exponentialRampToValueAtTime(.001,t+dt0+.05);
+    o.connect(g);g.connect(panner);o.start(t+dt0);o.stop(t+dt0+.06);}
+  },x,y,z,1,2,15);
+ }
+ // صرخة/تأوّه قصير عند الإصابة
+ function hitGrunt(x,y,z,dead=false){
+  oneShot((panner,t)=>{
+   const o=actx.createOscillator();o.type='sawtooth';const f0=dead?170:230;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*.4,t+(dead?.5:.22));
+   const lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1100;
+   const g=actx.createGain();g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+(dead?.55:.24));
+   o.connect(lp);lp.connect(g);g.connect(panner);o.start(t);o.stop(t+(dead?.6:.26));
+  },x,y,z,1,3,50);
+ }
+ return {ctx,unlock,setEnabled,isEnabled,updateListener,oneShot,startLoop,moveLoop,stopLoop,hasLoop,
+  footstep,thud,carCrash,carHorn,birdChirp,crowdMurmur,startOceanLoop,startEngineLoop,updateEngineLoop,
+  startWindLoop,gunshot,emptyClick,reloadSound,hitGrunt};
+})();
 
 /* ========= إعداد اللعب والشخصية ========= */
 const $=id=>document.getElementById(id);
@@ -929,7 +1165,9 @@ let farPedClock=0,crowdLodClock=0;
 const pedBuckets=new Map();
 function rebuildPedBuckets(){pedBuckets.clear();for(const p of allPedestrians()){const k=Math.floor(p.x/12)+','+Math.floor(p.z/12);let a=pedBuckets.get(k);if(!a)pedBuckets.set(k,a=[]);a.push(p)}}
 function nearbyPedestrians(x,z,radius=3){const out=[],cx=Math.floor(x/12),cz=Math.floor(z/12),span=Math.ceil(radius/12)+1;if(!pedBuckets.size)return allPedestrians().filter(p=>(p.x-x)**2+(p.z-z)**2<radius*radius);for(let ix=-span;ix<=span;ix++)for(let iz=-span;iz<=span;iz++){const a=pedBuckets.get((cx+ix)+','+(cz+iz));if(a)for(const p of a)if((p.x-x)**2+(p.z-z)**2<radius*radius)out.push(p)}return out}
-function startPedestrianImpact(p,vx,vz,source='vehicle',strength=1){if(!p||p.hitCooldown>0||p.reaction||p.driverExit)return false;setPedDetail(p,true);p.hitCooldown=1.1;p.flee=null;p.angry=null;p.pause=0;const len=Math.hypot(vx,vz)||1,force=source==='vehicle'?Math.min(9.5,1.9+strength*.34):Math.min(6.2,2.3+strength*.45);if(startPedestrianRagdoll(p,vx,vz,force,source))return true;const impulse=source==='vehicle'?Math.min(8.2,1.15+strength*.22):1.0,kind=source==='vehicle'&&strength<12?'stumble':'fall';p.reaction={type:kind,phase:'down',t:0,vx:vx/len*impulse,vz:vz/len*impulse,anger:R()<(source==='vehicle'?.18:.3)};if(p.ch){p.ch.root.visible=true;p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}return true}
+function startPedestrianImpact(p,vx,vz,source='vehicle',strength=1){if(!p||p.hitCooldown>0||p.reaction||p.driverExit)return false;setPedDetail(p,true);p.hitCooldown=1.1;p.flee=null;p.angry=null;p.pause=0;const len=Math.hypot(vx,vz)||1,force=source==='vehicle'?Math.min(9.5,1.9+strength*.34):Math.min(6.2,2.3+strength*.45);
+ SFX.hitGrunt(p.x,1.2,p.z,false);SFX.thud(p.x,1,p.z,Math.min(1,force/8));
+ if(startPedestrianRagdoll(p,vx,vz,force,source))return true;const impulse=source==='vehicle'?Math.min(8.2,1.15+strength*.22):1.0,kind=source==='vehicle'&&strength<12?'stumble':'fall';p.reaction={type:kind,phase:'down',t:0,vx:vx/len*impulse,vz:vz/len*impulse,anger:R()<(source==='vehicle'?.18:.3)};if(p.ch){p.ch.root.visible=true;p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}return true}
 function movePedestrian(p,dt,near){
  p.phase+=dt;if(p.hitCooldown>0)p.hitCooldown=Math.max(0,p.hitCooldown-dt);
  if(p.driverExit){const e=p.driverExit;e.t+=dt;const q=Math.min(1,e.t/e.duration),u=q*q*(3-2*q);p.x=e.sx+(e.ex-e.sx)*u;p.z=e.sz+(e.ez-e.sz)*u;p.heading=e.heading;if(q>=1){p.driverExit=null;p.pause=0;if(e.action==='yank'){const ax=e.ex-e.sx,az=e.ez-e.sz,al=Math.hypot(ax,az)||1;p.reaction={type:'fall',back:true,t:0,phase:'down',vx:ax/al*3.25,vz:az/al*3.25,anger:R()<.38}}else if(e.action==='fall')p.reaction={type:'fall',t:0,phase:'down',vx:0,vz:0,anger:false};else if(e.action==='shove')p.reaction={type:'shove',t:0};else p.flee={t:0,duration:3.4}}if(p.ch){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading;p.ch.update(e.t,dt,e.action==='yank'?'yanked':'exit')}return}
@@ -1124,6 +1362,7 @@ function updateMaps(){if(!gameStarted)return;drawMap(miniCtx,300,300,player.x,pl
 function openFullMap(){mapState.open=true;mapState.cx=0;mapState.cz=0;mapState.zoom=.24;$('mapOverlay').classList.add('open');$('mapOverlay').setAttribute('aria-hidden','false');updateMaps()}
 function closeFullMap(){$('mapOverlay').classList.remove('open');$('mapOverlay').setAttribute('aria-hidden','true');mapState.open=false}
 $('miniMapBtn').addEventListener('click',openFullMap);$('mapClose').addEventListener('click',closeFullMap);
+$('soundToggleBtn').addEventListener('click',()=>{const on=!SFX.isEnabled();SFX.setEnabled(on);$('soundToggleBtn').textContent=on?'🔊':'🔇';showToast(on?'تم تشغيل الصوت':'تم إيقاف الصوت',1200)});
 $('mapZoomIn').addEventListener('click',()=>{mapState.zoom=Math.min(2.5,mapState.zoom*1.25);updateMaps()});$('mapZoomOut').addEventListener('click',()=>{mapState.zoom=Math.max(.12,mapState.zoom/1.25);updateMaps()});
 $('mapRecenter').addEventListener('click',()=>{mapState.cx=player.x;mapState.cz=player.z;mapState.zoom=.8;updateMaps()});$('clearRoute').addEventListener('click',clearGps);
 largeCanvas.addEventListener('pointerdown',e=>{if(!mapState.open)return;largeCanvas.setPointerCapture(e.pointerId);mapState.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false};});
@@ -1260,6 +1499,7 @@ function resolveTrafficCollisions(dt){
     loser.speed*=loser.userDriven?-.12:.18;if(!loser.userDriven)loser.collisionHold=Math.max(loser.collisionHold||0,.42);
     const winner=loser===a?b:a;if(winner.userDriven)winner.speed*=.55;else{winner.speed*=.52;winner.collisionHold=Math.max(winner.collisionHold||0,.18)}
     const impulse=Math.min(9,Math.max(1.2,closing*.22));if(a.retired&&!a.userDriven)a.hitImpulse={vx:nx*impulse,vz:nz*impulse};if(b.retired&&!b.userDriven)b.hitImpulse={vx:-nx*impulse,vz:-nz*impulse};
+    if(closing>4.5)SFX.carCrash((a.x+b.x)/2,(a.y||0)+.5,(a.z+b.z)/2,Math.min(1,closing/16));
     syncVehicleAfterCollision(loser);syncVehicleAfterCollision(winner);
     if(closing>3&&a.impactClock<=0&&b.impactClock<=0){const hit=closing>34?2.15:closing>22?1.15:closing>12?.58:.22;const ix=(a.x+b.x)*.5,iz=(a.z+b.z)*.5;damageVehicle(a,hit,ix,iz);damageVehicle(b,hit*.9,ix,iz);a.impactClock=.8;b.impactClock=.8;if(closing>38){if(a.userDriven)triggerVehicleCrash(a,ix,iz,closing,'تصادم قوي');if(b.userDriven)triggerVehicleCrash(b,ix,iz,closing,'تصادم قوي')}}
    }
@@ -1422,6 +1662,7 @@ $('fullBtn').addEventListener('click',async()=>{
 });
 window.addEventListener('keydown',e=>{if(e.code==='Escape'&&mapState.open)closeFullMap()});
 $('startBtn').addEventListener('click',async()=>{
+ SFX.unlock();
  if(!mpImmersiveVerified||!mpSocket||mpSocket.readyState!==WebSocket.OPEN){try{await mpPrepareConnection()}catch(e){showToast('انقطع الاتصال بالخادم. أعد فتح اللعبة وحاول من جديد.',2600);return}}
  $('startBtn').disabled=true;$('startBtn').textContent='جارٍ تجهيز شخصيتك...';
  if(window.__viceRagdollReady&&!ragdollPhysicsReady){try{await Promise.race([window.__viceRagdollReady,new Promise(resolve=>setTimeout(resolve,6500))])}catch(e){}}
@@ -1430,9 +1671,11 @@ $('startBtn').addEventListener('click',async()=>{
  try{await mpJoinWorld();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
  await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));
  if(worldDB&&!mpWorldTargets)await loadWorldSnapshot();
- gameStarted=true;$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
+ gameStarted=true;$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('soundToggleBtn').style.display='flex';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
  $('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';
  showToast(`مرحباً ${mpPlayerName} بك في THE Z ONLINE.`,3000);
+ SFX.startWindLoop();
+ for(const b of BEACHES)SFX.startOceanLoop('ocean_'+b.id,b.cx,0,(b.waterMinZ+b.waterMaxZ)/2);
 });
 $('runBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();runToggle=!runToggle;$('runBtn').classList.toggle('active',runToggle)});
 $('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jumpQueued=true});
@@ -1732,6 +1975,7 @@ function resolvePlayerVehicleImpact(){
  const dx=car.x-(car.prevX??car.x),dz=car.z-(car.prevZ??car.z),travel=Math.hypot(dx,dz),speed=Math.abs(car.speed||0);
  if(speed<5.2||travel<.035)return;
  const len=travel||1,fx=dx/len,fz=dz/len;
+ SFX.carCrash(player.x,player.y,player.z,Math.min(1,speed/10));
  if(startPlayerRagdoll(fx*Math.min(10,speed*.82),fz*Math.min(10,speed*.82),Math.min(4.5,1.8+speed*.18)))
   showToast('اصطدمت بك مركبة متحركة! تم تفعيل السقوط الفيزيائي.',1800);
 }
@@ -1748,10 +1992,17 @@ function updatePlayer(dt){
  const onWater=isBeachWater(player.x,player.z),sprint=runToggle||player.run,targetSpeed=moving?(onWater?(sprint?2.45:1.65):(sprint?8.7:4.15)):0;player.moveSpeed+=(targetSpeed-player.moveSpeed)*(1-Math.exp(-dt*(moving?5.2:7.2)));const speed=player.moveSpeed;if(moving&&speed>.05){const nx=player.x+dx*speed*dt,nz=player.z+dz*speed*dt;let collided=false,impactPed=null,impactKind='wall';
   if(walkZone(nx,player.z)&&!blockedAt(nx,player.z,player.y,.43)){const hit=pedestrianAt(nx,player.z,.62);if(hit){collided=true;impactPed=hit;impactKind='pedestrian'}else if(!onWater&&vehicleAt(nx,player.z,.58)){collided=true;impactKind='car'}else player.x=nx}else{collided=true;impactKind='wall'}
   if(!collided){if(walkZone(player.x,nz)&&!blockedAt(player.x,nz,player.y,.43)){const hit=pedestrianAt(player.x,nz,.62);if(hit){collided=true;impactPed=hit;impactKind='pedestrian'}else if(!onWater&&vehicleAt(player.x,nz,.58)){collided=true;impactKind='car'}else player.z=nz}else{collided=true;impactKind='wall'}}
-  if(collided&&speed>6.15&&!onWater&&!player.ragdoll){if(impactPed)startPedestrianImpact(impactPed,dx,dz,'player',speed);if(startPlayerRagdoll(dx*speed*.72,dz*speed*.72,Math.max(2.0,speed*.30)))return}
+  /* Ragdoll must NEVER trigger from a plain wall/building bump while walking or jogging.
+     It only fires for a genuine hard impact: running into a vehicle, or slamming into a
+     wall/building at real sprint speed (a GTA-style face-plant), never from simple contact. */
+  if(collided&&!onWater&&!player.ragdoll){
+   if(impactKind==='car'){SFX.carCrash(player.x,player.y,player.z,Math.min(1,speed/9));if(startPlayerRagdoll(dx*speed*.78,dz*speed*.78,Math.max(2.2,speed*.32)))return}
+   else if(impactKind==='wall'&&speed>7.9){SFX.thud(player.x,player.y,player.z,Math.min(1,speed/10));if(startPlayerRagdoll(dx*speed*.5,dz*speed*.5,Math.max(1.6,speed*.2)))return}
+   else if(impactKind==='pedestrian'&&impactPed){startPedestrianImpact(impactPed,dx,dz,'player',speed)}
+  }
   {const hd=headingTo(dx,dz)-player.heading,dh=Math.atan2(Math.sin(hd),Math.cos(hd));player.turnLean=-dh*(sprint?.32:.16);player.heading=angleLerp(player.heading,headingTo(dx,dz),Math.min(1,dt*(sprint?13:9)))}}
  if(jumpQueued){tryStartJump();jumpQueued=false}
- if(isBeachWater(player.x,player.z)){player.swimming=true;player.y+=(-2.08-player.y)*Math.min(1,dt*3.2);player.vy=0;player.grounded=true;player.jumpLandTimer=0}else{player.swimming=false;if(player.y<0)player.y=Math.min(0,player.y+dt*2.5);const ground=groundAt(player.x,player.z);if(player.grounded&&ground<player.y-.45){player.fallStartY=player.y;player.grounded=false;player.vy=0}player.vy-=22*dt;player.y+=player.vy*dt;if(player.y<=ground){const impactSpeed=-player.vy,fallHeight=Math.max(0,(player.fallStartY??player.y)-ground);if(!player.grounded&&impactSpeed>9.0&&fallHeight>3.8){player.y=ground;player.vy=0;player.grounded=false;playerChar.root.position.set(player.x,player.y,player.z);playerChar.root.rotation.set(0,player.heading,0);playerChar.root.updateMatrixWorld(true);if(startPlayerRagdoll(0,0,1.1,{fallVelocity:-Math.min(12,impactSpeed*.62)}))return}if(!player.grounded&&player.vy<-4)player.jumpLandTimer=.2;player.y=ground;player.vy=0;player.grounded=true;player.fallStartY=undefined}else player.grounded=false}
+ if(isBeachWater(player.x,player.z)){player.swimming=true;player.y+=(-2.08-player.y)*Math.min(1,dt*3.2);player.vy=0;player.grounded=true;player.jumpLandTimer=0}else{player.swimming=false;if(player.y<0)player.y=Math.min(0,player.y+dt*2.5);const ground=groundAt(player.x,player.z);if(player.grounded&&ground<player.y-.45){player.fallStartY=player.y;player.grounded=false;player.vy=0}player.vy-=22*dt;player.y+=player.vy*dt;if(player.y<=ground){const impactSpeed=-player.vy,fallHeight=Math.max(0,(player.fallStartY??player.y)-ground);if(!player.grounded&&impactSpeed>9.0&&fallHeight>3.8){player.y=ground;player.vy=0;player.grounded=false;playerChar.root.position.set(player.x,player.y,player.z);playerChar.root.rotation.set(0,player.heading,0);playerChar.root.updateMatrixWorld(true);SFX.thud(player.x,player.y,player.z,Math.min(1,impactSpeed/14));if(startPlayerRagdoll(0,0,1.1,{fallVelocity:-Math.min(12,impactSpeed*.62)}))return}if(!player.grounded&&player.vy<-4)player.jumpLandTimer=.2;player.y=ground;player.vy=0;player.grounded=true;player.fallStartY=undefined}else player.grounded=false}
  if(playerAction){playerAction.t+=dt;if(playerAction.t>playerAction.duration)playerAction=null}
  if(player.jumpLandTimer>0)player.jumpLandTimer-=dt;if(player.ragdoll)return;playerChar.root.position.set(player.x,player.y,player.z);playerChar.root.rotation.y=player.heading;const anim=playerAction?(playerAction.type==='stagger'?'stumble':playerAction.type==='punch'?'punch':playerAction.type==='punchL'?'punchL':playerAction.type==='kick'?'kick':'push'):player.swimming?(moving?'swim':'treadWater'):!player.grounded?(player.jumpKind||'jump'):player.jumpLandTimer>0?'land':moving?(sprint?'run':'walk'):'idle';player.leanS=(player.leanS||0)+(((moving&&!player.swimming)?(player.turnLean||0):0)-(player.leanS||0))*Math.min(1,dt*6);localPlayerAnimation=anim;playerChar.update(playerAction?playerAction.t:worldTime,dt,anim,player.leanS);
 }
@@ -1764,7 +2015,7 @@ function updateInterface(){
  else{$('nearLine').textContent=player.swimming?'سباحة • حرّك عصا التحكم للاتجاه نحو الشاطئ':'WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج • F دفع';}
  const c=nearestTrafficCar();$('rideBtn').style.display=!currentVehicle&&!vehicleTransition&&!playerDeath&&!player.ragdoll&&c?'grid':'none';const rideText=$('rideBtn').querySelector('span');if(rideText)rideText.textContent='ركوب';$('rideBtn').setAttribute('aria-label','ركوب المركبة');const rideSvg=$('rideBtn').querySelector('svg');if(rideSvg)rideSvg.innerHTML='<path d="M4 20l2-7a3 3 0 0 1 3-2h13a4 4 0 0 1 3 2l3 7v5h-3M7 25H4v-5h24M8 25h16"/><circle cx="9" cy="20" r="2"/><circle cx="23" cy="20" r="2"/>';const p=nearestPed();$('talkBtn').style.display=!currentVehicle&&!vehicleTransition&&!playerDeath&&!player.ragdoll&&!c&&p?'grid':'none';
  if(currentVehicle){$('rideBtn').style.display='none';$('exitBtn').style.display='grid';$('driveUI').style.display='block';$('pushBtn').style.display='none';$('punchBtn').style.display='none'}else{$('exitBtn').style.display='none';$('driveUI').style.display='none';$('pushBtn').style.display=!vehicleTransition&&!player.swimming&&!playerDeath&&!player.ragdoll?'grid':'none';$('punchBtn').style.display=!vehicleTransition&&!player.swimming&&!playerDeath&&!player.ragdoll?'grid':'none'}
- $('miniMapBtn').style.display='block';updateMaps();
+ $('miniMapBtn').style.display='block';$('soundToggleBtn').style.display='flex';updateMaps();
 }
 /* ========= الكاميرا والحلقة الرئيسية ========= */
 function resize(){const w=innerWidth,h=innerHeight;ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
@@ -1808,6 +2059,44 @@ function syncWorldVisibility(){
 worldDBReady=false;openWorldDB().then(db=>{worldDB=db;worldDBReady=true;if(db)loadWorldSnapshot().then(ok=>{if(ok)showToast('تم استرجاع مواقع سكان المدينة والمركبات المحفوظة.',1600)})});
 
 let lastFrame=performance.now(),elapsed=0;
+/* ========= تشغيل الصوت أثناء اللعب: خطوات، محركات، أبواق، طيور، همهمة ناس ========= */
+let footstepClock=0,ambienceClock=2,hornClock=5,engineAudibleIds=new Set();
+function groundSurfaceAt(x,z){
+ if(isBeachWater(x,z))return'sand';if(isBeachSand(x,z))return'sand';
+ if(player.swimming)return'sand';
+ return groundAt(x,z)>0.5?'wood':'asphalt';
+}
+function updateWorldAudio(dt){
+ if(!SFX.ctx())return;
+ SFX.updateListener();
+ const camDist=(x,y,z)=>Math.hypot(x-cam.position.x,y-cam.position.y,z-cam.position.z);
+ // خطوات اللاعب حسب سرعته وحالته (مشي/جري)، فقط عندما يكون على الأرض وليس في مركبة
+ if(!currentVehicle&&!player.ragdoll&&!player.swimming&&player.grounded&&player.moveSpeed>.3){
+  const stepRate=player.moveSpeed>6?.27:.4;footstepClock+=dt;
+  if(footstepClock>=stepRate){footstepClock=0;SFX.footstep(player.x,player.y,player.z,groundSurfaceAt(player.x,player.z),player.moveSpeed>6)}
+ }else footstepClock=0;
+ // محركات السيارات: حلقة صوت لكل سيارة قريبة من الكاميرا، تتوقف عند الابتعاد
+ const AUDIBLE=85;
+ for(const c of traffic){
+  if(c.retired&&!c.userDriven){SFX.stopLoop('eng_'+c.id);engineAudibleIds.delete(c.id);continue}
+  const d=camDist(c.x,c.y||0,c.z);
+  if(d<AUDIBLE){
+   if(!SFX.hasLoop('eng_'+c.id))SFX.startEngineLoop('eng_'+c.id,c.x,c.y||0,c.z);
+   SFX.moveLoop('eng_'+c.id,c.x,c.y||0,c.z);SFX.updateEngineLoop('eng_'+c.id,c.speed||0);engineAudibleIds.add(c.id);
+  }else if(engineAudibleIds.has(c.id)){SFX.stopLoop('eng_'+c.id);engineAudibleIds.delete(c.id)}
+ }
+ // بوق عشوائي خفيف من سيارة قريبة بين الحين والآخر (أجواء مدينة حية)
+ hornClock-=dt;if(hornClock<=0){hornClock=5+Math.random()*9;
+  const near=traffic.filter(c=>!c.retired&&(c.speed||0)>1&&camDist(c.x,c.y||0,c.z)<60);
+  if(near.length&&Math.random()<.5){const c=near[Math.floor(Math.random()*near.length)];SFX.carHorn(c.x,c.y||0,c.z)}
+ }
+ // طيور وهمهمة ناس عشوائية من محيط اللاعب (أجواء واقعية للمدينة)
+ ambienceClock-=dt;if(ambienceClock<=0){ambienceClock=1.6+Math.random()*2.6;
+  const near=allPedestrians().filter(p=>camDist(p.x,0,p.z)<40);
+  if(near.length&&Math.random()<.6){const p=near[Math.floor(Math.random()*near.length)];SFX.crowdMurmur(p.x,1.5,p.z)}
+  if(Math.random()<.45){const ang=Math.random()*6.28,r=12+Math.random()*22;SFX.birdChirp(player.x+Math.cos(ang)*r,5+Math.random()*4,player.z+Math.sin(ang)*r)}
+ }
+}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
  if(interactQueued){doInteract();interactQueued=false}if(pushQueued){performPush();pushQueued=false}if(punchQueued){performPunch();punchQueued=false}
  updatePlayer(dt);refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpApplyWorldState(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}mpSendWorldState(dt);updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);
@@ -1816,7 +2105,9 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-last
  if(currentVehicle){target=currentVehicle.root.position;const yaw=currentVehicle.heading+cameraYaw;const dist=currentVehicle.type==='airliner'?Math.max(15,cameraDistance*3):currentVehicle.type==='ship'?Math.max(12,cameraDistance*2.5):Math.max(8,cameraDistance*1.75);desired=new T.Vector3(target.x-Math.sin(yaw)*dist,target.y+Math.max(4.2,dist*.34)+cameraPitch*6,target.z-Math.cos(yaw)*dist)}
  else{target=new T.Vector3(player.x,player.y+(player.swimming?2.05:1.15),player.z);desired=new T.Vector3(player.x+Math.sin(cameraYaw)*cameraDistance,player.y+(player.swimming?3.15:2.7)+cameraPitch*5,player.z+Math.cos(cameraYaw)*cameraDistance)}
  if(!currentVehicle&&blockedAt(desired.x,desired.z,desired.y,.18))desired.lerp(target,.48);cam.position.lerp(desired,1-Math.exp(-dt*7));cam.lookAt(target.x,target.y+(currentVehicle?1.3:0),target.z);
- $('hint').style.display=matchMedia('(pointer:fine)').matches?'block':'none';updateInterface();cam.updateMatrixWorld();updateCrowdLOD(dt);syncWorldVisibility();if(worldDB&&gameStarted){worldSaveClock+=dt;if(worldSaveClock>=1){worldSaveClock=0;saveWorldSnapshot()}}ren.render(sc,cam)
+ $('hint').style.display=matchMedia('(pointer:fine)').matches?'block':'none';updateInterface();cam.updateMatrixWorld();updateCrowdLOD(dt);syncWorldVisibility();if(worldDB&&gameStarted){worldSaveClock+=dt;if(worldSaveClock>=1){worldSaveClock=0;saveWorldSnapshot()}}
+ updateWorldAudio(dt);
+ ren.render(sc,cam)
 }
 requestAnimationFrame(frame);
 </script>
