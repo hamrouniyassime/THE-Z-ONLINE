@@ -22,8 +22,9 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 
 BASE_DIR = Path(__file__).resolve().parent
-DEFAULT_GAME_FILE = "VICE_CITY_LIFE_v10_MULTIPLAYER.html"
-GAME_FILE = Path(os.environ.get("GAME_HTML", DEFAULT_GAME_FILE)).name
+# Always serve the project entry page. This intentionally ignores any stale
+# GAME_HTML environment variable left over from older deployments.
+GAME_FILE = "index.html"
 GAME_PATH = BASE_DIR / GAME_FILE
 PORT = int(os.environ.get("PORT", "8000"))
 MAX_PLAYERS_PER_ROOM = int(os.environ.get("MAX_PLAYERS_PER_ROOM", "32"))
@@ -118,7 +119,7 @@ async def home():
             status_code=404,
             content={
                 "error": f"Game file not found: {GAME_FILE}",
-                "hint": "Put the HTML file beside server.py, or set GAME_HTML to its filename.",
+                "hint": "Make sure index.html is committed beside app.py in the deployed repository, then redeploy the latest commit.",
             },
         )
     return FileResponse(GAME_PATH, media_type="text/html")
@@ -237,4 +238,4 @@ async def multiplayer_socket(websocket: WebSocket):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("server:app", host="0.0.0.0", port=PORT, reload=False)
+    uvicorn.run("app:app", host="0.0.0.0", port=PORT, reload=False)
