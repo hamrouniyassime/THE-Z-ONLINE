@@ -1359,7 +1359,7 @@ function startWanted(level=1){
 function arrestPlayer(){
  if(playerDeath)return;let pos=new T.Vector3(player.x,player.y||0,player.z);
  if(currentVehicle){currentVehicle.root.updateMatrixWorld(true);pos=playerChar.root.getWorldPosition(new T.Vector3());const c=currentVehicle;c.speed=0;c.targetSpeed=0;c.userDriven=false;c.claimed=true;c.axis='parked';c.manual=true;c.retired=true;c.parked=true;currentVehicle=null;}
- attachPlayerToScene(pos.x,pos.y,pos.z,player.heading,true);player.x=pos.x;player.y=pos.y;player.z=pos.z;playerDeath={t:0,duration:2.4,reason:'arrest',spawnX:-1100,spawnZ:12};
+ attachPlayerToScene(pos.x,pos.y,pos.z,player.heading,true);player.x=pos.x;player.y=pos.y;player.z=pos.z;playerDeath={t:0,duration:2.4,reason:'arrest',spawnX:-2500,spawnZ:-2500};
  for(const u of policeUnits){u.policeChase=false;u.retired=true;u.axis='parked';u.speed=0;u.targetSpeed=0}
  policeUnits=[];wantedLevel=0;$('exitBtn').style.display='none';$('driveUI').style.display='none';$('airUp').style.display='none';$('airDown').style.display='none';$('handbrakeBtn').style.display='none';$('stick').style.display='none';$('jumpBtn').style.display='none';$('runBtn').style.display='none';$('pushBtn').style.display='none';$('punchBtn').style.display='none';
  showToast('تم توقيفك من الشرطة. ستعود إلى نقطة آمنة بعد المشهد.',2400);
@@ -1735,7 +1735,7 @@ $('startBtn').addEventListener('click',async()=>{
  if(window.__viceRagdollReady&&!ragdollPhysicsReady){try{await Promise.race([window.__viceRagdollReady,new Promise(resolve=>setTimeout(resolve,6500))])}catch(e){}}
  applyCharacterCustomization();
  mpPlayerName=String($('mpName').value||'').trim().slice(0,18)||`Player${Math.floor(100+Math.random()*900)}`;
- try{await mpJoinWorld();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
+ try{await mpJoinWorld();ensurePlayerOutdoorSpawn();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
  await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));
  if(worldDB&&!mpWorldTargets)await loadWorldSnapshot();
  gameStarted=true;gameSound.start();applyQuality(qualityMode,false);$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('gameSettingsBtn').style.display='grid';$('activityToggle').style.display='grid';$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
@@ -1978,7 +1978,7 @@ function mpPrepareConnection(){
   ws.onopen=()=>{clearInterval(mpHeartbeatTimer);mpHeartbeatTimer=setInterval(()=>{if(ws.readyState===WebSocket.OPEN){try{ws.send(JSON.stringify({type:'ping'}))}catch(e){}}},20000)};
   ws.onmessage=e=>{try{const msg=JSON.parse(e.data);if(msg.type==='immersive_verified'){mpHandleMessage(msg);if(!done){done=true;clearTimeout(timer);resolve(true)}return}mpHandleMessage(msg)}catch(err){console.warn('Invalid multiplayer packet',err)}};
   ws.onerror=()=>{if(!done){done=true;clearTimeout(timer);reject(new Error('Could not connect to the Python server'))}};
-  ws.onclose=()=>{clearInterval(mpHeartbeatTimer);mpHeartbeatTimer=null;mpConnected=false;mpPlayerId=null;mpIsWorldHost=false;mpClearRemote();if(!done){done=true;clearTimeout(timer);reject(new Error('Server closed the connection before verification'))}if(gameStarted&&!mpManualClose){clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(async()=>{try{await mpPrepareConnection();await mpJoinWorld()}catch(e){console.warn('Reconnect failed',e)}},3000)}};
+  ws.onclose=()=>{clearInterval(mpHeartbeatTimer);mpHeartbeatTimer=null;mpConnected=false;mpPlayerId=null;mpIsWorldHost=false;mpClearRemote();if(!done){done=true;clearTimeout(timer);reject(new Error('Server closed the connection before verification'))}if(gameStarted&&!mpManualClose){clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(async()=>{try{await mpPrepareConnection();await mpJoinWorld();ensurePlayerOutdoorSpawn()}catch(e){console.warn('Reconnect failed',e)}},3000)}};
  });
 }
 function mpJoinWorld(){
@@ -2180,21 +2180,44 @@ const POI_DEFS = [
  ['cafe','مقهى',28,'#d6bd98','K',true],['gamingCafe','مقهى ألعاب',8,'#9c8dff','G',true],['correction','مركز إصلاحي',6,'#aab1c0','R',true],['club','نادي حي',30,'#ad9aff','★',true]
 ];
 const poiColor = Object.fromEntries(POI_DEFS.map(d=>[d[0],d[3]]));
-function thezPoint(i,phase=0){
- const city=((i+phase)%2===0)?-1100:1100;
- const col=((i*7+phase*3)%9)-4,row=((i*5+phase*2)%9)-4;
- const jitterX=((phase%3)-1)*4,jitterZ=(((phase+1)%3)-1)*4;
- return {x:city+col*43+jitterX,z:row*43+jitterZ};
+// Four planned POI districts. Each building occupies one parcel between streets.
+const THEZ_POI_DISTRICTS=[
+ {cx:-3500,cz:-3500},{cx:3500,cz:-3500},
+ {cx:-3500,cz:3500},{cx:3500,cz:3500}
+];
+let thezPoiLotSerial=0;
+function thezPoiDimensions(type,i=0){
+ let w=12,d=11,h=7;
+ if(type==='home'){w=10;d=10;h=6.5}
+ else if(type==='hospital'){w=18;d=16;h=18}
+ else if(type==='bank'){w=15;d=14;h=11}
+ else if(type==='supermarket'||type==='market'){w=18;d=16;h=8}
+ else if(type==='warehouse'){w=20;d=18;h=11}
+ else if(type==='electronics'||type==='grocery'||type==='gearshop'){w=13;d=12;h=8}
+ else if(type==='construction'){w=19;d=18;h=18}
+ else if(type==='skyscraper'){w=21;d=19;h=48}
+ else if(type==='buytower'){w=18;d=17;h=28+(i%4)*5}
+ else if(type==='cafe'||type==='gamingCafe'){w=11;d=10;h=6}
+ else if(type==='correction'){w=19;d=15;h=13}
+ return {w,d,h};
+}
+function thezPoint(i,phase=0,type='home'){
+ const slot=thezPoiLotSerial++,district=THEZ_POI_DISTRICTS[Math.floor(slot/80)%THEZ_POI_DISTRICTS.length];
+ const local=slot%80,col=local%8,row=Math.floor(local/8);
+ const buildingX=district.cx+(col-3.5)*100,buildingZ=district.cz+(row-4.5)*100;
+ const size=thezPoiDimensions(type,i);
+ // The POI marker is outside the west wall, on a small pedestrian access apron.
+ return {x:buildingX-size.w/2-7,z:buildingZ,buildingX,buildingZ};
 }
 const cityPOIs=[];let poiSerial=0,interiorSerial=0;
 for(const def of POI_DEFS){
  const [type,label,count,color,icon,enterable]=def;
  for(let i=0;i<count;i++){
-  let p=thezPoint(i,poiSerial+1);
-  if(type==='airport'){p=i===0?{x:1630,z:-72}:{x:-3900,z:2550}}
+  let p=thezPoint(i,poiSerial+1,type);
+  if(type==='airport'){p=i===0?{x:1470,z:110}:{x:-3900,z:2630}}
   if(type==='beach'){const coords=[{x:-1100,z:430},{x:-1100,z:-410},{x:1100,z:-410},{x:-3700,z:940},{x:3600,z:-940}];p=coords[i]}
-  if(type==='atm')p=thezPoint(i,poiSerial+5);
-  const poi={id:`poi_${type}_${i+1}`,type,label:`${label} ${i+1}`,x:p.x,z:p.z,color,icon,enterable:!!enterable&&['hospital','home','warehouse','skyscraper','cafe'].includes(type),open:true,phase:(i+poiSerial)%24,price: type==='home'?3500+(i%8)*400:type==='buytower'?18000+(i%9)*2200:type==='warehouse'&&i>=7?6500+(i%3)*700:0,storyLocked:type==='warehouse'&&i<7,buyable:type==='home'||type==='buytower'||(type==='warehouse'&&i>=7),owned:false,interiorIndex:enterable?interiorSerial++:-1};
+  // ATMs use the already allocated parcel marker; do not consume a second lot.
+  const poi={id:`poi_${type}_${i+1}`,type,label:`${label} ${i+1}`,x:p.x,z:p.z,buildingX:p.buildingX,buildingZ:p.buildingZ,color,icon,enterable:!!enterable&&['hospital','home','warehouse','skyscraper','cafe'].includes(type),open:true,phase:(i+poiSerial)%24,price: type==='home'?3500+(i%8)*400:type==='buytower'?18000+(i%9)*2200:type==='warehouse'&&i>=7?6500+(i%3)*700:0,storyLocked:type==='warehouse'&&i<7,buyable:type==='home'||type==='buytower'||(type==='warehouse'&&i>=7),owned:false,interiorIndex:enterable?interiorSerial++:-1};
   cityPOIs.push(poi);
  }
  poiSerial++;
@@ -2232,16 +2255,35 @@ function buyCityProperty(p){if(playerOwned.includes(p.id)){showToast('هذا ا�
 const INTERIOR_ROOT={x:0,z:0};
 function buildPOIArchitecture(){
  const sharedGeo=new T.BoxGeometry(1,1,1),roofGeo=new T.BoxGeometry(1,1,1),baseMat=new T.MeshStandardMaterial({color:0xffffff,roughness:.82}),roofMat=new T.MeshStandardMaterial({color:0x293748,roughness:.74});
- const groups=new Map();for(const p of cityPOIs){if(p.type==='beach'||p.type==='atm'||p.type==='club')continue;let a=groups.get(p.type);if(!a)groups.set(p.type,a=[]);a.push(p)}
+ const groups=new Map();for(const p of cityPOIs){if(p.type==='beach'||p.type==='atm'||p.type==='club'||p.type==='airport')continue;let a=groups.get(p.type);if(!a)groups.set(p.type,a=[]);a.push(p)}
  const dummy=new T.Object3D();
  for(const [type,items] of groups){const mesh=new T.InstancedMesh(sharedGeo,baseMat,items.length),roofs=new T.InstancedMesh(roofGeo,roofMat,items.length);mesh.castShadow=true;mesh.receiveShadow=true;roofs.castShadow=true;
-  items.forEach((p,i)=>{let w=12,d=11,h=7;if(type==='home'){w=10;d=10;h=6.5}else if(type==='hospital'){w=18;d=16;h=18}else if(type==='bank'){w=15;d=14;h=11}else if(type==='supermarket'||type==='market'){w=18;d=16;h=8}else if(type==='warehouse'){w=20;d=18;h=11}else if(type==='electronics'||type==='grocery'||type==='gearshop'){w=13;d=12;h=8}else if(type==='construction'){w=19;d=18;h=18}else if(type==='skyscraper'){w=21;d=19;h=48}else if(type==='buytower'){w=18;d=17;h=28+(i%4)*5}else if(type==='airport'){w=35;d=25;h=12}else if(type==='cafe'||type==='gamingCafe'){w=11;d=10;h=6}else if(type==='correction'){w=19;d=15;h=13}
-   const bx=p.x+13,bz=p.z+13;dummy.position.set(bx,h/2-.42,bz);dummy.rotation.set(0,(i%4)*Math.PI/2,0);dummy.scale.set(w,h,d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,new T.Color(p.color));
+  items.forEach((p,i)=>{const {w,d,h}=thezPoiDimensions(type,i);
+   const bx=Number.isFinite(p.buildingX)?p.buildingX:p.x+13,bz=Number.isFinite(p.buildingZ)?p.buildingZ:p.z+13;
+   p.buildingX=bx;p.buildingZ=bz;dummy.position.set(bx,h/2-.42,bz);
+dummy.rotation.set(0,(i%4)*Math.PI/2,0);dummy.scale.set(w,h,d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,new T.Color(p.color));
    dummy.position.set(bx,h-.4,bz);dummy.scale.set(w*1.035,.65,d*1.035);dummy.updateMatrix();roofs.setMatrixAt(i,dummy.matrix);
    thezRegisterSolid(THEZ_POI_SOLID_GRID,[bx-w/2,bx+w/2,bz-d/2,bz+d/2,h]);
   });mesh.instanceMatrix.needsUpdate=true;roofs.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;sc.add(mesh,roofs)
  }
 }
+function buildPoiDistrictRoads(){
+ const roadMat=new T.MeshStandardMaterial({color:0x34383e,roughness:.96});
+ const lineMat=new T.MeshBasicMaterial({color:0xe5c85d});
+ for(const district of THEZ_POI_DISTRICTS){
+  for(let c=0;c<=8;c++){
+   const x=district.cx+(c-4)*100;
+   const road=new T.Mesh(new T.BoxGeometry(12,.12,1000),roadMat);road.position.set(x,-.32,district.cz);sc.add(road);
+   const line=new T.Mesh(new T.BoxGeometry(.18,.016,1000),lineMat);line.position.set(x,-.245,district.cz);sc.add(line);
+  }
+  for(let r=0;r<=10;r++){
+   const z=district.cz+(r-5)*100;
+   const road=new T.Mesh(new T.BoxGeometry(800,.12,12),roadMat);road.position.set(district.cx,-.32,z);sc.add(road);
+   const line=new T.Mesh(new T.BoxGeometry(800,.016,.18),lineMat);line.position.set(district.cx,-.245,z);sc.add(line);
+  }
+ }
+}
+buildPoiDistrictRoads();
 buildPOIArchitecture();
 function createInteriorRooms(){
  const floorMat=new T.MeshStandardMaterial({color:0x8d8a82,roughness:.95}),wallMat=new T.MeshStandardMaterial({color:0xc6c1b4,roughness:.9}),trimMat=new T.MeshStandardMaterial({color:0x4a6274,roughness:.8}),lampMat=new T.MeshBasicMaterial({color:0xffdba1});
@@ -2268,7 +2310,41 @@ blockedAt=function(x,z,y=0,pad=.42){if(thezBaseBlockedAt(x,z,y,pad))return true;
 function enterCityInterior(p){if(!p?.enterable||!Number.isFinite(p.interiorX)){showToast('هذا المبنى لا يحتوي على مساحة داخلية في هذه النسخة.');return}if(p.storyLocked){const hour=Math.floor((worldTime/20)%24);if(!(hour>=20||hour<5)){showToast('هذا المستودع القصصي يفتح بين الساعة 20:00 و05:00 داخل وقت اللعبة.');return}}
  if(insidePoi)return;insidePoi={poi:p,returnX:player.x,returnZ:player.z,returnHeading:player.heading};player.x=p.interiorX;player.z=p.interiorZ;player.y=0;player.vy=0;player.heading=0;player.grounded=true;playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.y=0;playerChar.root.visible=true;showToast(`دخلت ${p.label}. اضغط E للخروج.`,2200)
 }
-function exitCityInterior(){if(!insidePoi)return;const a=insidePoi;insidePoi=null;player.x=a.returnX;player.z=a.returnZ;player.y=0;player.heading=a.returnHeading;playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.y=player.heading;showToast('خرجت إلى الشارع.',1400)}
+function isSafeOutdoorPoint(x,z){
+ if(!Number.isFinite(x)||!Number.isFinite(z)||!walkZone(x,z))return false;
+ if(isBeachWater(x,z)||blockedAt(x,z,0,.95))return false;
+ if(typeof vehicleAt==='function'&&vehicleAt(x,z,2.2))return false;
+ return true;
+}
+function findSafeOutdoorPoint(x,z){
+ if(isSafeOutdoorPoint(x,z))return {x,z};
+ for(let radius=8;radius<=120;radius+=6){
+  for(let step=0;step<32;step++){
+   const a=step*Math.PI*2/32,px=x+Math.cos(a)*radius,pz=z+Math.sin(a)*radius;
+   if(isSafeOutdoorPoint(px,pz))return {x:px,z:pz};
+  }
+ }
+ return {x:-2500,z:-2500};
+}
+function ensurePlayerOutdoorSpawn(){
+ insidePoi=null;
+ // Older server builds may still send the old downtown spawn. Move those clients
+ // to a distinct slot inside the clear welcome plaza rather than trusting stale coordinates.
+ if(Math.hypot(player.x+2500,player.z+2500)>65){
+  let hash=0;const key=String(mpPlayerId||mpPlayerName||'visitor');
+  for(let i=0;i<key.length;i++)hash=(Math.imul(hash,31)+key.charCodeAt(i))|0;
+  const angle=((hash>>>0)%100000)/100000*Math.PI*2,radius=8+((hash>>>8)%24);
+  player.x=-2500+Math.cos(angle)*radius;player.z=-2500+Math.sin(angle)*radius;
+ }
+ const safe=findSafeOutdoorPoint(player.x,player.z);
+ player.x=safe.x;player.z=safe.z;player.y=0;player.vy=0;player.grounded=true;player.moveSpeed=0;playerAction=null;
+ playerChar.root.visible=true;playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.set(0,player.heading||0,0);
+}
+function exitCityInterior(){
+ if(!insidePoi)return;const a=insidePoi;insidePoi=null;const safe=findSafeOutdoorPoint(a.returnX,a.returnZ);
+ player.x=safe.x;player.z=safe.z;player.y=0;player.vy=0;player.heading=a.returnHeading;player.grounded=true;
+ playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.y=player.heading;showToast('خرجت إلى الشارع.',1400)
+}
 function renderWorldHub(tab=activeHubTab){activeHubTab=tab;$('worldStats').innerHTML=`<span class="world-pill">النقد: $${playerWallet.toLocaleString('en-US')}</span><span class="world-pill">البنك: $${playerBank.toLocaleString('en-US')}</span><span class="world-pill">العقارات: ${playerOwned.length}</span><span class="world-pill">المهام: ${activeCityJob?'مهمة نشطة':'لا توجد مهمة'}</span><span class="world-pill">المساحة: 112 كم²</span>`;
  document.querySelectorAll('.world-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));const body=$('worldHubBody');let cards=[];
  if(tab==='jobs')cards=JOBS.map((j,i)=>`<article class="world-card"><h4>${j[0]}</h4><p>${j[1]}<br>المكافأة: $${j[2]}</p><button data-job="${i}">استلام المهمة</button></article>`).join('');
@@ -2353,8 +2429,16 @@ function build112KmWorld(){
  connectRoad(closestRoadNode(-1000,0),closestRoadNode(-1100,0));connectRoad(closestRoadNode(1000,0),closestRoadNode(1100,0));
  const trunkGeo=new T.CylinderGeometry(.18,.26,5,5).translate(0,2.5,0),leafGeo=new T.ConeGeometry(2.3,7,6).translate(0,7.2,0),trunkMat=new T.MeshStandardMaterial({color:0x6b4a2f}),leafMat=new T.MeshStandardMaterial({color:0x2b7c42});
  const count=520,trunks=new T.InstancedMesh(trunkGeo,trunkMat,count),leaves=new T.InstancedMesh(leafGeo,leafMat,count),dummy=new T.Object3D();let made=0;
- for(let i=0;i<count;i++){let x=ra(-5100,5100),z=ra(-5100,5100);if(Math.abs(x)<1450&&Math.abs(z)<700)continue;if(x>3950&&x<5000&&z>3950&&z<5000)continue;if(x<-4300&&x>-4500&&z>2450&&z<2750)continue;if(Math.abs(x%1500)<35||Math.abs(z%1500)<35)continue;dummy.position.set(x,0,z);dummy.rotation.y=R()*Math.PI*2;dummy.scale.setScalar(.75+R()*.65);dummy.updateMatrix();trunks.setMatrixAt(made,dummy.matrix);leaves.setMatrixAt(made,dummy.matrix);made++}
+ for(let i=0;i<count;i++){let x=ra(-5100,5100),z=ra(-5100,5100);if(Math.abs(x)<1450&&Math.abs(z)<700)continue;if(Math.abs(x%1500)<35||Math.abs(z%1500)<35)continue;if(THEZ_POI_DISTRICTS.some(d=>Math.abs(x-d.cx)<470&&Math.abs(z-d.cz)<570))continue;if(Math.abs(x+2500)<105&&Math.abs(z+2500)<105)continue;dummy.position.set(x,0,z);dummy.rotation.y=R()*Math.PI*2;dummy.scale.setScalar(.75+R()*.65);dummy.updateMatrix();trunks.setMatrixAt(made,dummy.matrix);leaves.setMatrixAt(made,dummy.matrix);made++}
  trunks.count=made;leaves.count=made;sc.add(trunks,leaves);
+ // Dedicated open-air arrival plaza: intentionally no building or roof around spawn.
+ const hubX=-2500,hubZ=-2500;
+ const plaza=new T.Mesh(new T.BoxGeometry(170,.16,170),new T.MeshStandardMaterial({color:0x777d82,roughness:.94}));plaza.position.set(hubX,-.29,hubZ);plaza.receiveShadow=true;sc.add(plaza);
+ const plazaInset=new T.Mesh(new T.BoxGeometry(118,.025,118),new T.MeshStandardMaterial({color:0x8b9094,roughness:1}));plazaInset.position.set(hubX,-.19,hubZ);sc.add(plazaInset);
+ const hubRoadA=new T.Mesh(new T.BoxGeometry(500,.12,12),highwayMat);hubRoadA.position.set(-2750,-.32,hubZ);sc.add(hubRoadA);
+ const hubRoadB=new T.Mesh(new T.BoxGeometry(12,.12,500),highwayMat);hubRoadB.position.set(hubX,-.32,-2750);sc.add(hubRoadB);
+ const hubRing=new T.Mesh(new T.TorusGeometry(25,.32,8,48),new T.MeshBasicMaterial({color:0x58d5e8}));hubRing.rotation.x=Math.PI/2;hubRing.position.set(hubX,-.13,hubZ);sc.add(hubRing);
+ const hubBeacon=new T.Mesh(new T.CylinderGeometry(.45,.7,6,8),new T.MeshStandardMaterial({color:0x263b52,emissive:0x173448,emissiveIntensity:.8}));hubBeacon.position.set(hubX+42,2.8,hubZ+42);sc.add(hubBeacon);
  // A second small airport in the north-western district.
  const runway=new T.Mesh(new T.BoxGeometry(720,.14,44),highwayMat);runway.position.set(-3900,-.27,2550);sc.add(runway);
  const terminal=new T.Mesh(new T.BoxGeometry(88,13,34),new T.MeshStandardMaterial({color:0x9aa9ba,metalness:.25,roughness:.5}));terminal.position.set(-3900,6.5,2630);sc.add(terminal);

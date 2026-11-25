@@ -36,7 +36,7 @@ WORLD_ROOM = "the-z-online"
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 log = logging.getLogger("the-z-online")
 
-app = FastAPI(title="THE Z ONLINE", version="2.0.0")
+app = FastAPI(title="THE Z ONLINE", version="2.1.0")
 
 # player_id -> {websocket, room, state}
 clients: dict[str, dict[str, Any]] = {}
@@ -232,13 +232,13 @@ async def multiplayer_socket(websocket: WebSocket):
         name = clean_name(join_packet.get("name"))
         gender = "f" if join_packet.get("gender") == "f" else "m"
         character = clean_character(join_packet.get("character"), gender)
-        # Spread arrivals around the same central street so players do not
-        # spawn directly inside one another.
+        # Spawn in the dedicated open-air arrival plaza, well away from buildings.
+        # Golden-angle placement separates players while keeping them inside the plaza.
         spawn_slot = len(room_members)
-        spawn_radius = 2.6 + math.sqrt(spawn_slot) * 2.0
+        spawn_radius = 4.0 + math.sqrt(spawn_slot) * 2.7
         spawn_angle = spawn_slot * 2.399963229728653
-        spawn_x = -1100.0 + math.cos(spawn_angle) * spawn_radius
-        spawn_z = 12.0 + math.sin(spawn_angle) * spawn_radius
+        spawn_x = -2500.0 + math.cos(spawn_angle) * spawn_radius
+        spawn_z = -2500.0 + math.sin(spawn_angle) * spawn_radius
         state: dict[str, Any] = {
             "id": player_id,
             "name": name,
