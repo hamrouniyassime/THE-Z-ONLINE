@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
-<title>VICE CITY — حياة المدينة</title>
+<title>THE Z ONLINE — THE ZYZ STUDIO</title>
 <style>
 :root{color-scheme:dark;--glass:rgba(10,15,26,.72);--line:rgba(255,255,255,.16);--pink:#ff79b7;--cyan:#70e4f2}
 *{box-sizing:border-box;margin:0;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -63,26 +63,91 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 #clearRoute{padding:10px 14px;border-radius:12px;border:1px solid #ffffff3d;background:#8b356b;color:white;font-weight:700;pointer-events:auto}
 @media(max-width:520px){#miniMapBtn{width:100px;height:100px;top:calc(8px + env(safe-area-inset-top,0px));left:8px}#hud{left:118px;right:8px}#hud .hud-box{max-width:100%}}
 
+
+/* THE Z ONLINE entry sequence */
+#entryGate{position:fixed;inset:0;z-index:220;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center}
+#fullBtn{position:absolute;left:50%;top:50%;right:auto;transform:translate(-50%,-50%);width:88px;height:88px;border:1px solid #ffffff35;border-radius:27px;background:linear-gradient(145deg,#fff,#cfd5e4);color:#111;display:grid;place-items:center;box-shadow:0 0 0 10px #ffffff08,0 12px 50px #ffffff25;cursor:pointer;animation:gatePulse 2.2s ease-in-out infinite}
+#fullBtn svg{width:38px;height:38px;stroke:#10131b;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#gateCopy{position:absolute;left:18px;right:18px;top:calc(50% + 82px);color:#d7d9e3;font-size:13px;line-height:1.8;letter-spacing:.5px}
+#gateStatus{min-height:22px;margin-top:6px;color:#83d9e8;font-size:12px}
+@keyframes gatePulse{0%,100%{box-shadow:0 0 0 10px #ffffff08,0 12px 50px #ffffff25}50%{box-shadow:0 0 0 18px #ffffff05,0 12px 65px #ffffff3a}}
+#entryGate.fade-out{opacity:0;visibility:hidden;transition:opacity .65s ease,visibility .65s}
+#cinematicIntro{position:fixed;inset:0;z-index:210;display:none;align-items:center;justify-content:center;overflow:hidden;background:#020207;color:#fff}
+#cinematicIntro img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;filter:saturate(1.1) contrast(1.08);animation:introImage 4.8s ease both}
+#cinematicIntro.no-art{background:radial-gradient(ellipse at 50% 42%,#26385f 0%,#111426 42%,#020207 78%)}
+#cinematicIntro.no-art img{display:none}
+#cinematicIntro:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#03030a9c,#03030a30 42%,#03030ae8);pointer-events:none}
+.cinematic-content{z-index:1;position:relative;text-align:center;padding:24px;animation:introText 1.4s .2s both}
+.cinematic-kicker{font-size:clamp(10px,2vw,14px);letter-spacing:.62em;color:#d9dff0;font-weight:800;text-transform:uppercase;margin-bottom:15px}
+.cinematic-title{font-size:clamp(46px,11vw,112px);line-height:.95;letter-spacing:.045em;font-weight:1000;text-shadow:0 8px 45px #000,0 0 34px #83b9ff88;background:linear-gradient(180deg,#fff 10%,#d6e5ff 52%,#9bafe8);background-clip:text;-webkit-background-clip:text;color:transparent}
+.cinematic-rule{height:2px;width:min(340px,70vw);margin:22px auto 13px;background:linear-gradient(90deg,transparent,#dbeaff,transparent);box-shadow:0 0 20px #a4d3ff}
+.cinematic-studio{font-size:11px;letter-spacing:.38em;color:#e0e5f6;font-weight:700}
+@keyframes introImage{from{transform:scale(1.12);opacity:0}to{transform:scale(1);opacity:.72}}
+@keyframes introText{from{opacity:0;transform:translateY(24px);filter:blur(7px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+#startScreen{display:none;background:linear-gradient(110deg,#050711d9,#070817eF);backdrop-filter:blur(10px);overflow:auto;align-items:center}
+.start-card{width:min(620px,96vw);max-height:calc(100dvh - 28px);overflow:auto;border:1px solid #ffffff2b;border-radius:25px;padding:23px 24px 21px;background:linear-gradient(145deg,#171d30ed,#080b16f2 75%);box-shadow:0 28px 100px #000c;position:relative;text-align:center}
+.start-card:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:url('/img.png');background-position:center;background-size:cover;border-radius:inherit;mask-image:linear-gradient(180deg,#000,transparent 70%)}
+.start-card>*{position:relative}
+.brand{font-size:10px;letter-spacing:5px;color:#b9d5ff;font-weight:900;margin-bottom:8px}
+.start-card h1{font-size:clamp(27px,7vw,43px);letter-spacing:3px;line-height:1.05;text-shadow:0 0 28px #75a9ff70}
+.start-card .sub{color:#aebbd3;font-size:12px;margin:8px 0 18px}
+.pick-label{font-size:12px;color:#e0e7f6;margin-bottom:9px;font-weight:700}
+.gender-row{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.gender{flex:1;max-width:210px;padding:12px 10px;border:1px solid #ffffff24;background:#ffffff08;color:white;border-radius:13px;font:inherit;font-weight:800;cursor:pointer}
+.gender.active{border-color:#8ebcff;background:#719efb20;box-shadow:inset 0 0 0 1px #8ebcff55}
+.gender .emoji{display:none}
+.mp-fields{display:block;margin:0 0 12px;text-align:right}
+.mp-fields label,.custom-grid label{display:block;color:#dbe3f4;font-size:11px;font-weight:650;text-align:right}
+.mp-fields input,.custom-grid select{width:100%;margin-top:5px;padding:10px 11px;border:1px solid #ffffff2c;border-radius:10px;background:#080d19;color:#fff;font:inherit;font-size:13px;outline:none;min-height:40px}
+.mp-fields input:focus,.custom-grid select:focus{border-color:#8ebcff}
+.custom-title{font-size:12px;font-weight:800;color:#bdcff0;text-align:right;margin:12px 0 8px}
+.custom-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:10px}
+.custom-checks{display:flex;gap:18px;justify-content:flex-start;align-items:center;margin:8px 0 14px;color:#dce5f6;font-size:12px}
+.custom-checks label{display:flex;align-items:center;gap:7px}
+.custom-checks input{accent-color:#83b5ff;width:16px;height:16px}
+.start-btn{width:100%;padding:14px;border:0;border-radius:13px;background:linear-gradient(100deg,#377be7,#795bdf 58%,#b64eaa);color:white;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 8px 28px #406fcb4a}
+.start-btn:disabled{opacity:.55;cursor:wait}
+#mpLobbyStatus{display:none}
+#hud #mpStatus{display:none}
+@media(max-width:520px){#fullBtn{width:78px;height:78px;top:50%;right:auto;left:50%}#fullBtn svg{width:34px;height:34px}.start-card{padding:20px 16px 18px;max-height:calc(100dvh - 18px)}.brand{letter-spacing:3px}.custom-grid{gap:7px}.custom-grid select,.mp-fields input{font-size:12px;padding:9px 8px}}
+
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<section id="entryGate" aria-label="تجهيز الشاشة">
+ <button id="fullBtn" aria-label="تكبير الشاشة وتدوير الهاتف" title="ملء الشاشة والوضع الأفقي"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/><path d="M3 8l5-5M21 8l-5-5M3 16l5 5M21 16l-5 5"/></svg></button>
+ <div id="gateCopy">اضغط للانتقال إلى وضع ملء الشاشة وتدوير الجهاز أفقياً<div id="gateStatus">بانتظار بدء التجربة</div></div>
+</section>
+<section id="cinematicIntro" aria-label="THE Z ONLINE">
+ <img src="/img.png" alt="" onerror="this.parentElement.classList.add('no-art')">
+ <div class="cinematic-content"><div class="cinematic-kicker">THE ZYZ STUDIO PRESENTS</div><div class="cinematic-title">THE Z ONLINE</div><div class="cinematic-rule"></div><div class="cinematic-studio">A SHARED CITY · ONE WORLD</div></div>
+</section>
 <section id="startScreen">
  <div class="start-card">
-  <div class="brand">THE CITY IS YOURS</div><h1>VICE CITY</h1>
-  <p class="sub">مدينتان كبيرتان • شاطئ • جسر طويل • حياة داخل المدينة</p>
+  <div class="brand">THE ZYZ STUDIO</div><h1>THE Z ONLINE</h1>
+  <p class="sub">أنشئ شخصيتك وادخل إلى مدينة واحدة تجمع جميع اللاعبين</p>
   <div class="pick-label">اختر شخصية اللاعب</div>
   <div class="gender-row">
-   <button class="gender active" data-g="m"><span class="emoji">🧑</span>ذكر</button>
-   <button class="gender" data-g="f"><span class="emoji">👩</span>أنثى</button>
+   <button class="gender active" data-g="m" type="button">ذكر</button>
+   <button class="gender" data-g="f" type="button">أنثى</button>
   </div>
-  <div class="mp-fields"><label>اسم اللاعب<input id="mpName" maxlength="18" autocomplete="nickname" placeholder="اسمك في اللعبة"></label><label>الغرفة<input id="mpRoom" maxlength="24" value="vice-city" autocomplete="off"></label></div>
-  <p class="mp-note" id="mpLobbyStatus">اللعب الجماعي يتصل تلقائياً عند تشغيل اللعبة من خادم Python.</p>
-  <button id="startBtn" class="start-btn">ابدأ اللعب</button>
+  <div class="mp-fields"><label>اسم اللاعب<input id="mpName" maxlength="18" autocomplete="nickname" placeholder="اكتب اسمك داخل اللعبة"></label></div>
+  <div class="custom-title">تخصيص المظهر</div>
+  <div class="custom-grid">
+   <label>تسريحة الشعر<select id="charHair"><option value="short">قصير</option><option value="long">طويل</option><option value="pony">ذيل حصان</option><option value="spiky">مرفوع</option><option value="buzz">قصير جداً</option><option value="bald">بدون شعر</option></select></label>
+   <label>لون الشعر<select id="charHairColor"><option value="#211711">أسود</option><option value="#69452d">بني</option><option value="#b88a4a">ذهبي</option><option value="#c8c4bb">رمادي</option><option value="#7a2c27">أحمر داكن</option></select></label>
+   <label>لون البشرة<select id="charSkin"><option value="#e8b890">قمحي</option><option value="#fbd9bf">فاتح</option><option value="#c98d62">برونزي</option><option value="#9a6a45">بني</option><option value="#6b4429">داكن</option></select></label>
+   <label>لون القميص<select id="charShirt"><option value="#e8e8ee">أبيض</option><option value="#1d1d1f">أسود</option><option value="#d63a3a">أحمر</option><option value="#2f9e55">أخضر</option><option value="#7a4bd6">بنفسجي</option><option value="#3d8bff">أزرق</option><option value="#ec6aa8">وردي</option></select></label>
+   <label>لون البنطال<select id="charPants"><option value="#24395e">أزرق داكن</option><option value="#3f8fe0">أزرق</option><option value="#1d1d1f">أسود</option><option value="#7b6a4f">بني</option><option value="#5a5a5a">رمادي</option><option value="#e8e0d0">فاتح</option></select></label>
+   <label>لون الحذاء<select id="charShoe"><option value="#272b38">داكن</option><option value="#252525">أسود</option><option value="#f2f2f2">أبيض</option><option value="#c0392b">أحمر</option><option value="#343e63">أزرق</option></select></label>
+  </div>
+  <div class="custom-checks"><label><input id="charGlasses" type="checkbox"> نظارات</label><label id="beardOption"><input id="charBeard" type="checkbox"> لحية</label></div>
+  <p class="mp-note" id="mpLobbyStatus"></p>
+  <button id="startBtn" class="start-btn" type="button">ابدأ اللعب</button>
  </div>
 </section>
-<button id="fullBtn" aria-label="تكبير الشاشة وتدوير الهاتف" title="ملء الشاشة / الوضع الأفقي"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/><path d="M3 8l6-5M21 8l-6-5M3 16l6 5M21 16l-6 5" opacity=".25"/></svg></button>
-<div id="hud"><div class="hud-box"><strong id="areaName">فايس بيتش</strong><span id="statusLine">استكشف المدينة</span><span id="nearLine">WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج</span><span id="mpStatus">اللعب الجماعي: غير متصل</span></div></div>
+<div id="hud"><div class="hud-box"><strong id="areaName">فايس بيتش</strong><span id="statusLine">استكشف المدينة</span><span id="nearLine">WASD للحركة • Shift للجري • Space للقفز • E ركوب/خروج</span></div></div>
 <div id="toast"></div>
 <button id="miniMapBtn" aria-label="فتح الخريطة"><canvas id="miniMapCanvas" width="300" height="300"></canvas><span id="mapTag">GPS • الخريطة</span></button>
 <div id="mapOverlay" aria-hidden="true">
@@ -739,7 +804,7 @@ function stepRagdollPhysics(dt){
  ragdollAccumulator=Math.min(ragdollAccumulator+dt,.12);let steps=0;
  while(ragdollAccumulator>=RAGDOLL_FIXED_DT&&steps<4){ragdollWorld.step();ragdollAccumulator-=RAGDOLL_FIXED_DT;steps++}
  if(!steps)return;
- const finish=[];
+ const finish=[],finishRemote=[];
  for(const state of activeRagdolls){
   state.life+=dt;
   for(const body of Object.values(state.bodies)){
@@ -751,7 +816,8 @@ function stepRagdollPhysics(dt){
   if(state.ownerType==='player'){
    const pos=ragdollRootPosition(state);player.x=pos.x;player.z=pos.z;player.y=Math.max(0,pos.y);player.grounded=false;
    if(!state.death&&state.life>=state.maxLife)finish.push(state);
-  }else if(state.owner){const pos=ragdollRootPosition(state);state.owner.x=pos.x;state.owner.z=pos.z;}
+  }else if(state.ownerType==='remote'&&state.owner){const pos=ragdollRootPosition(state);state.owner.x=pos.x;state.owner.y=Math.max(0,pos.y);state.owner.z=pos.z;const q=state.bodies.pelvis.rotation(),e=new T.Euler().setFromQuaternion(new T.Quaternion(q.x,q.y,q.z,q.w),'YXZ');state.owner.heading=e.y;}
+  else if(state.owner){const pos=ragdollRootPosition(state);state.owner.x=pos.x;state.owner.z=pos.z;}
   if(state.ownerType==='pedestrian'&&state.life>=state.maxLife)finish.push(state);
  }
  for(const state of finish){if(state.ownerType==='player')finishPlayerRagdoll(state);else finishPedestrianRagdoll(state)}
@@ -992,6 +1058,8 @@ addSpecialVehicle('jetski','#19a3cf',1100,0,-400,Math.PI/2,0);
 addSpecialVehicle('boat','#f1f3f6',1180,0,-400,Math.PI/2,0);
 addSpecialVehicle('boat','#2d82bb',1260,0,-400,Math.PI/2,1);
 addSpecialVehicle('ship','#203d66',1350,0,-395,Math.PI/2,1);
+// Freeze the shared ambient fleet size; later local mission/police vehicles are not part of this baseline.
+const MP_BASE_TRAFFIC_COUNT=traffic.length;
 const vehicleFarMesh=new T.InstancedMesh(new T.BoxGeometry(1.9,.68,4.0),new T.MeshStandardMaterial({color:0xffffff,roughness:.85}),1200);vehicleFarMesh.count=0;vehicleFarMesh.frustumCulled=false;vehicleFarMesh.castShadow=false;sc.add(vehicleFarMesh);
 
 function ensureTrafficVisual(car){if(!car.root)buildTrafficVisual(car);return car.root}
@@ -1284,16 +1352,74 @@ function updateAircraft(dt){
   if(car.model&&car.model.root){const model=car.model.root,load=Math.min(1,speed/18);car.suspensionPhase=(car.suspensionPhase||0)+dt*(7+load*8);model.position.y=(isAircraftType(car.type)?0:Math.sin(car.suspensionPhase)*.018*load);model.rotation.z=(car.roll||0)*.42;model.rotation.x=isAircraftType(car.type)?(car.pitch||0):Math.sin(car.suspensionPhase*.5)*.006*load}
  }
 }
-/* ========= واجهة وتحكم ========= */
-let selectedGender='m';document.querySelectorAll('.gender').forEach(b=>b.addEventListener('click',()=>{selectedGender=b.dataset.g;document.querySelectorAll('.gender').forEach(x=>x.classList.toggle('active',x===b))}));
-async function requestImmersive(){try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}try{if(screen.orientation&&screen.orientation.lock&&matchMedia('(pointer:coarse)').matches)await screen.orientation.lock('landscape')}catch(e){}}
-$('fullBtn').addEventListener('click',requestImmersive);window.addEventListener('keydown',e=>{if(e.code==='Escape'&&mapState.open)closeFullMap()});
+/* ========= THE Z ONLINE: شاشة الدخول والتخصيص ========= */
+let selectedGender='m';
+function rebuildPlayerPreview(){
+ const old=playerChar;if(old?.root?.parent)old.root.parent.remove(old.root);if(old?.dispose)old.dispose();
+ playerChar=createCharacter(playerCfg);sc.add(playerChar.root);playerChar.root.position.set(player.x,0,player.z);playerChar.root.rotation.set(0,player.heading,0);playerChar.root.visible=true;
+}
+function applyCharacterCustomization(){
+ playerCfg.g=selectedGender;
+ playerCfg.hair=$('charHair').value;
+ playerCfg.hc=$('charHairColor').value;
+ playerCfg.skin=$('charSkin').value;
+ playerCfg.shirt=$('charShirt').value;
+ playerCfg.pants=$('charPants').value;
+ playerCfg.shoe=$('charShoe').value;
+ playerCfg.glasses=$('charGlasses').checked;
+ playerCfg.beard=selectedGender==='m'&&$('charBeard').checked;
+ playerCfg.skirt=false;
+ rebuildPlayerPreview();
+}
+function setGender(g){
+ selectedGender=g==='f'?'f':'m';
+ document.querySelectorAll('.gender').forEach(b=>b.classList.toggle('active',b.dataset.g===selectedGender));
+ $('beardOption').style.display=selectedGender==='m'?'flex':'none';
+ if(selectedGender==='f'&&$('charHair').value==='buzz')$('charHair').value='long';
+ if(selectedGender==='m'&&$('charHair').value==='pony')$('charHair').value='short';
+ applyCharacterCustomization();
+}
+document.querySelectorAll('.gender').forEach(b=>b.addEventListener('click',()=>setGender(b.dataset.g)));
+['charHair','charHairColor','charSkin','charShirt','charPants','charShoe','charGlasses','charBeard'].forEach(id=>$(id).addEventListener('change',applyCharacterCustomization));
+$('charBeard').checked=false;$('charGlasses').checked=false;
+async function requestImmersive(){
+ try{if(!document.fullscreenElement){if(!document.documentElement.requestFullscreen)return false;try{await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(firstError){await document.documentElement.requestFullscreen()}}}catch(e){console.warn('Fullscreen request was blocked',e)}
+ try{if(screen.orientation&&typeof screen.orientation.lock==='function')await screen.orientation.lock('landscape');}catch(e){console.warn('Landscape lock was blocked',e)}
+ // Some mobile browsers resolve the orientation-lock promise just before their
+ // viewport dimensions update. Poll briefly instead of rejecting too early.
+ const deadline=Date.now()+2600;
+ while(Date.now()<deadline){
+  const orientationType=screen.orientation?.type||'';
+  const landscape=orientationType.startsWith('landscape')||window.innerWidth>window.innerHeight;
+  if(document.fullscreenElement&&landscape&&window.innerWidth>window.innerHeight)return true;
+  await new Promise(resolve=>setTimeout(resolve,120));
+ }
+ return false;
+}
+function showEntryFailure(message){$('gateStatus').textContent=message;$('fullBtn').disabled=false;$('fullBtn').style.opacity='1'}
+$('fullBtn').addEventListener('click',async()=>{
+ $('fullBtn').disabled=true;$('fullBtn').style.opacity='.5';$('gateStatus').textContent='جارٍ طلب ملء الشاشة والوضع الأفقي...';
+ const immersive=await requestImmersive();
+ if(!immersive){showEntryFailure('لم يتم تأكيد ملء الشاشة والوضع الأفقي. افتح اللعبة في المتصفح واسمح بملء الشاشة ثم أدر الجهاز أفقياً.');return}
+ $('gateStatus').textContent='تم تأكيد الشاشة. جارٍ التحقق من خادم المدينة...';
+ try{await mpPrepareConnection();}
+ catch(err){showEntryFailure('تعذر تأكيد الاتصال بالخادم. افتح اللعبة من خادم Python وتحقق من اتصال الإنترنت.');console.warn(err);return}
+ $('entryGate').classList.add('fade-out');$('cinematicIntro').style.display='flex';
+ setTimeout(()=>{$('entryGate').style.display='none';$('cinematicIntro').style.display='none';$('startScreen').style.display='flex';applyCharacterCustomization();},4700);
+});
+window.addEventListener('keydown',e=>{if(e.code==='Escape'&&mapState.open)closeFullMap()});
 $('startBtn').addEventListener('click',async()=>{
- if(window.__viceRagdollReady&&!ragdollPhysicsReady){$('startBtn').disabled=true;$('startBtn').textContent='تحميل الفيزياء...';try{await Promise.race([window.__viceRagdollReady,new Promise(resolve=>setTimeout(resolve,6500))])}catch(e){}$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب'}
- playerCfg.g=selectedGender;playerCfg.hair=selectedGender==='f'?'long':'short';playerCfg.beard=false;playerCfg.skirt=false;
- sc.remove(playerChar.root);playerChar=createCharacter(playerCfg);sc.add(playerChar.root);playerChar.root.position.set(player.x,0,player.z);
- await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));if(worldDB)await loadWorldSnapshot();gameStarted=true;mpStartFromMenu();$('startScreen').style.display='none';$('fullBtn').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
- await requestImmersive();showToast(`أهلاً بك! ${RESIDENT_COUNT} ساكن في المدينتين، و${RESIDENTS_PER_CITY} ساكن في كل مدينة، وثلاثة شواطئ مزدحمة.`,3600);
+ if(!mpImmersiveVerified||!mpSocket||mpSocket.readyState!==WebSocket.OPEN){try{await mpPrepareConnection()}catch(e){showToast('انقطع الاتصال بالخادم. أعد فتح اللعبة وحاول من جديد.',2600);return}}
+ $('startBtn').disabled=true;$('startBtn').textContent='جارٍ تجهيز شخصيتك...';
+ if(window.__viceRagdollReady&&!ragdollPhysicsReady){try{await Promise.race([window.__viceRagdollReady,new Promise(resolve=>setTimeout(resolve,6500))])}catch(e){}}
+ applyCharacterCustomization();
+ mpPlayerName=String($('mpName').value||'').trim().slice(0,18)||`Player${Math.floor(100+Math.random()*900)}`;
+ try{await mpJoinWorld();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
+ await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));
+ if(worldDB&&!mpWorldTargets)await loadWorldSnapshot();
+ gameStarted=true;$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
+ $('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';
+ showToast(`مرحباً ${mpPlayerName} بك في THE Z ONLINE.`,3000);
 });
 $('runBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();runToggle=!runToggle;$('runBtn').classList.toggle('active',runToggle)});
 $('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jumpQueued=true});
@@ -1382,7 +1508,7 @@ function spawnDriverPedestrian(car,action){
  car.root.updateMatrixWorld(true);const start=car.root.localToWorld(vehicleSeatLocal(car)),end=car.root.localToWorld(vehicleDoorLocal(car,-1));const walker=createCharacter(cfg);walker.root.position.copy(start);walker.root.scale.setScalar(.84);sc.add(walker.root);const p=registerPedestrian(walker,cfg,start.x,start.z,.84,`driver_${car.id}_${Math.floor(worldTime)}`);p.driverExit={sx:start.x,sz:start.z,ex:end.x,ez:end.z,t:0,duration:1.02,heading:car.root.rotation.y,action};if(transientPeds.length>=MAX_TRANSIENT_PEDS){const old=transientPeds.shift();disposePedDetail(old)}transientPeds.push(p);car.driver=null;return p;
 }
 function enterVehicle(car){
- if(currentVehicle||vehicleTransition||!car)return;ensureTrafficVisual(car);car.speed=0;car.targetSpeed=0;car.entering=true;car.doorTarget=1;car.doorTimer=1.5;
+ if(currentVehicle||vehicleTransition||!car)return;if(car._mpNetworkDriven){showToast('هذه المركبة يقودها لاعب آخر حالياً.',1900);return}ensureTrafficVisual(car);car.speed=0;car.targetSpeed=0;car.entering=true;car.doorTarget=1;car.doorTimer=1.5;
  const mood=car.driver?(R()<.42?'flee':R()<.72?'fall':'shove'):'none';const driverPed=spawnDriverPedestrian(car,mood==='none'?'flee':mood);car.pendingDriver=driverPed;
  car.root.updateMatrixWorld(true);const entry=car.root.localToWorld(vehicleDoorLocal(car,-1));
  if(mood==='shove'){
@@ -1435,78 +1561,157 @@ function finishExitVehicle(c){
 function talkToNearest(){const p=nearestPed();if(!p){showToast('اقترب من أحد سكان المدينة للتفاعل معه.');return}setPedDetail(p,true);p.pause=2.3;p.ch.root.rotation.y=headingTo(player.x-p.x,player.z-p.z);p.ch.update(worldTime,.016,'wave');showToast(pk(['مرحباً! يوم جميل في المدينة.','أهلاً، هل تبحث عن مكان معين؟','الطريق إلى الشاطئ من ذلك الاتجاه.','المدينة مزدحمة اليوم!','أتمنى لك يوماً سعيداً.']),2600)}
 function doInteract(){if(playerDeath)return;if(currentVehicle){exitVehicle();return}const c=nearestTrafficCar();if(c){enterVehicle(c);return}talkToNearest()}
 $('talkBtn').style.display='none';
-/* ========= MULTIPLAYER: WebSocket room sync ========= */
+/* ========= MULTIPLAYER: THE Z ONLINE — عالم واحد مشترك ========= */
 let localPlayerAnimation='idle';
 const remotePlayers=new Map();
-let mpSocket=null,mpConnected=false,mpPlayerId=null,mpSendClock=0,mpReconnectTimer=null,mpManualClose=false;
-let mpPlayerName='',mpRoomName='vice-city';
+let mpSocket=null,mpConnected=false,mpPlayerId=null,mpSendClock=0,mpWorldClock=0,mpReconnectTimer=null,mpManualClose=false;
+let mpPlayerName='Player',mpImmersiveVerified=false,mpIsWorldHost=false,mpJoinResolve=null,mpJoinReject=null,mpWorldTargets=null,mpHeartbeatTimer=null;
+const MP_WORLD_ROOM='the-z-online';
 const MP_ALLOWED_ANIMS=new Set(['idle','walk','run','jump','jumpTuck','jumpLong','jumpSide','land','swim','treadWater','drive','rideBike','rideChopper','rideBicycle','fall','fallBack','getupBack','hit','stumble','push','punch','punchL','kick','enter','exit']);
 function mpSetStatus(message){const a=$('mpStatus'),b=$('mpLobbyStatus');if(a)a.textContent=message;if(b)b.textContent=message}
+function mpMakeCharacterData(){return {hair:playerCfg.hair,hc:playerCfg.hc,skin:playerCfg.skin,eye:playerCfg.eye,shirt:playerCfg.shirt,pants:playerCfg.pants,shoe:playerCfg.shoe,beard:!!playerCfg.beard,glasses:!!playerCfg.glasses,skirt:!!playerCfg.skirt}}
 function mpMakeNameSprite(name){
- const canvas=document.createElement('canvas');canvas.width=320;canvas.height=80;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(5,12,22,.78)';ctx.fillRect(8,8,304,64);ctx.strokeStyle='rgba(112,228,242,.8)';ctx.lineWidth=3;ctx.strokeRect(8,8,304,64);ctx.fillStyle='#ffffff';ctx.font='bold 30px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(name||'لاعب').slice(0,18),160,40,286);const tex=new T.CanvasTexture(canvas);tex.encoding=T.sRGBEncoding;const matl=new T.SpriteMaterial({map:tex,transparent:true,depthTest:false});const sprite=new T.Sprite(matl);sprite.scale.set(2.05,.52,1);sprite.renderOrder=20;return sprite;
+ const canvas=document.createElement('canvas');canvas.width=320;canvas.height=80;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(5,12,22,.78)';ctx.fillRect(8,8,304,64);ctx.strokeStyle='rgba(142,188,255,.8)';ctx.lineWidth=3;ctx.strokeRect(8,8,304,64);ctx.fillStyle='#ffffff';ctx.font='bold 30px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(name||'Player').slice(0,18),160,40,286);const tex=new T.CanvasTexture(canvas);tex.encoding=T.sRGBEncoding;const matl=new T.SpriteMaterial({map:tex,transparent:true,depthTest:false});const sprite=new T.Sprite(matl);sprite.scale.set(2.05,.52,1);sprite.renderOrder=20;return sprite;
 }
 function mpCreateRemote(data){
- const cfg=randomCharacterCfg();cfg.g=data.gender==='f'?'f':'m';if(cfg.g==='f')cfg.beard=false;else cfg.skirt=false;
+ const cfg=randomCharacterCfg(),appearance=data.character&&typeof data.character==='object'?data.character:{};Object.assign(cfg,appearance);cfg.g=data.gender==='f'?'f':'m';if(cfg.g==='f'){cfg.beard=false;cfg.skirt=false}
  const character=createCharacter(cfg),group=new T.Group(),label=mpMakeNameSprite(data.name);group.add(character.root,label);label.position.set(0,2.1,0);sc.add(group);
- const r={id:data.id,name:data.name||'لاعب',gender:cfg.g,character,group,label,vehicle:null,x:Number(data.x)||0,y:Number(data.y)||0,z:Number(data.z)||0,heading:Number(data.heading)||0,targetX:Number(data.x)||0,targetY:Number(data.y)||0,targetZ:Number(data.z)||0,targetHeading:Number(data.heading)||0,anim:'idle',vehicleType:null,vehicleColor:'#3c8fc4',initialized:true};remotePlayers.set(r.id,r);return r;
+ const r={id:data.id,name:data.name||'Player',gender:cfg.g,character,characterConfig:{...cfg},group,label,vehicle:null,vehicleId:'',ragdollState:null,x:Number(data.x)||0,y:Number(data.y)||0,z:Number(data.z)||0,heading:Number(data.heading)||0,targetX:Number(data.x)||0,targetY:Number(data.y)||0,targetZ:Number(data.z)||0,targetHeading:Number(data.heading)||0,anim:'idle',ragdoll:false,ragdollRotation:{x:0,y:0,z:0},vehicleType:null,vehicleColor:'#3c8fc4',initialized:true};remotePlayers.set(r.id,r);return r;
 }
 function mpRemoveRemoteVehicle(r){
  if(!r.vehicle)return;
  if(r.character.root.parent)r.character.root.parent.remove(r.character.root);if(r.label.parent)r.label.parent.remove(r.label);
- disposeTrafficVisual(r.vehicle);r.vehicle=null;r.vehicleType=null;r.group.add(r.character.root,r.label);r.character.root.position.set(0,0,0);r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(1);r.label.position.set(0,2.1,0);
+ disposeTrafficVisual(r.vehicle);r.vehicle=null;r.vehicleType=null;r.vehicleId='';r.group.add(r.character.root,r.label);r.character.root.position.set(0,0,0);r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(1);r.label.position.set(0,2.1,0);
 }
 function mpSetRemoteVehicle(r,data){
- const type=String(data.vehicleType||'sedan');if(!Object.prototype.hasOwnProperty.call(typeIndex,type)){mpRemoveRemoteVehicle(r);return}
- if(r.vehicle&&r.vehicleType===type)return;
+ const type=String(data.vehicleType||'sedan'),vehicleId=String(data.vehicleId||'');if(!Object.prototype.hasOwnProperty.call(typeIndex,type)){mpRemoveRemoteVehicle(r);return}
+ if(r.vehicle&&r.vehicleType===type&&r.vehicleId===vehicleId)return;
  mpRemoveRemoteVehicle(r);if(r.character.root.parent)r.character.root.parent.remove(r.character.root);if(r.label.parent)r.label.parent.remove(r.label);
- const color=/^#[0-9a-fA-F]{6}$/.test(data.vehicleColor||'')?data.vehicleColor:'#3c8fc4';const car=createTrafficVehicle(type,color,Math.abs(data.x)>700?1100:-1100,'special',0,0,1,{id:'mp_'+r.id,x:r.x,z:r.z,y:r.y,heading:r.heading,claimed:true});car.claimed=true;buildTrafficVisual(car);r.vehicle=car;r.vehicleType=type;r.vehicleColor=color;car.root.add(r.character.root,r.label);r.character.root.position.copy(vehicleSeatLocal(car));r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(vehicleCharacterScale(car));r.label.position.set(0,2.4,0);
+ const color=/^#[0-9a-fA-F]{6}$/.test(data.vehicleColor||'')?data.vehicleColor:'#3c8fc4';const car=createTrafficVehicle(type,color,Math.abs(data.x)>700?1100:-1100,'special',0,0,1,{id:'mp_'+r.id,x:r.x,z:r.z,y:r.y,heading:r.heading,claimed:true});car.claimed=true;buildTrafficVisual(car);r.vehicle=car;r.vehicleType=type;r.vehicleColor=color;r.vehicleId=vehicleId;car.root.add(r.character.root,r.label);r.character.root.position.copy(vehicleSeatLocal(car));r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(vehicleCharacterScale(car));r.label.position.set(0,2.4,0);
+}
+const MP_RAGDOLL_KEYS=['pelvis','torso','head','upperArmL','lowerArmL','upperArmR','lowerArmR','upperLegL','lowerLegL','upperLegR','lowerLegR'];
+function mpCollectRagdollPose(){
+ if(!player.ragdoll?.bodies)return null;const pose=[];
+ for(const key of MP_RAGDOLL_KEYS){const b=player.ragdoll.bodies[key];if(!b)return null;const t=b.translation(),q=b.rotation();pose.push(t.x,t.y,t.z,q.x,q.y,q.z,q.w)}
+ return pose;
+}
+function mpTryStartRemoteRagdoll(r){
+ if(!r||r.ragdollState||!ragdollPhysicsReady||!ragdollWorld||r.vehicle)return;
+ if(r.character.root.parent!==r.group)r.group.add(r.character.root);
+ r.group.position.set(r.x,r.y,r.z);r.group.rotation.set(0,r.heading,0);r.character.root.position.set(0,0,0);r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(1);
+ const state=createCharacterRagdoll(r.character,{ownerType:'remote',owner:r,maxLife:999,velocity:{x:0,y:0,z:0},impulse:{x:0,y:0,z:0},spin:{x:0,z:0}});
+ if(!state)return;r.ragdollState=state;r.group.position.set(0,0,0);r.group.rotation.set(0,0,0);r.label.position.set(r.x,r.y+2.35,r.z);syncRagdollVisual(state);
+}
+function mpApplyRemoteRagdollPose(r,pose){
+ if(!r||!Array.isArray(pose)||pose.length!==MP_RAGDOLL_KEYS.length*7)return;
+ mpTryStartRemoteRagdoll(r);const state=r.ragdollState;if(!state)return;
+ for(let i=0;i<MP_RAGDOLL_KEYS.length;i++){const b=state.bodies[MP_RAGDOLL_KEYS[i]],o=i*7;if(!b)continue;b.setTranslation({x:Number(pose[o])||0,y:Number(pose[o+1])||0,z:Number(pose[o+2])||0},true);b.setRotation({x:Number(pose[o+3])||0,y:Number(pose[o+4])||0,z:Number(pose[o+5])||0,w:Number(pose[o+6])||1},true);b.setLinvel({x:0,y:0,z:0},true);b.setAngvel({x:0,y:0,z:0},true)}
+ syncRagdollVisual(state);
+}
+function mpFinishRemoteRagdoll(r){
+ if(!r?.ragdollState)return;const state=r.ragdollState,pos=ragdollRootPosition(state),q=state.bodies.pelvis.rotation(),e=new T.Euler().setFromQuaternion(new T.Quaternion(q.x,q.y,q.z,q.w),'YXZ');
+ destroyRagdollState(state);r.ragdollState=null;r.x=pos.x;r.y=Math.max(0,pos.y);r.z=pos.z;r.heading=e.y;r.targetX=r.x;r.targetY=r.y;r.targetZ=r.z;r.targetHeading=r.heading;
+ const old=r.character;if(old?.root?.parent)old.root.parent.remove(old.root);if(old?.dispose)old.dispose();r.character=createCharacter(r.characterConfig||randomCharacterCfg());r.group.add(r.character.root);r.group.position.set(r.x,r.y,r.z);r.group.rotation.set(0,r.heading,0);r.character.root.position.set(0,0,0);r.character.root.rotation.set(0,0,0);r.label.position.set(0,2.1,0);r.character.update(worldTime,.016,'getupBack');
+}
+function mpRefreshRemoteVehicleClaims(){
+ const ids=new Set([...remotePlayers.values()].map(r=>r.vehicleId).filter(Boolean));
+ for(const c of traffic)c._mpNetworkDriven=ids.has(String(c.id));
 }
 function mpUpsertRemote(data){
  if(!data||!data.id||data.id===mpPlayerId)return;let r=remotePlayers.get(String(data.id));if(!r)r=mpCreateRemote(data);
  r.name=String(data.name||r.name).slice(0,18);r.targetX=Number.isFinite(Number(data.x))?Number(data.x):r.targetX;r.targetY=Number.isFinite(Number(data.y))?Number(data.y):r.targetY;r.targetZ=Number.isFinite(Number(data.z))?Number(data.z):r.targetZ;r.targetHeading=Number.isFinite(Number(data.heading))?Number(data.heading):r.targetHeading;
- r.anim=MP_ALLOWED_ANIMS.has(data.anim)?data.anim:'idle';r.gender=data.gender==='f'?'f':'m';
- if(data.inVehicle&&data.vehicleType)mpSetRemoteVehicle(r,data);else mpRemoveRemoteVehicle(r);
+ r.anim=MP_ALLOWED_ANIMS.has(data.anim)?data.anim:'idle';r.gender=data.gender==='f'?'f':'m';const wasRagdoll=!!r.ragdoll;r.ragdoll=!!data.ragdoll;
+ if(data.ragdollRotation&&typeof data.ragdollRotation==='object')r.ragdollRotation={x:Number(data.ragdollRotation.x)||0,y:Number(data.ragdollRotation.y)||0,z:Number(data.ragdollRotation.z)||0};
+ if(data.inVehicle&&data.vehicleType){if(r.ragdollState)mpFinishRemoteRagdoll(r);mpSetRemoteVehicle(r,data)}else{mpRemoveRemoteVehicle(r);if(r.ragdoll){mpTryStartRemoteRagdoll(r);if(data.ragdollPose)mpApplyRemoteRagdollPose(r,data.ragdollPose)}else if(wasRagdoll||r.ragdollState)mpFinishRemoteRagdoll(r)}
+ mpRefreshRemoteVehicleClaims();
 }
-function mpRemoveRemote(id){const r=remotePlayers.get(String(id));if(!r)return;mpRemoveRemoteVehicle(r);if(r.group.parent)r.group.parent.remove(r.group);r.character.dispose();if(r.label.material.map)r.label.material.map.dispose();r.label.material.dispose();remotePlayers.delete(String(id))}
+function mpRemoveRemote(id){const r=remotePlayers.get(String(id));if(!r)return;if(r.ragdollState){destroyRagdollState(r.ragdollState);r.ragdollState=null}mpRemoveRemoteVehicle(r);if(r.group.parent)r.group.parent.remove(r.group);r.character.dispose();if(r.label.material.map)r.label.material.map.dispose();r.label.material.dispose();remotePlayers.delete(String(id));mpRefreshRemoteVehicleClaims()}
 function mpHandleMessage(msg){
  if(!msg||typeof msg!=='object')return;
- if(msg.type==='welcome'){mpPlayerId=msg.id;for(const p of (msg.players||[]))mpUpsertRemote(p);mpSetStatus(`متصل بالغرفة ${mpRoomName} • ${remotePlayers.size+1} لاعب`);return}
- if(msg.type==='player_join'){mpUpsertRemote(msg.player);mpSetStatus(`متصل بالغرفة ${mpRoomName} • ${remotePlayers.size+1} لاعب`);return}
- if(msg.type==='player_update'){mpUpsertRemote(msg.player);mpSetStatus(`متصل بالغرفة ${mpRoomName} • ${remotePlayers.size+1} لاعب`);return}
- if(msg.type==='player_leave'){mpRemoveRemote(msg.id);mpSetStatus(mpConnected?`متصل بالغرفة ${mpRoomName} • ${remotePlayers.size+1} لاعب`:'اللعب الجماعي: غير متصل')}
+ if(msg.type==='immersive_verified'){mpImmersiveVerified=true;return}
+ if(msg.type==='pong')return;
+ if(msg.type==='immersive_rejected'||msg.type==='join_rejected'||msg.type==='server_full'){if(mpJoinReject){mpJoinReject(new Error(msg.message||'Server rejected connection'));mpJoinReject=null;mpJoinResolve=null}return}
+ if(msg.type==='welcome'){
+  mpPlayerId=msg.id;mpConnected=true;mpIsWorldHost=!!msg.is_world_host;if(msg.spawn){player.x=Number(msg.spawn.x)||-1100;player.y=Number(msg.spawn.y)||0;player.z=Number(msg.spawn.z)||12;playerChar.root.position.set(player.x,player.y,player.z)}
+  for(const p of (msg.players||[]))mpUpsertRemote(p);
+  if(msg.world_state){mpSetWorldSnapshot(msg.world_state);mpApplyWorldState(1,true)}
+  if(mpJoinResolve){mpJoinResolve(true);mpJoinResolve=null;mpJoinReject=null}
+  return;
+ }
+ if(msg.type==='player_join'){mpUpsertRemote(msg.player);return}
+ if(msg.type==='player_update'){mpUpsertRemote(msg.player);return}
+ if(msg.type==='player_leave'){mpRemoveRemote(msg.id);return}
+ if(msg.type==='world_host'){mpIsWorldHost=msg.id===mpPlayerId;return}
+ if(msg.type==='world_state'){mpSetWorldSnapshot(msg.state);return}
+ if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
 }
 function mpClearRemote(){for(const id of [...remotePlayers.keys()])mpRemoveRemote(id)}
-function mpConnect(){
- if(!gameStarted)return;if(location.protocol==='file:'){mpSetStatus('اللعب الجماعي يحتاج فتح اللعبة من خادم Python، وليس من ملف HTML مباشرة.');return}
- if(mpSocket&&([WebSocket.OPEN,WebSocket.CONNECTING].includes(mpSocket.readyState)))return;
- mpManualClose=false;const scheme=location.protocol==='https:'?'wss':'ws',url=`${scheme}://${location.host}/ws?room=${encodeURIComponent(mpRoomName)}&name=${encodeURIComponent(mpPlayerName)}&gender=${encodeURIComponent(playerCfg.g)}`;
- try{mpSocket=new WebSocket(url)}catch(e){mpSetStatus('تعذّر إنشاء اتصال اللعب الجماعي.');return}
- mpSetStatus('جارٍ الاتصال بغرفة اللعب الجماعي...');
- mpSocket.onopen=()=>{mpConnected=true;mpSetStatus('تم الاتصال بخادم اللعب الجماعي.');showToast('اتصلت بالمدينة الجماعية.',1400)};
- mpSocket.onmessage=e=>{try{mpHandleMessage(JSON.parse(e.data))}catch(err){console.warn('Invalid multiplayer packet',err)}};
- mpSocket.onerror=()=>{mpSetStatus('تعذّر الاتصال؛ تحقق من تشغيل خادم Python.')};
- mpSocket.onclose=()=>{mpConnected=false;mpPlayerId=null;mpClearRemote();mpSetStatus('انقطع الاتصال بخادم اللعب الجماعي.');if(gameStarted&&!mpManualClose){clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(mpConnect,3500)}};
+function mpWebSocketUrl(){const scheme=location.protocol==='https:'?'wss':'ws';return `${scheme}://${location.host}/ws?fullscreen=1&landscape=1`}
+function mpPrepareConnection(){
+ if(location.protocol==='file:')return Promise.reject(new Error('Open the game through the Python server, not as a local HTML file.'));
+ if(mpSocket&&mpSocket.readyState===WebSocket.OPEN&&mpImmersiveVerified)return Promise.resolve(true);
+ return new Promise((resolve,reject)=>{
+  let done=false;const timer=setTimeout(()=>{if(!done){done=true;reject(new Error('Server verification timed out'))}},12000);
+  mpManualClose=false;try{mpSocket=new WebSocket(mpWebSocketUrl())}catch(e){clearTimeout(timer);reject(e);return}
+  const ws=mpSocket;
+  ws.onopen=()=>{clearInterval(mpHeartbeatTimer);mpHeartbeatTimer=setInterval(()=>{if(ws.readyState===WebSocket.OPEN){try{ws.send(JSON.stringify({type:'ping'}))}catch(e){}}},20000)};
+  ws.onmessage=e=>{try{const msg=JSON.parse(e.data);if(msg.type==='immersive_verified'){mpHandleMessage(msg);if(!done){done=true;clearTimeout(timer);resolve(true)}return}mpHandleMessage(msg)}catch(err){console.warn('Invalid multiplayer packet',err)}};
+  ws.onerror=()=>{if(!done){done=true;clearTimeout(timer);reject(new Error('Could not connect to the Python server'))}};
+  ws.onclose=()=>{clearInterval(mpHeartbeatTimer);mpHeartbeatTimer=null;mpConnected=false;mpPlayerId=null;mpIsWorldHost=false;mpClearRemote();if(!done){done=true;clearTimeout(timer);reject(new Error('Server closed the connection before verification'))}if(gameStarted&&!mpManualClose){clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(async()=>{try{await mpPrepareConnection();await mpJoinWorld()}catch(e){console.warn('Reconnect failed',e)}},3000)}};
+ });
+}
+function mpJoinWorld(){
+ if(!mpImmersiveVerified||!mpSocket||mpSocket.readyState!==WebSocket.OPEN)return Promise.reject(new Error('Immersive mode has not been verified'));
+ if(mpConnected)return Promise.resolve(true);
+ return new Promise((resolve,reject)=>{
+  mpJoinResolve=resolve;mpJoinReject=reject;
+  try{mpSocket.send(JSON.stringify({type:'join',name:mpPlayerName,gender:playerCfg.g,character:mpMakeCharacterData()}))}catch(e){mpJoinResolve=null;mpJoinReject=null;reject(e);return}
+  setTimeout(()=>{if(mpJoinResolve){mpJoinResolve=null;mpJoinReject=null;reject(new Error('Join response timed out'))}},12000);
+ });
 }
 function mpSendState(){
  if(!mpConnected||!mpSocket||mpSocket.readyState!==WebSocket.OPEN||!gameStarted)return;
- const v=currentVehicle;const packet={type:'state',x:Number(player.x)||0,y:Number(player.y)||0,z:Number(player.z)||0,heading:Number(player.heading)||0,anim:MP_ALLOWED_ANIMS.has(localPlayerAnimation)?localPlayerAnimation:'idle',inVehicle:!!v,vehicleType:v?.type||'',vehicleColor:v?.color||'',gender:playerCfg.g};
+ const v=currentVehicle;let ragdollRotation={x:0,y:0,z:0};
+ if(player.ragdoll?.bodies?.pelvis){try{const q=player.ragdoll.bodies.pelvis.rotation(),e=new T.Euler().setFromQuaternion(new T.Quaternion(q.x,q.y,q.z,q.w),'YXZ');ragdollRotation={x:e.x,y:e.y,z:e.z}}catch(e){}}
+ const anim=player.ragdoll?'fallBack':playerDeath?'fallBack':MP_ALLOWED_ANIMS.has(localPlayerAnimation)?localPlayerAnimation:'idle';
+ const packet={type:'state',x:Number(player.x)||0,y:Number(player.y)||0,z:Number(player.z)||0,heading:Number(player.heading)||0,anim,inVehicle:!!v,vehicleId:v?String(v.id||''):'',vehicleType:v?.type||'',vehicleColor:v?.color||'',gender:playerCfg.g,ragdoll:!!player.ragdoll,ragdollRotation,ragdollPose:mpCollectRagdollPose()};
  try{mpSocket.send(JSON.stringify(packet))}catch(e){console.warn('Multiplayer send failed',e)}
+}
+function mpEncodeFloats(floatArray){
+ const bytes=new Uint8Array(floatArray.buffer,floatArray.byteOffset,floatArray.byteLength);let binary='';const chunk=0x6000;
+ for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+ return btoa(binary);
+}
+function mpDecodeFloats(encoded){
+ if(typeof encoded!=='string'||!encoded)return new Float32Array(0);const binary=atob(encoded),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Float32Array(bytes.buffer);
+}
+function mpSendWorldState(dt){
+ if(!mpConnected||!mpIsWorldHost||!mpSocket||mpSocket.readyState!==WebSocket.OPEN)return;
+ mpWorldClock+=dt;if(mpWorldClock<.65)return;mpWorldClock=0;
+ const pedData=new Float32Array(pedestrians.length*7);
+ for(let i=0;i<pedestrians.length;i++){const p=pedestrians[i],o=i*7;pedData[o]=p.x;pedData[o+1]=p.z;pedData[o+2]=p.heading;pedData[o+3]=p.idx||0;pedData[o+4]=p.phase||0;pedData[o+5]=p.pause||0;pedData[o+6]=p.speed||0}
+ const carData=new Float32Array(MP_BASE_TRAFFIC_COUNT*9);
+ for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){const c=traffic[i],o=i*9;carData[o]=c.x;carData[o+1]=c.z;carData[o+2]=c.y||0;carData[o+3]=c.heading||0;carData[o+4]=c.speed||0;carData[o+5]=c.damage||0;carData[o+6]=c.userDriven?1:0;carData[o+7]=c.claimed?1:0;carData[o+8]=c.retired?1:0}
+ try{mpSocket.send(JSON.stringify({type:'world_state',state:{peds:mpEncodeFloats(pedData),cars:mpEncodeFloats(carData),pedCount:pedestrians.length,carCount:MP_BASE_TRAFFIC_COUNT,at:Date.now()}}))}catch(e){console.warn('World snapshot send failed',e)}
+}
+function mpSetWorldSnapshot(state){
+ if(!state||typeof state!=='object')return;
+ try{const peds=mpDecodeFloats(state.peds),cars=mpDecodeFloats(state.cars);if(peds.length!==Number(state.pedCount)*7||cars.length!==Number(state.carCount)*9)return;mpWorldTargets={peds,cars,pedCount:Number(state.pedCount),carCount:Number(state.carCount)}}catch(e){console.warn('Invalid shared world snapshot',e)}
+}
+function mpApplyWorldState(dt,force=false){
+ if(!mpConnected||(!force&&mpIsWorldHost)||!mpWorldTargets)return;const a=1-Math.exp(-dt*5.5),w=mpWorldTargets;
+ if(w.pedCount===pedestrians.length){for(let i=0;i<pedestrians.length;i++){const p=pedestrians[i],o=i*7;p.x+=(w.peds[o]-p.x)*a;p.z+=(w.peds[o+1]-p.z)*a;p.heading=angleLerp(p.heading,w.peds[o+2],a);p.idx=Math.max(0,Math.floor(w.peds[o+3]))%Math.max(1,p.path.length);p.phase=w.peds[o+4];p.pause=w.peds[o+5];p.speed=w.peds[o+6]}}
+ if(w.carCount===MP_BASE_TRAFFIC_COUNT){const remoteIds=new Set([...remotePlayers.values()].map(r=>r.vehicleId).filter(Boolean));for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){const c=traffic[i],o=i*9,remoteDriven=remoteIds.has(String(c.id));c._mpNetworkDriven=remoteDriven;if(remoteDriven){if(c.root)c.root.visible=false;continue}c.x+=(w.cars[o]-c.x)*a;c.z+=(w.cars[o+1]-c.z)*a;c.y+=(w.cars[o+2]-c.y)*a;c.heading=angleLerp(c.heading,w.cars[o+3],a);c.speed+=(w.cars[o+4]-c.speed)*a;c.damage=w.cars[o+5];c.claimed=w.cars[o+7]>.5;c.retired=w.cars[o+8]>.5;if(c.axis==='x')c.t=c.x-c.cx;else if(c.axis==='z')c.t=c.z-c.baseZ;if(c.root){c.root.position.set(c.x,c.y,c.z);c.root.rotation.set(c.pitch||0,c.heading,c.roll||0)}}}
 }
 function mpUpdateRemoteVisuals(dt){
  const k=1-Math.exp(-dt*13);
  for(const r of remotePlayers.values()){
   r.x+=(r.targetX-r.x)*k;r.y+=(r.targetY-r.y)*k;r.z+=(r.targetZ-r.z)*k;r.heading=angleLerp(r.heading,r.targetHeading,Math.min(1,k*1.25));
   if(r.vehicle){const car=r.vehicle;car.x=r.x;car.y=r.y;car.z=r.z;car.heading=r.heading;car.root.position.set(r.x,r.y,r.z);car.root.rotation.set(0,r.heading,0);r.character.update(worldTime,dt,r.anim,0)}
-  else{r.group.position.set(r.x,r.y,r.z);r.group.rotation.y=r.heading;r.character.update(worldTime,dt,r.anim,0)}
+  else if(r.ragdollState){r.group.position.set(0,0,0);r.group.rotation.set(0,0,0);r.label.position.set(r.x,r.y+2.35,r.z)}
+  else{if(r.ragdoll)mpTryStartRemoteRagdoll(r);r.group.position.set(r.x,r.y,r.z);r.group.rotation.y=r.heading;r.character.root.rotation.x=0;r.character.root.rotation.z=0;r.character.update(worldTime,dt,r.anim,0)}
  }
 }
-function mpStartFromMenu(){
- mpPlayerName=String($('mpName').value||'').trim().slice(0,18)||`لاعب${Math.floor(100+Math.random()*900)}`;
- mpRoomName=String($('mpRoom').value||'vice-city').trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,24)||'vice-city';
- connectMultiplayerAfterStart();
-}
-function connectMultiplayerAfterStart(){mpConnect()}
-
 /* Player-on-foot impact from moving traffic: hand off to articulated Rapier bodies. */
 function resolvePlayerVehicleImpact(){
  if(currentVehicle||player.ragdoll||playerDeath||!player.grounded||player.swimming)return;
@@ -1564,6 +1769,7 @@ function syncWorldVisibility(){
  cam.updateMatrixWorld();worldVP.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);worldFrustum.setFromProjectionMatrix(worldVP);
  const candidates=[],far=[];
  for(const c of traffic){
+  if(c._mpNetworkDriven){if(c.root)c.root.visible=false;continue}
   if(c.userDriven){if(c.root)c.root.visible=true;continue}
   const dx=c.x-player.x,dz=c.z-player.z,d2=dx*dx+dz*dz,dist=Math.sqrt(d2);
   if(dist>430){if(c.root)disposeTrafficVisual(c);continue}
@@ -1591,7 +1797,7 @@ worldDBReady=false;openWorldDB().then(db=>{worldDB=db;worldDBReady=true;if(db)lo
 let lastFrame=performance.now(),elapsed=0;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-lastFrame)/1000);lastFrame=now;if(!gameStarted){ren.render(sc,cam);return}worldTime+=dt;elapsed+=dt;
  if(interactQueued){doInteract();interactQueued=false}if(pushQueued){performPush();pushQueued=false}if(punchQueued){performPunch();punchQueued=false}
- updatePlayer(dt);refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);
+ updatePlayer(dt);refreshGpsRoute(dt);updatePedestrians(dt);updateTraffic(dt);resolveTrafficCollisions(dt);resolvePlayerVehicleImpact();stepRagdollPhysics(dt);mpApplyWorldState(dt);mpUpdateRemoteVisuals(dt);mpSendClock+=dt;if(mpSendClock>=.09){mpSendClock=0;mpSendState()}mpSendWorldState(dt);updateSignals();updateAircraft(dt);updateVehicleEffects(dt);updateBeach(dt);
  if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$('toast').classList.remove('show')}
  let target,desired;
  if(currentVehicle){target=currentVehicle.root.position;const yaw=currentVehicle.heading+cameraYaw;const dist=currentVehicle.type==='airliner'?Math.max(15,cameraDistance*3):currentVehicle.type==='ship'?Math.max(12,cameraDistance*2.5):Math.max(8,cameraDistance*1.75);desired=new T.Vector3(target.x-Math.sin(yaw)*dist,target.y+Math.max(4.2,dist*.34)+cameraPitch*6,target.z-Math.cos(yaw)*dist)}
