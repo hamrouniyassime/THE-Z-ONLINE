@@ -25,6 +25,7 @@ from fastapi.responses import FileResponse, JSONResponse
 BASE_DIR = Path(__file__).resolve().parent
 GAME_PATH = BASE_DIR / "index.html"
 IMAGE_PATH = BASE_DIR / "img.png"
+WORLD_MAP_PATH = BASE_DIR / "world-map.webp"
 PORT = int(os.environ.get("PORT", "8000"))
 MAX_PLAYERS = max(2, min(128, int(os.environ.get("MAX_PLAYERS", "64"))))
 MAX_NAME_LENGTH = 18
@@ -36,7 +37,7 @@ WORLD_ROOM = "the-z-online"
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 log = logging.getLogger("the-z-online")
 
-app = FastAPI(title="THE Z ONLINE", version="2.1.0")
+app = FastAPI(title="THE Z ONLINE", version="2.2.0")
 
 # player_id -> {websocket, room, state}
 clients: dict[str, dict[str, Any]] = {}
@@ -165,6 +166,13 @@ async def title_image():
     return FileResponse(IMAGE_PATH, media_type="image/png")
 
 
+@app.get("/world-map.webp")
+async def world_map_image():
+    if not WORLD_MAP_PATH.is_file():
+        return JSONResponse(status_code=404, content={"error": "world-map.webp is missing beside app.py"})
+    return FileResponse(WORLD_MAP_PATH, media_type="image/webp", headers={"Cache-Control": "public, max-age=86400"})
+
+
 @app.get("/healthz")
 async def health():
     return {
@@ -176,6 +184,7 @@ async def health():
         "world_host_connected": world_host_id in clients if world_host_id else False,
         "game_file_found": GAME_PATH.is_file(),
         "title_image_found": IMAGE_PATH.is_file(),
+        "world_map_found": WORLD_MAP_PATH.is_file(),
     }
 
 
@@ -237,8 +246,8 @@ async def multiplayer_socket(websocket: WebSocket):
         spawn_slot = len(room_members)
         spawn_radius = 4.0 + math.sqrt(spawn_slot) * 2.7
         spawn_angle = spawn_slot * 2.399963229728653
-        spawn_x = -2500.0 + math.cos(spawn_angle) * spawn_radius
-        spawn_z = -2500.0 + math.sin(spawn_angle) * spawn_radius
+        spawn_x = 100.0 + math.cos(spawn_angle) * spawn_radius
+        spawn_z = 1900.0 + math.sin(spawn_angle) * spawn_radius
         state: dict[str, Any] = {
             "id": player_id,
             "name": name,
