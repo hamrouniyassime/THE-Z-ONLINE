@@ -1738,7 +1738,7 @@ $('startBtn').addEventListener('click',async()=>{
  try{await mpJoinWorld();ensurePlayerOutdoorSpawn();}catch(err){$('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';showToast('لم يستطع الخادم إدخالك إلى المدينة. أعد المحاولة.',3000);console.warn(err);return}
  await (worldDBReady?Promise.resolve():new Promise(r=>{const q=setInterval(()=>{if(worldDBReady){clearInterval(q);r()}},40);setTimeout(()=>{clearInterval(q);r()},1300)}));
  if(worldDB&&!mpWorldTargets)await loadWorldSnapshot();
- gameStarted=true;gameSound.start();applyQuality(qualityMode,false);$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('gameSettingsBtn').style.display='grid';$('activityToggle').style.display='grid';$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
+ gameStarted=true;gameSound.start();applyQuality(qualityMode,false);$('startScreen').style.display='none';$('hud').style.display='block';$('miniMapBtn').style.display='block';$('gameSettingsBtn').style.display='grid';$('activityToggle').style.display='grid';['worldHubBtn','phoneHubBtn'].forEach(i=>{const e=document.getElementById(i);if(e)e.style.display='block'});$('touchUI').style.display=matchMedia('(pointer:coarse)').matches?'block':'none';updateMaps();
  $('startBtn').disabled=false;$('startBtn').textContent='ابدأ اللعب';
  showToast(`مرحباً ${mpPlayerName} بك في THE Z ONLINE.`,3000);
 });
@@ -2461,7 +2461,7 @@ openFullMap=function(){mapState.open=true;mapState.cx=0;mapState.cz=0;mapState.z
 // Five named coast destinations are included in the five-beach catalogue and map.
 function updateCityExpansion(dt){if(activeCityJob){const d=Math.hypot(player.x-activeCityJob.x,player.z-activeCityJob.z);if(d<18){playerWallet+=activeCityJob.reward;const name=activeCityJob.name;activeCityJob=null;saveCityProfile();showToast(`أنجزت المهمة ${name}! حصلت على مكافأة.`,3000);if($('worldHubPanel').classList.contains('open'))renderWorldHub(activeHubTab)}}updateCityAnimals(dt)}
 // Wrap start button listener so the two new city controls are visible once gameplay starts.
-$('startBtn').addEventListener('click',()=>{setTimeout(()=>{if(gameStarted){$('worldHubBtn').style.display='block';$('phoneHubBtn').style.display='block';renderWorldHub('jobs')}},250)});
+$('startBtn').addEventListener('click',()=>{setTimeout(()=>{if(gameStarted){['worldHubBtn','phoneHubBtn'].forEach(i=>{const e=document.getElementById(i);if(e)e.style.display='block'});renderWorldHub('jobs')}},250)});
 // Restore saved local economy and inventory in the top-level hub.
 $('worldStats').innerHTML=`<span class="world-pill">الرصيد: $${playerWallet.toLocaleString('en-US')}</span><span class="world-pill">المساحة: 112 كم²</span>`;
 
