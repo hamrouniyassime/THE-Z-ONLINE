@@ -962,7 +962,9 @@ function startPedestrianRagdoll(p,vx,vz,force=3.8,source='impact'){
  if(!p.ch)return false;p.ch.root.position.set(p.x,p.beachRole==='swim'?-2.08:0,p.z);p.ch.root.rotation.set(0,p.heading,0);p.ch.root.scale.setScalar(p.scale);p.ch.root.updateMatrixWorld(true);
  const len=Math.hypot(vx,vz)||1,fx=vx/len*force,fz=vz/len*force;
  const state=createCharacterRagdoll(p.ch,{ownerType:'pedestrian',owner:p,maxLife:2.15,velocity:{x:fx*.55,y:.8,z:fz*.55},impulse:{x:fx*.42,y:Math.min(3.2,force*.32),z:fz*.42},spin:{x:ra(-1.2,1.2),z:ra(-1.2,1.2)}});
- if(!state)return false;p.reaction={type:'ragdoll',phase:'down',t:0,ragdoll:state,source,anger:R()<.28};state.owner=p;p.hitCooldown=1.25;p.pause=0;p.flee=null;p.angry=null;p.ch.root.visible=true;return true;
+ if(!state)return false;p.reaction={type:'ragdoll',phase:'down',t:0,ragdoll:state,source,anger:R()<.28};state.owner=p;p.hitCooldown=1.25;p.pause=0;p.flee=null;p.angry=null;p.ch.root.visible=true;
+ if(!mpApplyingRemoteWorldChange&&typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_ragdoll',String(p.id||''),{x:p.x,z:p.z,heading:p.heading,vx, vz,force,ragdoll:true,anger:!!p.reaction.anger});
+ return true;
 }
 function finishPedestrianRagdoll(state,forced=false){
  if(!state||state.removed)return;const p=state.owner;if(!p){destroyRagdollState(state);return}
@@ -1101,7 +1103,7 @@ let farPedClock=0,crowdLodClock=0;
 const pedBuckets=new Map();
 function rebuildPedBuckets(){pedBuckets.clear();for(const p of allPedestrians()){const k=Math.floor(p.x/12)+','+Math.floor(p.z/12);let a=pedBuckets.get(k);if(!a)pedBuckets.set(k,a=[]);a.push(p)}}
 function nearbyPedestrians(x,z,radius=3){const out=[],cx=Math.floor(x/12),cz=Math.floor(z/12),span=Math.ceil(radius/12)+1;if(!pedBuckets.size)return allPedestrians().filter(p=>(p.x-x)**2+(p.z-z)**2<radius*radius);for(let ix=-span;ix<=span;ix++)for(let iz=-span;iz<=span;iz++){const a=pedBuckets.get((cx+ix)+','+(cz+iz));if(a)for(const p of a)if((p.x-x)**2+(p.z-z)**2<radius*radius)out.push(p)}return out}
-function startPedestrianImpact(p,vx,vz,source='vehicle',strength=1){if(!p||p.hitCooldown>0||p.reaction||p.driverExit)return false;setPedDetail(p,true);p.hitCooldown=1.1;p.flee=null;p.angry=null;p.pause=0;const len=Math.hypot(vx,vz)||1,force=source==='vehicle'?Math.min(9.5,1.9+strength*.34):Math.min(6.2,2.3+strength*.45);if(startPedestrianRagdoll(p,vx,vz,force,source))return true;const impulse=source==='vehicle'?Math.min(8.2,1.15+strength*.22):1.0,kind=source==='vehicle'&&strength<12?'stumble':'fall';p.reaction={type:kind,phase:'down',t:0,vx:vx/len*impulse,vz:vz/len*impulse,anger:R()<(source==='vehicle'?.18:.3)};if(p.ch){p.ch.root.visible=true;p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}return true}
+function startPedestrianImpact(p,vx,vz,source='vehicle',strength=1){if(!p||p.hitCooldown>0||p.reaction||p.driverExit)return false;setPedDetail(p,true);p.hitCooldown=1.1;p.flee=null;p.angry=null;p.pause=0;const len=Math.hypot(vx,vz)||1,force=source==='vehicle'?Math.min(9.5,1.9+strength*.34):Math.min(6.2,2.3+strength*.45);if(startPedestrianRagdoll(p,vx,vz,force,source))return true;const impulse=source==='vehicle'?Math.min(8.2,1.15+strength*.22):1.0,kind=source==='vehicle'&&strength<12?'stumble':'fall';p.reaction={type:kind,phase:'down',t:0,vx:vx/len*impulse,vz:vz/len*impulse,anger:R()<(source==='vehicle'?.18:.3)};if(p.ch){p.ch.root.visible=true;p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}if(!mpApplyingRemoteWorldChange&&typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_hit',String(p.id||''),{x:p.x,z:p.z,heading:p.heading,vx:p.reaction.vx,vz:p.reaction.vz,anger:!!p.reaction.anger});return true}
 function movePedestrian(p,dt,near){
  p.phase+=dt;if(p.hitCooldown>0)p.hitCooldown=Math.max(0,p.hitCooldown-dt);
  if(p.driverExit){const e=p.driverExit;e.t+=dt;const q=Math.min(1,e.t/e.duration),u=q*q*(3-2*q);p.x=e.sx+(e.ex-e.sx)*u;p.z=e.sz+(e.ez-e.sz)*u;p.heading=e.heading;if(q>=1){p.driverExit=null;p.pause=0;if(e.action==='yank'){const ax=e.ex-e.sx,az=e.ez-e.sz,al=Math.hypot(ax,az)||1;p.reaction={type:'fall',back:true,t:0,phase:'down',vx:ax/al*3.25,vz:az/al*3.25,anger:R()<.38}}else if(e.action==='fall')p.reaction={type:'fall',t:0,phase:'down',vx:0,vz:0,anger:false};else if(e.action==='shove')p.reaction={type:'shove',t:0};else p.flee={t:0,duration:3.4}}if(p.ch){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading;p.ch.update(e.t,dt,e.action==='yank'?'yanked':'exit')}return}
@@ -1356,13 +1358,19 @@ function startWanted(level=1){
  wantedLevel=Math.max(wantedLevel,level);policeDispatchClock=worldTime;
  if(!policeUnits.length){for(let i=0;i<Math.min(2,wantedLevel+1);i++){
   const side=i===0?-1:1,x=player.x+Math.sin(player.heading+side*1.1)*34,z=player.z+Math.cos(player.heading+side*1.1)*34;
-  const unit=createTrafficVehicle('police','#182944',player.x<0?-1100:1100,'special',0,0,1,{id:`police_response_${Math.floor(worldTime)}_${i}`,x,z,heading:headingTo(player.x-x,player.z-z),routeCity:player.x<0?-1100:1100});
-  unit.policeChase=true;unit.userDriven=false;unit.axis='special';unit.speed=0;unit.targetSpeed=0;unit.claimed=false;traffic.push(unit);ensureTrafficVisual(unit);addPoliceSiren(unit);policeUnits.push(unit);
+  const unit=createTrafficVehicle('police','#182944',player.x<0?-1100:1100,'special',0,0,1,{id:`police_response_${mpPlayerId||'solo'}_${Math.floor(worldTime*10)}_${i}`,x,z,heading:headingTo(player.x-x,player.z-z),routeCity:player.x<0?-1100:1100});
+  unit.policeChase=true;unit.policeTargetId=mpPlayerId||'';unit.userDriven=false;unit.axis='special';unit.speed=0;unit.targetSpeed=0;unit.claimed=false;traffic.push(unit);ensureTrafficVisual(unit);addPoliceSiren(unit);policeUnits.push(unit);
  }}
+ if(mpConnected&&policeUnits.length){
+  const units=policeUnits.map(u=>({id:String(u.id),type:u.type,color:u.color,x:u.x,y:u.y||0,z:u.z,heading:u.heading||0,speed:u.speed||0,damage:u.damage||0,exploded:!!u.exploded,disabled:!!u.disabled,claimed:!!u.claimed,retired:!!u.retired,parked:!!u.parked,policeChase:true,policeTargetId:mpPlayerId||''}));
+  mpEmitWorldEvent('world_interaction',`police_dispatch_${mpPlayerId||'local'}_${Math.floor(worldTime*10)}`,{action:'police_dispatch',targetId:mpPlayerId||'',level:wantedLevel,units});
+ }
  showToast('ورد بلاغ إلى الشرطة؛ وحدات الدورية تتجه إلى موقعك.',2400);
 }
 function arrestPlayer(){
- if(playerDeath)return;let pos=new T.Vector3(player.x,player.y||0,player.z);
+ if(playerDeath)return;
+ if(mpConnected&&mpPlayerId)mpEmitWorldEvent('world_interaction',`police_arrest_${mpPlayerId}`,{action:'police_arrested',targetId:mpPlayerId});
+ let pos=new T.Vector3(player.x,player.y||0,player.z);
  if(currentVehicle){currentVehicle.root.updateMatrixWorld(true);pos=playerChar.root.getWorldPosition(new T.Vector3());const c=currentVehicle;c.speed=0;c.targetSpeed=0;c.userDriven=false;c.claimed=true;c.axis='parked';c.manual=true;c.retired=true;c.parked=true;currentVehicle=null;}
  attachPlayerToScene(pos.x,pos.y,pos.z,player.heading,true);player.x=pos.x;player.y=pos.y;player.z=pos.z;playerDeath={t:0,duration:2.4,reason:'arrest',spawnX:-2500,spawnZ:-2500};
  for(const u of policeUnits){u.policeChase=false;u.retired=true;u.axis='parked';u.speed=0;u.targetSpeed=0}
@@ -1370,13 +1378,23 @@ function arrestPlayer(){
  showToast('تم توقيفك من الشرطة. ستعود إلى نقطة آمنة بعد المشهد.',2400);
 }
 function updatePoliceUnit(car,dt){
- if(!car.policeChase||car.exploded)return;const dx=player.x-car.x,dz=player.z-car.z,dist=Math.hypot(dx,dz)||.001,target=headingTo(dx,dz);car.heading=angleLerp(car.heading,target,Math.min(1,dt*2.35));
+ if(!car.policeChase||car.exploded)return;
+ // Only the elected world host simulates shared police AI. Other clients render snapshots.
+ if(mpConnected&&!mpIsWorldHost)return;
+ const targetId=String(car.policeTargetId||'');
+ const target=targetId&&targetId!==mpPlayerId?remotePlayers.get(targetId):player;
+ if(!target){car.speed+=(0-car.speed)*Math.min(1,dt*1.8);return}
+ const tx=Number(target.x)||0,tz=Number(target.z)||0,dx=tx-car.x,dz=tz-car.z,dist=Math.hypot(dx,dz)||.001,targetHeading=headingTo(dx,dz);
+ car.heading=angleLerp(car.heading,targetHeading,Math.min(1,dt*2.35));
  const desired=Math.min(18,5.5+dist*.48);car.speed+=(desired-car.speed)*Math.min(1,dt*1.7);
  const nx=car.x+Math.sin(car.heading)*car.speed*dt,nz=car.z+Math.cos(car.heading)*car.speed*dt;
  if(!blockedAt(nx,nz,0,.95)){car.x=nx;car.z=nz}else{car.heading+=Math.PI*.42;car.speed*=.45}
  car.moveYaw=car.heading;if(car.root){car.root.position.set(car.x,0,car.z);car.root.rotation.set(0,car.heading,0);if(car.driver?.update)car.driver.update(worldTime,dt)}
  if(car.sirenParts){const phase=Math.sin(worldTime*13);car.sirenParts.red.material.color.set(phase>0?0xff2038:0x401018);car.sirenParts.blue.material.color.set(phase<0?0x2787ff:0x101d48)}
- if(dist<3.8){car.captureClock=(car.captureClock||0)+dt;if(car.captureClock>1.05)arrestPlayer()}else car.captureClock=0;
+ if(dist<3.8){car.captureClock=(car.captureClock||0)+dt;if(car.captureClock>1.05){
+   if(!targetId||targetId===mpPlayerId){arrestPlayer()}
+   else if(!car.captureSent){car.captureSent=true;mpEmitWorldEvent('world_interaction',`police_capture_${targetId}`,{action:'police_capture',targetId});for(const u of policeUnits){u.policeChase=false;u.retired=true;u.speed=0;u.targetSpeed=0}policeUnits=[];}
+  }}else car.captureClock=0;
 }
 
 function trafficBucketsForFrame(){
@@ -1623,6 +1641,7 @@ function damageVehicle(car,amount=1,impactX=null,impactZ=null){
   if(car.root){car.root.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.material!==glassMat){o.material.color.lerp(new T.Color(0x39383a),.32)}})}
   showToast('تحطمت المركبة وبقي حطامها في موقع الاصطدام.',2400);
  }
+ if(!mpApplyingRemoteWorldChange&&typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('vehicle_state',String(car.id||''),{x:car.x,z:car.z,y:car.y||0,heading:car.heading||0,speed:car.speed||0,damage:car.damage||0,exploded:!!car.exploded,disabled:!!car.disabled,claimed:!!car.claimed,retired:!!car.retired,parked:!!car.parked,impactX:impactX??car.x,impactZ:impactZ??car.z});
 }
 function triggerVehicleCrash(car,impactX,impactZ,impactSpeed=30,reason='حادث'){
  if(!car)return;
@@ -1768,7 +1787,7 @@ function performPush(){
  if(!hit)return; // A deliberate push animation still plays when the player pushes empty air.
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
- if(!startPedestrianRagdoll(p,dx,dz,4.6,'push'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};
+ if(!startPedestrianRagdoll(p,dx,dz,4.6,'push')){p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*3.35,vz:dz/len*3.35,anger:R()<.34};if(typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_hit',String(p.id||''),{x:p.x,z:p.z,heading:p.heading,vx:p.reaction.vx,vz:p.reaction.vz,anger:!!p.reaction.anger});}
  if(p.ch){p.ch.root.visible=true;if(!p.reaction||p.reaction.type!=='ragdoll'){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}}
  if(R()<.18)startWanted(1);
 }
@@ -1795,7 +1814,7 @@ function performPunch(){
  const dx=p.x-player.x,dz=p.z-player.z,len=Math.hypot(dx,dz)||1;player.heading=headingTo(dx,dz);playerAction={type:kind,t:0,duration:kind==='kick'?.66:.46};
  p.heading=headingTo(dx,dz)+Math.PI;p.pause=0;p.flee=null;p.angry=null;setPedDetail(p,true);p.hitCooldown=1.05;
  const heavy=kind==='kick',force=heavy?5.0:2.7;
- if(!startPedestrianRagdoll(p,dx,dz,heavy?6.1:4.0,'punch'))p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};
+ if(!startPedestrianRagdoll(p,dx,dz,heavy?6.1:4.0,'punch')){p.reaction={type:'fall',back:true,t:0,phase:'down',vx:dx/len*force,vz:dz/len*force,anger:R()<.38};if(typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_hit',String(p.id||''),{x:p.x,z:p.z,heading:p.heading,vx:p.reaction.vx,vz:p.reaction.vz,anger:!!p.reaction.anger});}
  if(p.ch&&(!p.reaction||p.reaction.type!=='ragdoll')){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}
  if(R()<.2)startWanted(1);
 }
@@ -1831,7 +1850,7 @@ function vehicleAt(x,z,radius=.62){
 }
 function spawnDriverPedestrian(car,action){
  if(!car.driver)return null;const cfg=car.driver.cfg;if(car.driver.root.parent)car.driver.root.parent.remove(car.driver.root);if(car.driver.character&&car.driver.character.dispose)car.driver.character.dispose();
- car.root.updateMatrixWorld(true);const start=car.root.localToWorld(vehicleSeatLocal(car)),end=car.root.localToWorld(vehicleDoorLocal(car,-1));const walker=createCharacter(cfg);walker.root.position.copy(start);walker.root.scale.setScalar(.84);sc.add(walker.root);const p=registerPedestrian(walker,cfg,start.x,start.z,.84,`driver_${car.id}_${Math.floor(worldTime)}`);p.driverExit={sx:start.x,sz:start.z,ex:end.x,ez:end.z,t:0,duration:1.02,heading:car.root.rotation.y,action};if(transientPeds.length>=MAX_TRANSIENT_PEDS){const old=transientPeds.shift();disposePedDetail(old)}transientPeds.push(p);car.driver=null;return p;
+ car.root.updateMatrixWorld(true);const start=car.root.localToWorld(vehicleSeatLocal(car)),end=car.root.localToWorld(vehicleDoorLocal(car,-1));const walker=createCharacter(cfg);walker.root.position.copy(start);walker.root.scale.setScalar(.84);sc.add(walker.root);const p=registerPedestrian(walker,cfg,start.x,start.z,.84,`driver_${car.id}_${Math.floor(worldTime)}`);p.driverExit={sx:start.x,sz:start.z,ex:end.x,ez:end.z,t:0,duration:1.02,heading:car.root.rotation.y,action};if(transientPeds.length>=MAX_TRANSIENT_PEDS){const old=transientPeds.shift();if(typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_state',String(old.id||''),{action:'despawn'});disposePedDetail(old)}transientPeds.push(p);car.driver=null;if(!mpApplyingRemoteWorldChange&&typeof mpEmitWorldEvent==='function')mpEmitWorldEvent('pedestrian_state',String(p.id||''),{action:'spawn',id:String(p.id),gender:cfg.g==='f'?'f':'m',cfg:p.cfg,x:p.x,z:p.z,heading:p.heading,scale:p.scale,idx:p.idx,phase:p.phase,speed:p.speed,pause:p.pause,gesture:p.gesture,driverExit:p.driverExit});return p;
 }
 function enterVehicle(car){
  if(currentVehicle||vehicleTransition||!car)return;if(car._mpNetworkDriven){showToast('هذه المركبة يقودها لاعب آخر حالياً.',1900);return}ensureTrafficVisual(car);car.speed=0;car.targetSpeed=0;car.entering=true;car.doorTarget=1;car.doorTimer=1.5;
@@ -1892,6 +1911,9 @@ let localPlayerAnimation='idle';
 const remotePlayers=new Map();
 let mpSocket=null,mpConnected=false,mpPlayerId=null,mpSendClock=0,mpWorldClock=0,mpReconnectTimer=null,mpManualClose=false;
 let mpPlayerName='Player',mpImmersiveVerified=false,mpIsWorldHost=false,mpJoinResolve=null,mpJoinReject=null,mpWorldTargets=null,mpHeartbeatTimer=null;
+let mpApplyingRemoteWorldChange=false,mpWorldRevision=0;const mpSeenWorldEvents=new Set();
+const MP_PED_STRIDE=15,MP_CAR_STRIDE=13,MP_WORLD_MAP_VERSION='the-z-city-map-v3';
+const MP_WORLD_EVENT_KINDS=new Set(['vehicle_state','vehicle_damage','vehicle_explosion','vehicle_removed','pedestrian_state','pedestrian_hit','pedestrian_ragdoll','world_effect','map_object_state','world_interaction']);
 const MP_WORLD_ROOM='the-z-online';
 const MP_ALLOWED_ANIMS=new Set(['idle','walk','run','wave','dance','sit','jump','jumpTuck','jumpLong','jumpSide','land','swim','treadWater','drive','rideBike','rideChopper','rideBicycle','fall','fallBack','getupBack','hit','stumble','push','punch','punchL','kick','enter','exit']);
 function mpSetStatus(message){const a=$('mpStatus'),b=$('mpLobbyStatus');if(a)a.textContent=message;if(b)b.textContent=message}
@@ -1913,7 +1935,7 @@ function mpSetRemoteVehicle(r,data){
  const type=String(data.vehicleType||'sedan'),vehicleId=String(data.vehicleId||'');if(!Object.prototype.hasOwnProperty.call(typeIndex,type)){mpRemoveRemoteVehicle(r);return}
  if(r.vehicle&&r.vehicleType===type&&r.vehicleId===vehicleId)return;
  mpRemoveRemoteVehicle(r);if(r.character.root.parent)r.character.root.parent.remove(r.character.root);if(r.label.parent)r.label.parent.remove(r.label);
- const color=/^#[0-9a-fA-F]{6}$/.test(data.vehicleColor||'')?data.vehicleColor:'#3c8fc4';const car=createTrafficVehicle(type,color,Math.abs(data.x)>700?1100:-1100,'special',0,0,1,{id:'mp_'+r.id,x:r.x,z:r.z,y:r.y,heading:r.heading,claimed:true});car.claimed=true;buildTrafficVisual(car);r.vehicle=car;r.vehicleType=type;r.vehicleColor=color;r.vehicleId=vehicleId;r.vehicleSpeed=Number(data.vehicleSpeed)||0;car.speed=r.vehicleSpeed;car.root.add(r.character.root,r.label);r.character.root.position.copy(vehicleSeatLocal(car));r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(vehicleCharacterScale(car));r.label.position.set(0,2.4,0);
+ const color=/^#[0-9a-fA-F]{6}$/.test(data.vehicleColor||'')?data.vehicleColor:'#3c8fc4';const car=createTrafficVehicle(type,color,Math.abs(data.x)>700?1100:-1100,'special',0,0,1,{id:'mp_'+r.id,x:r.x,z:r.z,y:r.y,heading:r.heading,claimed:true});car.claimed=true;car.networkVehicleId=vehicleId;buildTrafficVisual(car);r.vehicle=car;r.vehicleType=type;r.vehicleColor=color;r.vehicleId=vehicleId;r.vehicleSpeed=Number(data.vehicleSpeed)||0;car.speed=r.vehicleSpeed;car.root.add(r.character.root,r.label);r.character.root.position.copy(vehicleSeatLocal(car));r.character.root.rotation.set(0,0,0);r.character.root.scale.setScalar(vehicleCharacterScale(car));r.label.position.set(0,2.4,0);
 }
 const MP_RAGDOLL_KEYS=['pelvis','torso','head','upperArmL','lowerArmL','upperArmR','lowerArmR','upperLegL','lowerLegL','upperLegR','lowerLegR'];
 function mpCollectRagdollPose(){
@@ -1952,15 +1974,150 @@ function mpUpsertRemote(data){
  mpRefreshRemoteVehicleClaims();
 }
 function mpRemoveRemote(id){const r=remotePlayers.get(String(id));if(!r)return;if(r.ragdollState){destroyRagdollState(r.ragdollState);r.ragdollState=null}mpRemoveRemoteVehicle(r);if(r.group.parent)r.group.parent.remove(r.group);r.character.dispose();if(r.label.material.map)r.label.material.map.dispose();r.label.material.dispose();remotePlayers.delete(String(id));mpRefreshRemoteVehicleClaims()}
+function mpEmitWorldEvent(kind,objectId,data={}){
+ if(mpApplyingRemoteWorldChange||!MP_WORLD_EVENT_KINDS.has(kind)||!mpConnected||!mpSocket||mpSocket.readyState!==WebSocket.OPEN)return;
+ const packet={type:'world_event',kind,objectId:String(objectId||'').slice(0,96),data};
+ try{mpSocket.send(JSON.stringify(packet))}catch(e){console.warn('World event send failed',e)}
+}
+function mpFindPedByNetworkId(id){
+ const key=String(id||'');return pedestrians.find(p=>String(p.id)===key)||transientPeds.find(p=>String(p.id)===key)||null;
+}
+function mpCreateOrUpdateTransientPed(data){
+ if(!data||typeof data!=='object'||!data.id)return null;const id=String(data.id).slice(0,96);let p=transientPeds.find(q=>String(q.id)===id);
+ if(!p){const cfg=data.cfg&&typeof data.cfg==='object'?{...data.cfg}:randomCharacterCfg();cfg.g=data.gender==='f'?'f':'m';p=registerPedestrian(null,cfg,Number(data.x)||0,Number(data.z)||0,Number(data.scale)||.84,id);transientPeds.push(p)}
+ p.x=Number.isFinite(Number(data.x))?Number(data.x):p.x;p.z=Number.isFinite(Number(data.z))?Number(data.z):p.z;p.heading=Number.isFinite(Number(data.heading))?Number(data.heading):p.heading;p.scale=Number(data.scale)||p.scale||.84;
+ if(data.cfg&&typeof data.cfg==='object')p.cfg={...p.cfg,...data.cfg,g:data.gender==='f'?'f':'m'};p.idx=Math.max(0,Math.floor(Number(data.idx)||0))%Math.max(1,p.path.length);p.phase=Number(data.phase)||p.phase;p.speed=Number(data.speed)||p.speed;p.pause=Math.max(0,Number(data.pause)||0);p.gesture=String(data.gesture||p.gesture||'walk');p.hitCooldown=Math.max(0,Number(data.hitCooldown)||0);
+ p.driverExit=data.driverExit&&typeof data.driverExit==='object'?{...data.driverExit}:null;
+ const reaction=data.reaction&&typeof data.reaction==='object'?data.reaction:null;
+ const codes={ragdoll:1,fall:2,shove:3,hitFace:4,stumble:5},vals=new Float32Array(MP_PED_STRIDE);
+ vals[7]=reaction?(codes[reaction.type]||0):0;vals[8]=reaction?.phase==='getup'?1:0;vals[9]=Number(reaction?.t)||0;vals[10]=Number(reaction?.vx)||0;vals[11]=Number(reaction?.vz)||0;vals[12]=reaction?.anger?1:0;
+ vals[13]=data.flee?Math.max(0,(Number(data.flee.duration)||0)-(Number(data.flee.t)||0)):0;vals[14]=data.angry?Math.max(0,(Number(data.angry.duration)||0)-(Number(data.angry.t)||0)):0;
+ mpApplyingRemoteWorldChange=true;mpApplyPedNetworkState(p,vals,Array.isArray(data.ragdollPose)?data.ragdollPose:null);mpApplyingRemoteWorldChange=false;
+ if(p.ch?.root&&!p.reaction?.ragdoll){p.ch.root.position.set(p.x,0,p.z);p.ch.root.rotation.y=p.heading}
+ return p;
+}
+function mpRemoveTransientPedById(id){const i=transientPeds.findIndex(p=>String(p.id)===String(id));if(i<0)return;const p=transientPeds[i];if(p.reaction?.ragdoll&&!p.reaction.ragdoll.removed)destroyRagdollState(p.reaction.ragdoll);disposePedDetail(p);transientPeds.splice(i,1)}
+function mpApplyTransientPedSnapshot(rows){
+ if(!Array.isArray(rows))return;const seen=new Set();
+ for(const data of rows){const p=mpCreateOrUpdateTransientPed(data);if(p)seen.add(String(p.id))}
+ for(let i=transientPeds.length-1;i>=0;i--)if(!seen.has(String(transientPeds[i].id)))mpRemoveTransientPedById(transientPeds[i].id);
+}
+function mpClearPedNetworkRagdoll(p,keepGetup=false){
+ if(!p)return;const state=p.reaction?.ragdoll;
+ if(state&&!state.removed){const pos=ragdollRootPosition(state);p.x=pos.x;p.z=pos.z;destroyRagdollState(state)}
+ if(p.ch?.root?.parent)p.ch.root.parent.remove(p.ch.root);if(p.ch?.dispose)p.ch.dispose();
+ p.ch=createCharacter(p.cfg||randomCharacterCfg());p.ch.root.scale.setScalar(p.scale||1);p.ch.root.position.set(p.x,Math.max(0,groundAt(p.x,p.z)),p.z);p.ch.root.rotation.set(0,p.heading||0,0);p.ch.root.visible=true;sc.add(p.ch.root);
+ if(keepGetup)p.reaction={type:'ragdoll',phase:'getup',t:0,ragdoll:null,anger:false};else if(p.reaction?.type==='ragdoll')p.reaction=null;
+}
+function mpEnsurePedNetworkRagdoll(p){
+ if(!p)return null;if(p.reaction?.type==='ragdoll'&&p.reaction.ragdoll)return p.reaction.ragdoll;
+ if(!ragdollPhysicsReady||!ragdollWorld){p.reaction={type:'fall',back:true,t:0,phase:'down',vx:0,vz:0,anger:false};return null}
+ if(p.reaction&&p.reaction.type!=='ragdoll')p.reaction=null;
+ setPedDetail(p,true);if(!p.ch)return null;
+ p.ch.root.position.set(p.x,p.beachRole==='swim'?-2.08:0,p.z);p.ch.root.rotation.set(0,p.heading||0,0);p.ch.root.scale.setScalar(p.scale||1);p.ch.root.updateMatrixWorld(true);
+ const state=createCharacterRagdoll(p.ch,{ownerType:'pedestrian',owner:p,maxLife:999,velocity:{x:0,y:0,z:0},impulse:{x:0,y:0,z:0},spin:{x:0,z:0}});
+ if(!state)return null;state.owner=p;p.reaction={type:'ragdoll',phase:'down',t:0,ragdoll:state,source:'network',anger:false};p.ch.root.visible=true;return state;
+}
+function mpApplyPedNetworkPose(p,pose){
+ if(!p||!Array.isArray(pose)||pose.length!==77)return;const state=mpEnsurePedNetworkRagdoll(p);if(!state)return;
+ for(let i=0;i<MP_RAGDOLL_KEYS.length;i++){const body=state.bodies[MP_RAGDOLL_KEYS[i]],o=i*7;if(!body)continue;body.setTranslation({x:Number(pose[o])||0,y:Number(pose[o+1])||0,z:Number(pose[o+2])||0},true);body.setRotation({x:Number(pose[o+3])||0,y:Number(pose[o+4])||0,z:Number(pose[o+5])||0,w:Number(pose[o+6])||1},true);body.setLinvel({x:0,y:0,z:0},true);body.setAngvel({x:0,y:0,z:0},true)}
+ syncRagdollVisual(state);
+}
+function mpApplyPedNetworkState(p,values,pose){
+ if(!p||!values)return;const code=Math.round(values[7]||0),phase=Math.round(values[8]||0),t=Math.max(0,values[9]||0),vx=values[10]||0,vz=values[11]||0,anger=values[12]>.5;
+ if(code===1){
+  if(phase===1){if(p.reaction?.type==='ragdoll'&&p.reaction.ragdoll)mpClearPedNetworkRagdoll(p,true);p.reaction={type:'ragdoll',phase:'getup',t,ragdoll:null,anger}}
+  else{const state=mpEnsurePedNetworkRagdoll(p);p.reaction={type:'ragdoll',phase:'down',t,ragdoll:state,source:'network',anger};if(pose)mpApplyPedNetworkPose(p,pose)}
+ }else if(code>1){
+  if(p.reaction?.type==='ragdoll')mpClearPedNetworkRagdoll(p,false);
+  const names={2:'fall',3:'shove',4:'hitFace',5:'stumble'};p.reaction={type:names[code]||'fall',phase:phase===1?'getup':'down',t,vx,vz,back:true,anger};
+ }else{
+  if(p.reaction?.type==='ragdoll')mpClearPedNetworkRagdoll(p,false);
+  p.reaction=null;
+ }
+ const fleeLeft=Math.max(0,values[13]||0),angryLeft=Math.max(0,values[14]||0);
+ p.flee=fleeLeft>0?{t:0,duration:fleeLeft}:null;p.angry=angryLeft>0?{t:0,duration:angryLeft}:null;
+}
+function mpApplyVehicleNetworkState(objectId,data={}){
+ const key=String(objectId||''),matches=[];
+ for(const c of traffic)if(String(c.id)===key)matches.push(c);
+ if(currentVehicle&&(String(currentVehicle.id)===key||String(currentVehicle.networkVehicleId||'')===key)&&!matches.includes(currentVehicle))matches.push(currentVehicle);
+ for(const r of remotePlayers.values())if(r.vehicle&&String(r.vehicleId)===key&&!matches.includes(r.vehicle))matches.push(r.vehicle);
+ for(const c of matches){
+  mpApplyingRemoteWorldChange=true;
+  const targetDamage=Math.max(0,Math.min(7,Number(data.damage)||0));
+  if(targetDamage>c.damage+.005&&!c.exploded){
+   let delta=targetDamage-c.damage;if(data.exploded&&!c.exploded)delta=Math.max(delta,4.71-c.damage);
+   damageVehicle(c,Math.max(.01,delta),Number.isFinite(Number(data.impactX))?Number(data.impactX):c.x,Number.isFinite(Number(data.impactZ))?Number(data.impactZ):c.z);
+  }else if(data.exploded&&!c.exploded){damageVehicle(c,Math.max(.02,4.71-c.damage),c.x,c.z)}
+  c.damage=Math.max(c.damage,targetDamage);
+  if(data.exploded){c.exploded=true;c.disabled=true;c.speed=0;c.targetSpeed=0}
+  if(typeof data.disabled==='boolean')c.disabled=data.disabled;
+  if(typeof data.claimed==='boolean')c.claimed=data.claimed;
+  if(typeof data.retired==='boolean')c.retired=data.retired;
+  if(typeof data.parked==='boolean')c.parked=data.parked;
+  if(Number.isFinite(Number(data.x))&&Number.isFinite(Number(data.z))&&c!==currentVehicle&&!c.userDriven){c.x=Number(data.x);c.z=Number(data.z);if(Number.isFinite(Number(data.y)))c.y=Number(data.y);if(Number.isFinite(Number(data.heading)))c.heading=Number(data.heading);if(Number.isFinite(Number(data.speed)))c.speed=Number(data.speed);if(c.root){c.root.position.set(c.x,c.y,c.z);c.root.rotation.set(c.pitch||0,c.heading||0,c.roll||0)}}
+  mpApplyingRemoteWorldChange=false;
+ }
+}
+function mpApplyWorldEntity(entity){if(!entity||typeof entity!=='object')return;if(['vehicle_state','vehicle_damage','vehicle_explosion','vehicle_removed'].includes(entity.kind))mpApplyVehicleNetworkState(entity.objectId,entity.data||{});}
+function mpSpawnPoliceResponse(data={}){
+ const targetId=String(data.targetId||'');wantedLevel=Math.max(wantedLevel,Math.max(1,Number(data.level)||1));
+ for(const row of (Array.isArray(data.units)?data.units:[])){
+  if(!row||!row.id)continue;const id=String(row.id),type=Object.prototype.hasOwnProperty.call(typeIndex,String(row.type))?String(row.type):'police';
+  let car=traffic.find(v=>String(v.id)===id);
+  if(!car){car=createTrafficVehicle(type,/^#[0-9a-fA-F]{6}$/.test(row.color||'')?row.color:'#182944',Math.abs(Number(row.x)||0)>700?1100:-1100,'special',0,0,1,{id,x:Number(row.x)||0,y:Number(row.y)||0,z:Number(row.z)||0,heading:Number(row.heading)||0,routeCity:Math.abs(Number(row.x)||0)>700?1100:-1100});traffic.push(car)}
+  car.policeChase=true;car.policeTargetId=targetId;car.axis='special';car.userDriven=false;car.claimed=false;car.retired=false;car.parked=false;car.x=Number(row.x)||car.x;car.y=Number(row.y)||0;car.z=Number(row.z)||car.z;car.heading=Number(row.heading)||car.heading;car.speed=Number(row.speed)||0;car.moveYaw=car.heading;
+  if(row.damage!=null)car.damage=Math.max(car.damage,Number(row.damage)||0);if(row.exploded){car.exploded=true;car.disabled=true;car.speed=0}
+  ensureTrafficVisual(car);addPoliceSiren(car);if(!policeUnits.includes(car))policeUnits.push(car);
+ }
+}
+function mpApplyDynamicCarSnapshot(rows){
+ if(!Array.isArray(rows))return;const seen=new Set();
+ for(const row of rows){
+  if(!row||!row.id)continue;const id=String(row.id);seen.add(id);
+  let car=traffic.find(v=>String(v.id)===id);
+  if(!car){const type=Object.prototype.hasOwnProperty.call(typeIndex,String(row.type))?String(row.type):'sedan';car=createTrafficVehicle(type,/^#[0-9a-fA-F]{6}$/.test(row.color||'')?row.color:'#667788',Math.abs(Number(row.x)||0)>700?1100:-1100,'special',0,0,1,{id,x:Number(row.x)||0,y:Number(row.y)||0,z:Number(row.z)||0,heading:Number(row.heading)||0});traffic.push(car)}
+  const wasChasing=!!car.policeChase;
+  const remoteDamage=Math.max(0,Number(row.damage)||0);if((remoteDamage>car.damage+.01||row.exploded&&!car.exploded)&&!mpApplyingRemoteWorldChange)mpApplyVehicleNetworkState(id,{damage:remoteDamage,exploded:!!row.exploded,disabled:!!row.disabled,x:Number(row.x)||0,y:Number(row.y)||0,z:Number(row.z)||0,heading:Number(row.heading)||0,speed:Number(row.speed)||0});
+  car.policeChase=!!row.policeChase;car.policeTargetId=String(row.policeTargetId||'');
+  if(car.policeChase&&!policeUnits.includes(car))policeUnits.push(car);if(!car.policeChase&&wasChasing){const index=policeUnits.indexOf(car);if(index>=0)policeUnits.splice(index,1)}
+  car.axis='special';car.userDriven=false;car.claimed=!!row.claimed;car.retired=!!row.retired;car.parked=!!row.parked;car.disabled=!!row.disabled;car.exploded=!!row.exploded;
+  const targetX=Number(row.x)||0,targetY=Number(row.y)||0,targetZ=Number(row.z)||0;car.x+=(targetX-car.x)*.62;car.y+=(targetY-car.y)*.62;car.z+=(targetZ-car.z)*.62;car.heading=angleLerp(car.heading,Number(row.heading)||0,.62);car.speed+=((Number(row.speed)||0)-car.speed)*.62;car.damage=Math.max(car.damage,Number(row.damage)||0);
+  if(!car.root&&Math.hypot(car.x-player.x,car.z-player.z)<430)ensureTrafficVisual(car);
+  if(car.root){car.root.visible=true;car.root.position.set(car.x,car.y,car.z);car.root.rotation.set(car.pitch||0,car.heading,car.roll||0)}
+  if(car.policeChase){ensureTrafficVisual(car);addPoliceSiren(car)}
+ }
+}
+function mpApplyWorldEvent(event){
+ if(!event||typeof event!=='object')return;const eventId=String(event.eventId||'');if(eventId&&mpSeenWorldEvents.has(eventId))return;if(eventId){mpSeenWorldEvents.add(eventId);if(mpSeenWorldEvents.size>600)mpSeenWorldEvents.delete(mpSeenWorldEvents.values().next().value)}
+ const kind=String(event.kind||''),data=event.data&&typeof event.data==='object'?event.data:{};
+ if(kind==='world_interaction'){if(data.action==='police_dispatch'){mpSpawnPoliceResponse(data);return}if(data.action==='police_capture'&&String(data.targetId||'')===String(mpPlayerId||'')){arrestPlayer();return}if(data.action==='police_arrested'){for(const u of policeUnits){u.policeChase=false;u.retired=true;u.speed=0;u.targetSpeed=0}policeUnits=[];wantedLevel=0;return}}
+ if(['vehicle_state','vehicle_damage','vehicle_explosion','vehicle_removed'].includes(kind)){mpApplyVehicleNetworkState(event.objectId,data);return}
+ if(kind==='pedestrian_state'&&data.action==='spawn'){mpApplyingRemoteWorldChange=true;mpCreateOrUpdateTransientPed(data);mpApplyingRemoteWorldChange=false;return}
+ if(kind==='pedestrian_state'&&data.action==='despawn'){mpRemoveTransientPedById(event.objectId);return}
+ if(['pedestrian_hit','pedestrian_ragdoll','pedestrian_state'].includes(kind)){
+  const p=mpFindPedByNetworkId(event.objectId);if(!p)return;
+  mpApplyingRemoteWorldChange=true;
+  if(Number.isFinite(Number(data.x)))p.x=Number(data.x);if(Number.isFinite(Number(data.z)))p.z=Number(data.z);if(Number.isFinite(Number(data.heading)))p.heading=Number(data.heading);
+  if(kind==='pedestrian_ragdoll'||data.ragdoll){const started=startPedestrianRagdoll(p,Number(data.vx)||0,Number(data.vz)||0,Number(data.force)||4.2,'network');if(!started&&p.reaction?.type!=='ragdoll')p.reaction={type:'fall',back:true,t:0,phase:'down',vx:Number(data.vx)||0,vz:Number(data.vz)||0,anger:!!data.anger}}
+  else if(kind==='pedestrian_hit')p.reaction={type:'fall',back:true,t:0,phase:'down',vx:Number(data.vx)||0,vz:Number(data.vz)||0,anger:!!data.anger};
+  mpApplyingRemoteWorldChange=false;return;
+ }
+}
 function mpHandleMessage(msg){
  if(!msg||typeof msg!=='object')return;
  if(msg.type==='immersive_verified'){mpImmersiveVerified=true;return}
  if(msg.type==='pong')return;
  if(msg.type==='immersive_rejected'||msg.type==='join_rejected'||msg.type==='server_full'){if(mpJoinReject){mpJoinReject(new Error(msg.message||'Server rejected connection'));mpJoinReject=null;mpJoinResolve=null}return}
  if(msg.type==='welcome'){
-  mpPlayerId=msg.id;mpConnected=true;mpIsWorldHost=!!msg.is_world_host;if(msg.spawn){player.x=Number(msg.spawn.x)||-1100;player.y=Number(msg.spawn.y)||0;player.z=Number(msg.spawn.z)||12;playerChar.root.position.set(player.x,player.y,player.z)}
+  mpPlayerId=msg.id;mpConnected=true;mpIsWorldHost=!!msg.is_world_host;mpWorldRevision=Number(msg.world_revision)||0;
+  if(msg.world_meta&&msg.world_meta.map_version&&msg.world_meta.map_version!==MP_WORLD_MAP_VERSION)console.warn('THE Z ONLINE map version differs from the server world map.');
+  if(msg.spawn){player.x=Number(msg.spawn.x)||-1100;player.y=Number(msg.spawn.y)||0;player.z=Number(msg.spawn.z)||12;playerChar.root.position.set(player.x,player.y,player.z)}
   for(const p of (msg.players||[]))mpUpsertRemote(p);
   if(msg.world_state){mpSetWorldSnapshot(msg.world_state);mpApplyWorldState(1,true)}
+  for(const entity of (msg.world_entities||[]))mpApplyWorldEntity(entity);
+  for(const event of (msg.world_events||[])){if(Date.now()-Number(event.at||0)<12000)mpApplyWorldEvent(event)}
   if(mpJoinResolve){mpJoinResolve(true);mpJoinResolve=null;mpJoinReject=null}
   return;
  }
@@ -1968,10 +2125,12 @@ function mpHandleMessage(msg){
  if(msg.type==='player_update'){mpUpsertRemote(msg.player);return}
  if(msg.type==='player_leave'){mpRemoveRemote(msg.id);return}
  if(msg.type==='world_host'){mpIsWorldHost=msg.id===mpPlayerId;return}
- if(msg.type==='world_state'){mpSetWorldSnapshot(msg.state);return}
+ if(msg.type==='world_state'){mpSetWorldSnapshot(msg.state);mpWorldRevision=Math.max(mpWorldRevision,Number(msg.state?.revision)||0);return}
+ if(msg.type==='world_event'){mpApplyWorldEvent(msg);return}
+ if(msg.type==='server_status'){const e=$('mpStatus');if(e)e.textContent='متصلون بالعالم: '+(Number(msg.players_online)||0);return}
  if(msg.type==='vehicle_claim_denied'){if(currentVehicle&&String(currentVehicle.id||'')===String(msg.vehicleId||'')){showToast('هذه المركبة حجزها لاعب آخر؛ اختر مركبة مختلفة.',2400);exitVehicle()}return}
 }
-function mpClearRemote(){for(const id of [...remotePlayers.keys()])mpRemoveRemote(id)}
+function mpClearRemote(){for(const id of [...remotePlayers.keys()])mpRemoveRemote(id);mpWorldTargets=null;mpSeenWorldEvents.clear()}
 function mpWebSocketUrl(){const scheme=location.protocol==='https:'?'wss':'ws';return `${scheme}://${location.host}/ws?fullscreen=1&landscape=1`}
 function mpPrepareConnection(){
  if(location.protocol==='file:')return Promise.reject(new Error('Open the game through the Python server, not as a local HTML file.'));
@@ -2000,7 +2159,7 @@ function mpSendState(){
  const v=currentVehicle;let ragdollRotation={x:0,y:0,z:0};
  if(player.ragdoll?.bodies?.pelvis){try{const q=player.ragdoll.bodies.pelvis.rotation(),e=new T.Euler().setFromQuaternion(new T.Quaternion(q.x,q.y,q.z,q.w),'YXZ');ragdollRotation={x:e.x,y:e.y,z:e.z}}catch(e){}}
  const anim=player.ragdoll?'fallBack':playerDeath?'fallBack':MP_ALLOWED_ANIMS.has(localPlayerAnimation)?localPlayerAnimation:'idle';
- const packet={type:'state',x:Number(player.x)||0,y:Number(player.y)||0,z:Number(player.z)||0,heading:Number(player.heading)||0,anim,inVehicle:!!v,vehicleId:v?String(v.id||''):'',vehicleType:v?.type||'',vehicleColor:v?.color||'',vehicleSpeed:v?(Number(v.speed)||0):0,gender:playerCfg.g,ragdoll:!!player.ragdoll,ragdollRotation,ragdollPose:mpCollectRagdollPose()};
+ const packet={type:'state',name:mpPlayerName,gender:playerCfg.g,character:mpMakeCharacterData(),x:Number(player.x)||0,y:Number(player.y)||0,z:Number(player.z)||0,heading:Number(player.heading)||0,anim,inVehicle:!!v,vehicleId:v?String(v.id||''):'',vehicleType:v?.type||'',vehicleColor:v?.color||'',vehicleSpeed:v?(Number(v.speed)||0):0,ragdoll:!!player.ragdoll,ragdollRotation,ragdollPose:mpCollectRagdollPose()};
  try{mpSocket.send(JSON.stringify(packet))}catch(e){console.warn('Multiplayer send failed',e)}
 }
 function mpEncodeFloats(floatArray){
@@ -2013,21 +2172,64 @@ function mpDecodeFloats(encoded){
 }
 function mpSendWorldState(dt){
  if(!mpConnected||!mpIsWorldHost||!mpSocket||mpSocket.readyState!==WebSocket.OPEN)return;
- mpWorldClock+=dt;if(mpWorldClock<.65)return;mpWorldClock=0;
- const pedData=new Float32Array(pedestrians.length*7);
- for(let i=0;i<pedestrians.length;i++){const p=pedestrians[i],o=i*7;pedData[o]=p.x;pedData[o+1]=p.z;pedData[o+2]=p.heading;pedData[o+3]=p.idx||0;pedData[o+4]=p.phase||0;pedData[o+5]=p.pause||0;pedData[o+6]=p.speed||0}
- const carData=new Float32Array(MP_BASE_TRAFFIC_COUNT*9);
- for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){const c=traffic[i],o=i*9;carData[o]=c.x;carData[o+1]=c.z;carData[o+2]=c.y||0;carData[o+3]=c.heading||0;carData[o+4]=c.speed||0;carData[o+5]=c.damage||0;carData[o+6]=c.userDriven?1:0;carData[o+7]=c.claimed?1:0;carData[o+8]=c.retired?1:0}
- try{mpSocket.send(JSON.stringify({type:'world_state',state:{peds:mpEncodeFloats(pedData),cars:mpEncodeFloats(carData),pedCount:pedestrians.length,carCount:MP_BASE_TRAFFIC_COUNT,at:Date.now()}}))}catch(e){console.warn('World snapshot send failed',e)}
+ mpWorldClock+=dt;if(mpWorldClock<.60)return;mpWorldClock=0;
+ const pedData=new Float32Array(pedestrians.length*MP_PED_STRIDE),pedMeta=[];
+ const reactionCodes={ragdoll:1,fall:2,shove:3,hitFace:4,stumble:5};
+ for(let i=0;i<pedestrians.length;i++){
+  const p=pedestrians[i],o=i*MP_PED_STRIDE,r=p.reaction||{},code=reactionCodes[r.type]||0;
+  pedData[o]=p.x;pedData[o+1]=p.z;pedData[o+2]=p.heading;pedData[o+3]=p.idx||0;pedData[o+4]=p.phase||0;pedData[o+5]=p.pause||0;pedData[o+6]=p.speed||0;
+  pedData[o+7]=code;pedData[o+8]=r.phase==='getup'?1:0;pedData[o+9]=r.t||0;pedData[o+10]=r.vx||0;pedData[o+11]=r.vz||0;pedData[o+12]=r.anger?1:0;
+  pedData[o+13]=p.flee?Math.max(0,(p.flee.duration||0)-(p.flee.t||0)):0;pedData[o+14]=p.angry?Math.max(0,(p.angry.duration||0)-(p.angry.t||0)):0;
+  if(r.type==='ragdoll'&&r.ragdoll?.bodies){const pose=[];let valid=true;for(const key of MP_RAGDOLL_KEYS){const b=r.ragdoll.bodies[key];if(!b){valid=false;break}const t=b.translation(),q=b.rotation();pose.push(t.x,t.y,t.z,q.x,q.y,q.z,q.w)}if(valid)pedMeta.push({i,pose})}
+ }
+ const transientData=transientPeds.slice(-180).map(p=>{
+  const row={id:String(p.id),gender:p.cfg?.g==='f'?'f':'m',cfg:p.cfg,x:p.x,z:p.z,heading:p.heading,scale:p.scale,idx:p.idx,phase:p.phase,speed:p.speed,pause:p.pause,gesture:p.gesture,hitCooldown:p.hitCooldown,
+   driverExit:p.driverExit?{sx:p.driverExit.sx,sz:p.driverExit.sz,ex:p.driverExit.ex,ez:p.driverExit.ez,t:p.driverExit.t,duration:p.driverExit.duration,heading:p.driverExit.heading,action:p.driverExit.action}:null,
+   reaction:p.reaction?{type:p.reaction.type,phase:p.reaction.phase,t:p.reaction.t,vx:p.reaction.vx,vz:p.reaction.vz,back:p.reaction.back,anger:p.reaction.anger}:null,
+   flee:p.flee?{t:p.flee.t,duration:p.flee.duration}:null,angry:p.angry?{t:p.angry.t,duration:p.angry.duration}:null};
+  if(p.reaction?.type==='ragdoll'&&p.reaction.ragdoll?.bodies){const pose=[];let valid=true;for(const key of MP_RAGDOLL_KEYS){const b=p.reaction.ragdoll.bodies[key];if(!b){valid=false;break}const t=b.translation(),q=b.rotation();pose.push(t.x,t.y,t.z,q.x,q.y,q.z,q.w)}if(valid)row.ragdollPose=pose}
+  return row;
+ });
+ const carData=new Float32Array(MP_BASE_TRAFFIC_COUNT*MP_CAR_STRIDE);
+ for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){
+  const c=traffic[i],o=i*MP_CAR_STRIDE;carData[o]=c.x;carData[o+1]=c.z;carData[o+2]=c.y||0;carData[o+3]=c.heading||0;carData[o+4]=c.speed||0;
+  carData[o+5]=c.damage||0;carData[o+6]=c.userDriven?1:0;carData[o+7]=c.claimed?1:0;carData[o+8]=c.retired?1:0;carData[o+9]=c.exploded?1:0;carData[o+10]=c.disabled?1:0;carData[o+11]=c.parked?1:0;carData[o+12]=Math.min(24,c.smoke?.length||0);
+ }
+ const dynamicCars=traffic.slice(MP_BASE_TRAFFIC_COUNT).filter(c=>!c._mpRemoteReplica).slice(0,300).map(c=>({id:String(c.id),type:c.type,color:c.color||'#667788',x:c.x,y:c.y||0,z:c.z,heading:c.heading||0,speed:c.speed||0,damage:c.damage||0,exploded:!!c.exploded,disabled:!!c.disabled,claimed:!!c.claimed,retired:!!c.retired,parked:!!c.parked,policeChase:!!c.policeChase,policeTargetId:String(c.policeTargetId||'')}));
+ try{mpSocket.send(JSON.stringify({type:'world_state',state:{version:3,peds:mpEncodeFloats(pedData),cars:mpEncodeFloats(carData),pedCount:pedestrians.length,carCount:MP_BASE_TRAFFIC_COUNT,pedStride:MP_PED_STRIDE,carStride:MP_CAR_STRIDE,pedMeta,transientPeds:transientData,dynamicCars,worldTime,at:Date.now()}}))}catch(e){console.warn('World snapshot send failed',e)}
 }
 function mpSetWorldSnapshot(state){
  if(!state||typeof state!=='object')return;
- try{const peds=mpDecodeFloats(state.peds),cars=mpDecodeFloats(state.cars);if(peds.length!==Number(state.pedCount)*7||cars.length!==Number(state.carCount)*9)return;mpWorldTargets={peds,cars,pedCount:Number(state.pedCount),carCount:Number(state.carCount)}}catch(e){console.warn('Invalid shared world snapshot',e)}
+ try{
+  const peds=mpDecodeFloats(state.peds),cars=mpDecodeFloats(state.cars),pedCount=Number(state.pedCount),carCount=Number(state.carCount),pedStride=Number(state.pedStride)||7,carStride=Number(state.carStride)||9;
+  if(!Number.isInteger(pedCount)||!Number.isInteger(carCount)||peds.length!==pedCount*pedStride||cars.length!==carCount*carStride)return;
+  if(![7,15].includes(pedStride)||![9,13].includes(carStride))return;
+  mpWorldTargets={peds,cars,pedCount,carCount,pedStride,carStride,pedMeta:Array.isArray(state.pedMeta)?state.pedMeta:[],transientPeds:Array.isArray(state.transientPeds)?state.transientPeds:[],dynamicCars:Array.isArray(state.dynamicCars)?state.dynamicCars:[],worldTime:Number.isFinite(Number(state.worldTime))?Number(state.worldTime):worldTime,revision:Number(state.revision)||0};
+ }catch(e){console.warn('Invalid shared world snapshot',e)}
 }
 function mpApplyWorldState(dt,force=false){
- if(!mpConnected||(!force&&mpIsWorldHost)||!mpWorldTargets)return;const a=1-Math.exp(-dt*5.5),w=mpWorldTargets;
- if(w.pedCount===pedestrians.length){for(let i=0;i<pedestrians.length;i++){const p=pedestrians[i],o=i*7;p.x+=(w.peds[o]-p.x)*a;p.z+=(w.peds[o+1]-p.z)*a;p.heading=angleLerp(p.heading,w.peds[o+2],a);p.idx=Math.max(0,Math.floor(w.peds[o+3]))%Math.max(1,p.path.length);p.phase=w.peds[o+4];p.pause=w.peds[o+5];p.speed=w.peds[o+6]}}
- if(w.carCount===MP_BASE_TRAFFIC_COUNT){const remoteIds=new Set([...remotePlayers.values()].map(r=>r.vehicleId).filter(Boolean));for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){const c=traffic[i],o=i*9,remoteDriven=remoteIds.has(String(c.id));c._mpNetworkDriven=remoteDriven;if(remoteDriven){if(c.root)c.root.visible=false;continue}c.x+=(w.cars[o]-c.x)*a;c.z+=(w.cars[o+1]-c.z)*a;c.y+=(w.cars[o+2]-c.y)*a;c.heading=angleLerp(c.heading,w.cars[o+3],a);c.speed+=(w.cars[o+4]-c.speed)*a;c.damage=w.cars[o+5];c.claimed=w.cars[o+7]>.5;c.retired=w.cars[o+8]>.5;if(c.axis==='x')c.t=c.x-c.cx;else if(c.axis==='z')c.t=c.z-c.baseZ;if(c.root){c.root.position.set(c.x,c.y,c.z);c.root.rotation.set(c.pitch||0,c.heading,c.roll||0)}}}
+ if(!mpConnected||(!force&&mpIsWorldHost)||!mpWorldTargets)return;
+ const a=1-Math.exp(-dt*5.5),w=mpWorldTargets,meta=new Map((w.pedMeta||[]).map(v=>[Number(v.i),v.pose]));if(Number.isFinite(w.worldTime))worldTime+=(w.worldTime-worldTime)*Math.min(1,dt*2.0);
+ if(w.pedCount===pedestrians.length){
+  for(let i=0;i<pedestrians.length;i++){
+   const p=pedestrians[i],o=i*w.pedStride;p.x+=(w.peds[o]-p.x)*a;p.z+=(w.peds[o+1]-p.z)*a;p.heading=angleLerp(p.heading,w.peds[o+2],a);p.idx=Math.max(0,Math.floor(w.peds[o+3]))%Math.max(1,p.path.length);p.phase=w.peds[o+4];p.pause=w.peds[o+5];p.speed=w.peds[o+6];
+   if(w.pedStride===15){const values=w.peds.subarray(o,o+15);mpApplyPedNetworkState(p,values,meta.get(i));if(p.reaction?.type==='ragdoll'&&p.reaction.phase==='down'&&p.reaction.ragdoll){const rp=ragdollRootPosition(p.reaction.ragdoll);p.x=rp.x;p.z=rp.z;}if(p.ch?.root&&!p.reaction?.ragdoll){p.ch.root.position.set(p.x,p.beachRole==='swim'?-2.08:0,p.z);p.ch.root.rotation.y=p.heading}}
+  }
+ }
+ mpApplyTransientPedSnapshot(w.transientPeds||[]);
+ mpApplyDynamicCarSnapshot(w.dynamicCars||[]);
+ if(w.carCount===MP_BASE_TRAFFIC_COUNT){
+  const remoteIds=new Set([...remotePlayers.values()].map(r=>r.vehicleId).filter(Boolean));
+  for(let i=0;i<MP_BASE_TRAFFIC_COUNT;i++){
+   const c=traffic[i],o=i*w.carStride,remoteDriven=remoteIds.has(String(c.id));c._mpNetworkDriven=remoteDriven;
+   if(w.carStride===13){mpApplyVehicleNetworkState(String(c.id),{damage:w.cars[o+5],claimed:w.cars[o+7]>.5,retired:w.cars[o+8]>.5,exploded:w.cars[o+9]>.5,disabled:w.cars[o+10]>.5,parked:w.cars[o+11]>.5});}
+   else{c.damage=w.cars[o+5];c.claimed=w.cars[o+7]>.5;c.retired=w.cars[o+8]>.5}
+   if(remoteDriven||c===currentVehicle) {if(c.root&&remoteDriven)c.root.visible=false;continue}
+   c.x+=(w.cars[o]-c.x)*a;c.z+=(w.cars[o+1]-c.z)*a;c.y+=(w.cars[o+2]-c.y)*a;c.heading=angleLerp(c.heading,w.cars[o+3],a);c.speed+=(w.cars[o+4]-c.speed)*a;
+   if(c.axis==='x')c.t=c.x-c.cx;else if(c.axis==='z')c.t=c.z-c.baseZ;
+   if(c.root){c.root.position.set(c.x,c.y,c.z);c.root.rotation.set(c.pitch||0,c.heading,c.roll||0)}
+  }
+ }
 }
 function mpUpdateRemoteVisuals(dt){
  const k=1-Math.exp(-dt*13);
