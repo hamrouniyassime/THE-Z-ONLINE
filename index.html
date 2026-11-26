@@ -808,19 +808,24 @@ function createCharacter(cfg){
 let RAPIER=null,ragdollWorld=null,ragdollPhysicsReady=false,ragdollPhysicsError=null;
 const activeRagdolls=new Set(),RAGDOLL_FIXED_DT=1/60,RAGDOLL_MAX_ACTORS=10;
 let ragdollAccumulator=0,ragdollFloorBuilt=false;
+const ragdollStaticBodies=[];
 function buildRagdollStaticWorld(){
- if(!RAPIER||!ragdollWorld||ragdollFloorBuilt)return;
+ if(!RAPIER||!ragdollWorld)return;
+ // Rebuild once the final city footprint list is ready, so every new building blocks ragdolls.
+ for(const oldBody of ragdollStaticBodies.splice(0)){try{ragdollWorld.removeRigidBody(oldBody)}catch(e){}}
  ragdollFloorBuilt=true;
  const floorBody=ragdollWorld.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(0,-.34,0));
  ragdollWorld.createCollider(RAPIER.ColliderDesc.cuboid(3200,.34,3200).setFriction(.92).setRestitution(.015),floorBody);
+ ragdollStaticBodies.push(floorBody);
  // Every generated building footprint is turned into a fixed Rapier collider.
  // The same box data already powers the game's own walking / rooftop tests.
  for(const b of boxes){
-  const minX=b[0],maxX=b[1],minZ=b[2],maxZ=b[3],h=Number(b[4])||0;
-  const w=maxX-minX,d=maxZ-minZ;
+  const minX=b[0],maxX=b[1],minZ=b[2],maxZ=b[3];
+  const w=maxX-minX,d=maxZ-minZ,h=Number(b[4])||((w>4&&d>4)?8:0);
   if(!(w>.3&&d>.3&&h>1&&w<500&&d<500&&h<900))continue;
   const body=ragdollWorld.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation((minX+maxX)/2,h/2,(minZ+maxZ)/2));
   ragdollWorld.createCollider(RAPIER.ColliderDesc.cuboid(w/2,h/2,d/2).setFriction(.88).setRestitution(.025),body);
+  ragdollStaticBodies.push(body);
  }
 }
 function initRagdollPhysics(){
@@ -1305,7 +1310,7 @@ $('mapZoomIn').addEventListener('click',()=>{mapState.zoom=Math.min(2.5,mapState
 $('mapRecenter').addEventListener('click',()=>{mapState.cx=player.x;mapState.cz=player.z;mapState.zoom=.8;updateMaps()});$('clearRoute').addEventListener('click',clearGps);
 largeCanvas.addEventListener('pointerdown',e=>{if(!mapState.open)return;largeCanvas.setPointerCapture(e.pointerId);mapState.drag={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false};});
 largeCanvas.addEventListener('pointermove',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;const dx=e.clientX-d.lastX,dy=e.clientY-d.lastY;if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7)d.moved=true;if(d.moved){const r=largeCanvas.getBoundingClientRect(),scale=largeCanvas.width*mapState.zoom/900;mapState.cx-=dx*(largeCanvas.width/r.width)/scale;mapState.cz-=dy*(largeCanvas.height/r.height)/scale;updateMaps()}d.lastX=e.clientX;d.lastY=e.clientY});
-largeCanvas.addEventListener('pointerup',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;if(!d.moved){const r=largeCanvas.getBoundingClientRect(),px=(e.clientX-r.left)*largeCanvas.width/r.width,py=(e.clientY-r.top)*largeCanvas.height/r.height,tr=mapTransform(largeCanvas.width,largeCanvas.height,mapState.cx,mapState.cz,mapState.zoom),wx=tr.wx(px),wz=tr.wz(py);const picked=mapPoiVisible?nearestPoiFromMap(wx,wz,Math.max(15,8/(mapState.zoom*largeCanvas.width/900))):null;if(picked)openPoiDetail(picked);else setGpsDestination(wx,wz);updateMaps()}mapState.drag=null});
+largeCanvas.addEventListener('pointerup',e=>{const d=mapState.drag;if(!d||d.id!==e.pointerId)return;if(!d.moved){const r=largeCanvas.getBoundingClientRect(),px=(e.clientX-r.left)*largeCanvas.width/r.width,py=(e.clientY-r.top)*largeCanvas.height/r.height,tr=mapTransform(largeCanvas.width,largeCanvas.height,mapState.cx,mapState.cz,mapState.zoom),wx=tr.wx(px),wz=tr.wz(py);const picked=mapPoiVisible?nearestPoiFromMap(wx,wz,Math.max(15,8/(mapState.zoom*largeCanvas.width/900))):null;setGpsDestination(picked?picked.x:wx,picked?picked.z:wz);if(picked)openPoiDetail(picked);updateMaps()}mapState.drag=null});
 largeCanvas.addEventListener('wheel',e=>{e.preventDefault();mapState.zoom=Math.max(.12,Math.min(2.5,mapState.zoom*(e.deltaY<0?1.15:.87)));updateMaps()},{passive:false});
 function resizeMapCanvas(){largeCanvas.width=Math.max(1,innerWidth);largeCanvas.height=Math.max(1,innerHeight);updateMaps()}window.addEventListener('resize',resizeMapCanvas);resizeMapCanvas();
 
@@ -2476,7 +2481,7 @@ const glaT=tex(x=>{x.fillStyle='#e9eef3';x.fillRect(0,0,64,64);x.fillStyle='#5d8
 const M=(o)=>new T.MeshStandardMaterial(Object.assign({vertexColors:true,roughness:.85,side:T.DoubleSide},o));
 const mats={win:M({map:winT}),glass:M({map:glaT,roughness:.2,metalness:.45}),plain:M({})};
 const G={};let Z='x';const gb=k=>G[Z+'|'+k]||(G[Z+'|'+k]={k,p:[],n:[],u:[],c:[],i:[],v:0});
-const base=new T.BoxGeometry(1,1,1),colz=(x,z,w,d)=>boxes.push([x-w/2,x+w/2,z-d/2,z+d/2]);
+const base=new T.BoxGeometry(1,1,1),colz=(x,z,w,d,h=12)=>boxes.push([x-w/2,x+w/2,z-d/2,z+d/2,h]);
 function box(k,x,y,z,w,h,l,c,tw,th){const g=gb(k),P=base.attributes.position,N=base.attributes.normal,U=base.attributes.uv;col.set(c);tw=tw||4;th=th||3.2;
  for(let i=0;i<24;i++){g.p.push(P.getX(i)*w+x,(P.getY(i)+.5)*h+y,P.getZ(i)*l+z);const nx=N.getX(i),ny=N.getY(i);g.n.push(nx,ny,N.getZ(i));let u=U.getX(i),v=U.getY(i);if(Math.abs(ny)>.5)u=v=.03;else if(Math.abs(nx)>.5){u*=l/tw;v*=h/th}else{u*=w/tw;v*=h/th}g.u.push(u,v);g.c.push(col.r,col.g,col.b)}
  const ind=base.index.array;for(let i=0;i<36;i++)g.i.push(ind[i]+g.v);g.v+=24}
@@ -2501,19 +2506,19 @@ const CC=[0xc0392b,0x2e6fb5,0xeeeeee,0x222428,0xe0a82e,0x3f8f4f,0x8a8d91,0x7b2d8
 function car(x,z,ax,c,y){return;/* Non-driveable decorative car props are intentionally not built. */y=y===undefined?.15:y;const s=(l,w)=>ax?[w,l]:[l,w];let[a,b]=s(4.3,1.9);box('plain',x,y+.35,z,a,.8,b,c);[a,b]=s(2.3,1.7);box('plain',x,y+1.15,z,a,.75,b,0x2b3946);
  for(const dx of[-1.4,1.4])for(const dz of[-.95,.95])box('plain',ax?x+dz:x+dx,y,ax?z+dx:z+dz,ax?.3:.9,.7,ax?.9:.3,0x111111)}
 function house(x,z,face,pal){const w=ri(11,15),d=ri(9,12),h=pick([4,4,7.2,7.2,7.6]),wall=pick(pal),rf=pick([0x8a3b2c,0x59463a,0x3f4a57,0x9a5a36]),y=.15;
- box('win',x,y,z,w,h,d,wall);colz(x,z,w,d);roof(x,y+h,z,w+1.6,ri(2.6,3.6),d+1.6,rf,0);
+ box('win',x,y,z,w,h,d,wall);colz(x,z,w,d,h);roof(x,y+h,z,w+1.6,ri(2.6,3.6),d+1.6,rf,0);
  box('plain',x-w*.2,y,z+face*(d/2+.06),1.3,2.3,.2,0x3b2a20);box('plain',x-w*.2,y,z+face*(d/2+.5),2.4,.2,1.2,0xb8b2a6);
  box('plain',x+w*.28,y+h+1.2,z-face*d*.2,1.1,3,1.1,0x7a4a3a);
  const gx=x+w/2+2.8;box('win',gx,y,z,5.2,3.3,d-1,wall);box('plain',gx,y,z+face*((d-1)/2+.05),4.2,2.5,.15,0xcfd2d6);box('plain',gx,y+3.3,z,5.8,.3,d-.4,rf);
  box('plain',gx,y,z+face*(d/2+3.5),4.6,.04,7,0x8d8f92);if(rnd()<.6)car(gx,z+face*(d/2+3.5),1,pick(CC));tree(x-w/2-3,z+face*(d/2+4));HS.push([x-w*.2+2.6,z+face*(d/2+2.4),face])}
 const SH=[['بقالة','#2e9e4f',0xe8e0c8],['مخبز','#d98a2b',0xe9cf9a],['صيدلية','#1f9d8b',0xdfe8ea],['مقهى','#7a4a2b',0xb98a63],['مطعم','#c0392b',0xd9a79a],['كراج','#3a6ea5',0xb7bcc2],['بنك','#1d3f72',0xd8d2c0],['ملابس','#8e44ad',0xe3c6d8],['إلكترونيات','#2c3e50',0xc5ccd3]];
 const lab={},sprites=[];function label(i){if(lab[i])return lab[i];const c=document.createElement('canvas');c.width=256;c.height=72;const x=c.getContext('2d');x.fillStyle=SH[i][1];x.fillRect(0,0,256,72);x.strokeStyle='#fff';x.lineWidth=4;x.strokeRect(3,3,250,66);x.fillStyle='#fff';x.font='bold 40px Tahoma,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(SH[i][0],128,38);return lab[i]=new T.SpriteMaterial({map:new T.CanvasTexture(c)})}
-function shop(x,z,w,d,face,type,h){const t=SH[type],y=.15;h=h||ri(6,10);box('win',x,y,z,w,h,d,t[2]);colz(x,z,w,d);const fz=z+face*d/2;
+function shop(x,z,w,d,face,type,h){const t=SH[type],y=.15;h=h||ri(6,10);box('win',x,y,z,w,h,d,t[2]);colz(x,z,w,d,h);const fz=z+face*d/2;
  box('plain',x,y,fz+face*.1,w*.82,3.3,.25,0x24323f);box('plain',x+w*.28,y,fz+face*.2,1.3,2.4,.3,0x3b2a20);box('plain',x,y+3.4,fz+face*.9,w*.9,.25,1.8,parseInt(t[1].slice(1),16));
  box('plain',x,y+h,z,w+.4,.5,d+.4,0x555a60);box('plain',x-w*.2,y+h+.5,z,2,1.2,2,0x8a8f94);
  const s=new T.Sprite(label(type));s.scale.set(Math.min(w,15),Math.min(w,15)*72/256,1);s.position.set(x,y+5.2,fz+face*1.2);sprites.push(s)}
 const BL=[0x4a7fb0,0x5f93c4,0x3d6a94,0x7aa8d0,0x8fa9bd,0x6c7f90];
-function tower(x,z,w,d,h,c){const y=.15;box('glass',x,y,z,w,h,d,c);colz(x,z,w,d);box('plain',x,y+h,z,w+.6,.8,d+.6,0x44484d);
+function tower(x,z,w,d,h,c){const y=.15;box('glass',x,y,z,w,h,d,c);colz(x,z,w,d,h);box('plain',x,y+h,z,w+.6,.8,d+.6,0x44484d);
  if(h>110){box('glass',x,y+h+.8,z,w*.65,h*.1,d*.65,c);box('plain',x,y+h*1.1+.8,z,.8,Math.min(45,h*.15),.8,0xaa3333)}else box('plain',x,y+h+.8,z,w*.4,2.5,d*.4,0x777b80)}
 const pal=[0xf0e6d2,0xe8d5b5,0xd9e2ea,0xe6c9c0,0xdcdcd0,0xc9d8c5,0xefe2c2],extra=[];
 const part=(f)=>{try{f()}catch(e){console.warn('zone',Z,e)}};
@@ -2746,7 +2751,7 @@ function select(list,pl,maxD,rad,init){const cand=[];for(const c of list){if(c.h
 function lod(){if(C){C.updateMatrixWorld();pmx.multiplyMatrices(C.projectionMatrix,C.matrixWorldInverse);fr.setFromProjectionMatrix(pmx)}
  select(cars,cpool,330,0,(s,c)=>{s.g.visible=true;s.g.body.color.setHex(c.color);s.g.door.rotation.y=0});select(peds,ppool,200,1.5,(s,p)=>{s.g.visible=true});
  for(const s of cpool){if(!s.item){if(s.drv){s.g.remove(s.drv.ch.root);s.drv.ch.root.visible=false;s.drv.use=false;s.drv=null}continue}const d=(s.item.x-player.x)**2+(s.item.z-player.z)**2;
-  if(d<55*55&&!s.drv&&!s.item.hold){const f=dpool.find(q=>!q.use);if(f){f.use=true;s.drv=f;s.g.add(f.ch.root);f.ch.root.visible=true;f.ch.root.position.set(s.g.sx,s.g.sy,s.g.sz);f.ch.root.rotation.y=Math.PI/2;f.ch.root.scale.setScalar(.5)}}
+  if(d<55*55&&!s.drv&&!s.item.hold&&s.item.parkState!=='parked'&&s.item.parkState!=='pulling'){const f=dpool.find(q=>!q.use);if(f){f.use=true;s.drv=f;s.g.add(f.ch.root);f.ch.root.visible=true;f.ch.root.position.set(s.g.sx,s.g.sy,s.g.sz);f.ch.root.rotation.y=Math.PI/2;f.ch.root.scale.setScalar(.5)}}
   else if((d>65*65)&&s.drv){s.g.remove(s.drv.ch.root);s.drv.ch.root.visible=false;s.drv.use=false;s.drv=null}}}
 const parked=[];let OB=[],S=null,DRV=null,fleers=[],vic=null,runaways=[];
 function stepCars(dt){OB=parked.map(p=>({x:p.x,z:p.z,r:2.2}));for(const p of peds)if(p.cross)OB.push({x:p.x,z:p.z,r:.8});if(DRV)OB.push({x:DRV.x,z:DRV.z,r:2.2});else if(!S)OB.push({x:player.x,z:player.z,r:.9,pl:1});
@@ -2761,7 +2766,7 @@ function stepCars(dt){OB=parked.map(p=>({x:p.x,z:p.z,r:2.2}));for(const p of ped
  for(const p of cpool)if(p.item){p.g.position.set(p.item.x,.15,p.item.z);p.g.rotation.y=p.item.ry;if(p.drv)p.drv.ch.update(tt,dt,'drive')}}
 function stepPeds(dt){for(const p of peds){if(p.st==='sit')continue;const a=p.a,lat=a?a.c+p.side*((a.w||24)/2+2.5):0;
   if(p.rag){ragSync(p._ragSlot,p);if(p.rag){p.fall=.08;p.anim='fall';p.cross=false;continue}}
-  if(p.fall>0){p.fall-=dt;p.anim='fall';p.cross=false;if(p.kx||p.kz){p.x+=p.kx*dt;p.z+=p.kz*dt;p.kx*=1-Math.min(1,dt*2.4);p.kz*=1-Math.min(1,dt*2.4);p.tum=Math.min(1.5,(p.tum||0)+dt*4.5)}if(p.fall<=0){p.rag=null;p.kx=p.kz=0;p.tum=0}continue}
+  if(p.fall>0){p.fall-=dt;p.anim='fall';p.cross=false;if(p.kx||p.kz){const nx=p.x+p.kx*dt,nz=p.z+p.kz*dt;if(!hitPt(nx,nz)){p.x=nx;p.z=nz}else{p.kx=0;p.kz=0}p.kx*=1-Math.min(1,dt*2.4);p.kz*=1-Math.min(1,dt*2.4);p.tum=Math.min(1.5,(p.tum||0)+dt*4.5)}if(p.fall<=0){p.rag=null;p.kx=p.kz=0;p.tum=0}continue}
   if(p.chase>0&&pedChase(p,dt))continue;
   if(p.offroad&&p.walkPath&&p.walkPath.length){
    let target=p.walkPath[p.idx%p.walkPath.length],vx=target[0]-p.x,vz=target[1]-p.z,dist=Math.hypot(vx,vz);
@@ -2961,6 +2966,274 @@ function pedChase(p,dt){
  return p.chase>0;
 }
 const _pp=performPunch,_ps=performPush;performPunch=function(){_pp.apply(this,arguments);hitPed(9)};performPush=function(){_ps.apply(this,arguments);hitPed(6)};
+
+
+// ===== THE Z ONLINE CITY FIX PACK: persistent traffic, safe pedestrian flee, GPS routing, open sea =====
+// Ocean surrounding the island is real swim space, not merely a blue map background.
+const _thezOldIsBeachWater = isBeachWater;
+isBeachWater = function(x,z){
+ const surroundingSea = Math.abs(x) <= 4450 && Math.abs(z) <= 3450 && (Math.abs(x) > 1300 || Math.abs(z) > 910);
+ return _thezOldIsBeachWater(x,z) || surroundingSea;
+};
+
+// Build a navigable graph from the actual streets in the final generated city.
+const thezNavNodes = [];
+const thezNavNodeByKey = new Map();
+const thezNavSegmentNodes = new Map();
+function thezNavNode(x,z){
+ const key=(Math.round(x*10)/10)+','+(Math.round(z*10)/10);
+ let n=thezNavNodeByKey.get(key);
+ if(!n){n={id:thezNavNodes.length,x,z,edges:[]};thezNavNodes.push(n);thezNavNodeByKey.set(key,n)}
+ return n;
+}
+function thezNavConnect(a,b){
+ if(!a||!b||a===b)return;
+ const cost=Math.hypot(a.x-b.x,a.z-b.z);
+ if(!a.edges.some(e=>e.node===b))a.edges.push({node:b,cost});
+ if(!b.edges.some(e=>e.node===a))b.edges.push({node:a,cost});
+}
+(function buildThezStreetGraph(){
+ for(const r of RDS){
+  const marks=[r.a0,r.a1];
+  for(const s of RDS){
+   if(s===r)continue;
+   if(s.ax!==r.ax){
+    const x=r.ax==='x'?s.c:r.c,z=r.ax==='x'?r.c:s.c;
+    const onR=r.ax==='x'?(x>=r.a0-.2&&x<=r.a1+.2):(z>=r.a0-.2&&z<=r.a1+.2);
+    const onS=s.ax==='x'?(x>=s.a0-.2&&x<=s.a1+.2):(z>=s.a0-.2&&z<=s.a1+.2);
+    if(onR&&onS)marks.push(r.ax==='x'?x:z);
+   }else if(Math.abs(s.c-r.c)<.8){
+    if(s.a0>r.a0+.2&&s.a0<r.a1-.2)marks.push(s.a0);
+    if(s.a1>r.a0+.2&&s.a1<r.a1-.2)marks.push(s.a1);
+   }
+  }
+  marks.sort((a,b)=>a-b);
+  const unique=[];for(const u of marks)if(!unique.length||Math.abs(u-unique[unique.length-1])>.35)unique.push(u);
+  const list=unique.map(u=>({u,node:r.ax==='x'?thezNavNode(u,r.c):thezNavNode(r.c,u)}));
+  thezNavSegmentNodes.set(r,list);
+  for(let i=1;i<list.length;i++)thezNavConnect(list[i-1].node,list[i].node);
+ }
+})();
+function thezProjectToRoad(x,z){
+ let best=null,bd=Infinity;
+ for(const r of RDS){
+  const u=r.ax==='x'?Math.max(r.a0,Math.min(r.a1,x)):Math.max(r.a0,Math.min(r.a1,z));
+  const px=r.ax==='x'?u:r.c,pz=r.ax==='x'?r.c:u,d=(px-x)*(px-x)+(pz-z)*(pz-z);
+  if(d<bd){bd=d;best={r,u,x:px,z:pz,d2:d,nodes:thezNavSegmentNodes.get(r)||[]}}
+ }
+ return best;
+}
+function thezUrbanPath(sx,sz,tx,tz){
+ const sp=thezProjectToRoad(sx,sz),gp=thezProjectToRoad(tx,tz);
+ if(!sp||!gp)return [{x:sx,z:sz},{x:tx,z:tz}];
+ if(sp.r===gp.r){const points=[{x:sx,z:sz},{x:sp.x,z:sp.z},{x:gp.x,z:gp.z},{x:tx,z:tz}];return thezCleanPath(points)}
+ const dist=new Map(),prev=new Map(),done=new Set();
+ for(const item of sp.nodes)dist.set(item.node,Math.abs(item.u-sp.u));
+ let visits=0;
+ while(visits++<thezNavNodes.length){
+  let current=null,best=Infinity;
+  for(const n of thezNavNodes){if(done.has(n))continue;const d=dist.get(n);if(d!==undefined&&d<best){best=d;current=n}}
+  if(!current)break;done.add(current);
+  for(const e of current.edges){if(done.has(e.node))continue;const nd=best+e.cost;if(nd<(dist.get(e.node)??Infinity)){dist.set(e.node,nd);prev.set(e.node,current)}}
+ }
+ let goalNode=null,total=Infinity;
+ for(const item of gp.nodes){const d=dist.get(item.node);if(d===undefined)continue;const score=d+Math.abs(item.u-gp.u);if(score<total){total=score;goalNode=item.node}}
+ if(!goalNode)return thezCleanPath([{x:sx,z:sz},{x:sp.x,z:sp.z},{x:gp.x,z:gp.z},{x:tx,z:tz}]);
+ const chain=[];let cur=goalNode,guard=0;while(cur&&guard++<thezNavNodes.length+2){chain.push({x:cur.x,z:cur.z});cur=prev.get(cur)||null}
+ chain.reverse();return thezCleanPath([{x:sx,z:sz},{x:sp.x,z:sp.z},...chain,{x:gp.x,z:gp.z},{x:tx,z:tz}]);
+}
+function thezCleanPath(points){
+ const out=[];for(const p of points){if(!Number.isFinite(p.x)||!Number.isFinite(p.z))continue;const last=out[out.length-1];if(!last||Math.hypot(p.x-last.x,p.z-last.z)>.45)out.push({x:p.x,z:p.z})}return out;
+}
+setGpsDestination = function(x,z){
+ destination={x,z,requestedX:x,requestedZ:z};routePoints=thezUrbanPath(player.x,player.z,x,z);gpsRepathClock=1.2;
+ if(typeof rebuildGpsWorldLine==='function')rebuildGpsWorldLine();
+ const hint=$('mapHint');if(hint)hint.textContent='GPS مفعّل: اتبع الخط الأزرق حتى علامة الوجهة. اضغط على أي مكان آخر لتغيير الطريق.';
+ updateMaps();
+};
+refreshGpsRoute = function(dt){
+ if(!destination)return;gpsRepathClock-=dt;if(gpsRepathClock>0)return;
+ routePoints=thezUrbanPath(player.x,player.z,destination.requestedX??destination.x,destination.requestedZ??destination.z);
+ if(typeof rebuildGpsWorldLine==='function')rebuildGpsWorldLine();gpsRepathClock=1.15;
+ const hint=$('mapHint');if(hint){const d=Math.hypot(destination.x-player.x,destination.z-player.z);hint.textContent='GPS: المسار الأزرق • المسافة التقريبية '+Math.round(d)+' متر • اضغط لإعادة التحديد'}
+};
+const _thezMapRenderer=drawMap;
+drawMap=function(ctx,w,h,cx,cz,zoom){
+ _thezMapRenderer(ctx,w,h,cx,cz,zoom);
+ if(!routePoints||routePoints.length<2||!destination)return;
+ const tr=mapTransform(w,h,cx,cz,zoom);ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
+ routePoints.forEach((p,i)=>{const x=tr.x(p.x),y=tr.y(p.z);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
+ ctx.strokeStyle='rgba(0,0,0,.72)';ctx.lineWidth=Math.max(5,8*tr.scale);ctx.stroke();
+ ctx.strokeStyle='#20dfff';ctx.lineWidth=Math.max(2.5,4.5*tr.scale);ctx.shadowColor='#13c9ff';ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;
+ const gx=tr.x(destination.x),gy=tr.y(destination.z);ctx.beginPath();ctx.arc(gx,gy,Math.max(7,10*tr.scale),0,Math.PI*2);ctx.fillStyle='#ffc928';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#fff';ctx.stroke();
+ ctx.beginPath();ctx.arc(gx,gy,Math.max(12,15*tr.scale),0,Math.PI*2);ctx.strokeStyle='rgba(255,201,40,.7)';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+};
+openFullMap=function(){mapState.open=true;mapState.cx=0;mapState.cz=0;mapState.zoom=.28;$('mapOverlay').classList.add('open');$('mapOverlay').setAttribute('aria-hidden','false');updateMaps()};
+
+// Choose connected street segments at road ends; if a street is a dead end, turn around there.
+function thezNextRoad(r,endU,dir){
+ const ex=r.ax==='x'?endU:r.c,ez=r.ax==='x'?r.c:endU;
+ const inX=r.ax==='x'?dir:0,inZ=r.ax==='z'?dir:0,options=[];
+ for(const q of RDS){if(q===r)continue;
+  if(q.ax==='x'&&Math.abs(q.c-ez)<1.2&&ex>=q.a0-1.2&&ex<=q.a1+1.2){
+   if(q.a1-ex>3)options.push({r:q,u:ex,dir:1,dx:1,dz:0});
+   if(ex-q.a0>3)options.push({r:q,u:ex,dir:-1,dx:-1,dz:0});
+  }else if(q.ax==='z'&&Math.abs(q.c-ex)<1.2&&ez>=q.a0-1.2&&ez<=q.a1+1.2){
+   if(q.a1-ez>3)options.push({r:q,u:ez,dir:1,dx:0,dz:1});
+   if(ez-q.a0>3)options.push({r:q,u:ez,dir:-1,dx:0,dz:-1});
+  }
+ }
+ const valid=options.filter(o=>o.dx*inX+o.dz*inZ>-.25);
+ const pool=valid.length?valid:options;
+ if(!pool.length)return {r,u:endU,dir:-dir};
+ const straight=pool.filter(o=>o.dx*inX+o.dz*inZ>.75);
+ let pickFrom=straight.length&&Math.random()<.72?straight:pool;
+ return pickFrom[Math.floor(Math.random()*pickFrom.length)];
+}
+
+// Walk-away routes use a small A* grid, so fleeing citizens go around buildings rather than into them.
+function thezFindFleePath(p){
+ const cell=2.25,awayX=p.x-player.x,awayZ=p.z-player.z,al=Math.hypot(awayX,awayZ)||1,ax=awayX/al,az=awayZ/al;
+ const blocked=(i,j)=>hitPt(i*cell,j*cell);
+ let si=Math.round(p.x/cell),sj=Math.round(p.z/cell);
+ if(blocked(si,sj)){
+  let found=false;for(let r=1;r<=5&&!found;r++)for(let a=-r;a<=r&&!found;a++)for(let b=-r;b<=r&&!found;b++)if(Math.max(Math.abs(a),Math.abs(b))===r&&!blocked(si+a,sj+b)){si+=a;sj+=b;found=true}
+  if(!found)return [{x:p.x,z:p.z},{x:p.x+ax*5,z:p.z+az*5}];
+ }
+ const start=si+','+sj,open=[{i:si,j:sj}],came=new Map(),g=new Map([[start,0]]),closed=new Set();let goal=null,bestScore=-Infinity,expanded=0;
+ const dirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+ while(open.length&&expanded++<850){
+  let bi=0;for(let k=1;k<open.length;k++){const a=open[k],b=open[bi],ka=a.i+','+a.j,kb=b.i+','+b.j,fa=(g.get(ka)||0)+Math.hypot(a.i-si,a.j-sj)*.015,fb=(g.get(kb)||0)+Math.hypot(b.i-si,b.j-sj)*.015;if(fa<fb)bi=k}
+  const cur=open.splice(bi,1)[0],key=cur.i+','+cur.j;if(closed.has(key))continue;closed.add(key);
+  const wx=cur.i*cell,wz=cur.j*cell,dx=wx-p.x,dz=wz-p.z,dist=Math.hypot(dx,dz),dot=dist>.1?(dx*ax+dz*az)/dist:0;
+  if(dist>10&&dist<29&&dot>.12){const score=dot*12+Math.min(24,dist)*.11-(g.get(key)||0)*.015;if(score>bestScore){bestScore=score;goal=key}}
+  for(const [di,dj] of dirs){const ni=cur.i+di,nj=cur.j+dj,nk=ni+','+nj;if(closed.has(nk)||blocked(ni,nj))continue;if(di&&dj&&(blocked(cur.i+di,cur.j)||blocked(cur.i,cur.j+dj)))continue;const ng=(g.get(key)||0)+(di&&dj?1.414:1);if(ng<(g.get(nk)??Infinity)){g.set(nk,ng);came.set(nk,key);open.push({i:ni,j:nj})}}
+ }
+ if(!goal){let safe=null,safeScore=-Infinity;for(const key of closed){const [i,j]=key.split(',').map(Number),x=i*cell,z=j*cell,dx=x-p.x,dz=z-p.z,d=Math.hypot(dx,dz);if(d<2||d>18)continue;const score=(dx*ax+dz*az)/(d||1)+Math.min(d,14)*.025;if(score>safeScore){safeScore=score;safe={x,z}}}return safe?[{x:p.x,z:p.z},safe]:[{x:p.x,z:p.z}]}
+ const path=[];let k=goal,guard=0;while(k&&guard++<900){const [i,j]=k.split(',').map(Number);path.push({x:i*cell,z:j*cell});if(k===start)break;k=came.get(k)}path.reverse();
+ // Smooth unnecessary grid corners while checking every shortcut against building footprints.
+ const smooth=[];let at=0;while(at<path.length){smooth.push(path[at]);if(at===path.length-1)break;let best=at+1;for(let q=path.length-1;q>at+1;q--){let clear=true,steps=Math.ceil(Math.hypot(path[q].x-path[at].x,path[q].z-path[at].z)/1.3);for(let t=1;t<=steps;t++){const f=t/steps;if(hitPt(path[at].x+(path[q].x-path[at].x)*f,path[at].z+(path[q].z-path[at].z)*f)){clear=false;break}}if(clear){best=q;break}}at=best}
+ return smooth.length>1?smooth:[{x:p.x,z:p.z},{x:p.x+ax*5,z:p.z+az*5}];
+}
+function makePedFleePath(p){
+ if(!p)return;const path=thezFindFleePath(p);p.fleeDirX=p.x-player.x;p.fleeDirZ=p.z-player.z;if(!path||path.length<2){p.offroad=false;p.escapePath=false;p.walkPath=null;p.chase=0;p.anim='idle';return}p.offroad=true;p.escapePath=true;p.walkPath=path;p.idx=1;
+}
+function thezRejoinSidewalk(p){
+ let best=null,bd=Infinity;
+ for(const r of ARTS){
+  for(const side of[-1,1]){
+   const u=r.ax==='x'?Math.max(r.a0+4,Math.min(r.a1-4,p.x)):Math.max(r.a0+4,Math.min(r.a1-4,p.z));
+   const x=r.ax==='x'?u:r.c+side*(r.w/2+2.6),z=r.ax==='x'?r.c+side*(r.w/2+2.6):u;
+   if(hitPt(x,z))continue;const d=(x-p.x)*(x-p.x)+(z-p.z)*(z-p.z);if(d<bd){bd=d;best={r,side,u,x,z}}
+  }
+ }
+ if(best&&bd<36){p.a=best.r;p.side=best.side;p.u=best.u;p.x=best.x;p.z=best.z;p.offroad=false;p.walkPath=null;p.escapePath=false;p.st='walk';p.v=1.45;p.scare=0;
+  const forwardX=p.a.ax==='x'?p.dir||1:0,forwardZ=p.a.ax==='z'?p.dir||1:0,awayX=p.fleeDirX||1,awayZ=p.fleeDirZ||0;
+  if(forwardX*awayX+forwardZ*awayZ<0)p.dir=-1;else p.dir=1;
+ }else{p.escapePath=false;p.chase=0;p.offroad=false;p.walkPath=null;p.a=null;p.st='idle';p.anim='idle';}
+}
+pedChase=function(p,dt){
+ if(p.escapePath&&p.walkPath&&p.walkPath.length){
+  let target=p.walkPath[p.idx];if(!target){thezRejoinSidewalk(p);return false}
+  let dx=target.x-p.x,dz=target.z-p.z,dist=Math.hypot(dx,dz);
+  if(dist<1.15){p.idx++;if(p.idx>=p.walkPath.length){thezRejoinSidewalk(p);p.chase=0;return false}target=p.walkPath[p.idx];dx=target.x-p.x;dz=target.z-p.z;dist=Math.hypot(dx,dz)}
+  const len=Math.hypot(dx,dz)||1,step=5.6*dt,nx=p.x+dx/len*Math.min(step,dist),nz=p.z+dz/len*Math.min(step,dist);
+  if(hitPt(nx,nz)){makePedFleePath(p);return true}
+  p.x=nx;p.z=nz;p.heading=angleLerp(p.heading,headingTo(dx,dz),Math.min(1,dt*8));p.yaw=p.heading;p.anim='run';p.ph=(p.ph||0)+dt*8;p.chase=Math.max(0,(p.chase||0)-dt);return true;
+ }
+ p.chase=Math.max(0,(p.chase||0)-dt);
+ const dx=p.fleeDirX??(p.x-player.x),dz=p.fleeDirZ??(p.z-player.z),len=Math.hypot(dx,dz)||1;
+ const candidates=[0,.55,-.55,1.05,-1.05,1.57,-1.57,2.1,-2.1,Math.PI];let best=null,bestScore=-Infinity;
+ for(const a of candidates){const ca=Math.cos(a),sa=Math.sin(a),vx=(dx/len)*ca-(dz/len)*sa,vz=(dx/len)*sa+(dz/len)*ca,nx=p.x+vx*5*dt,nz=p.z+vz*5*dt;if(hitPt(nx,nz))continue;const score=vx*dx/len+vz*dz/len;if(score>bestScore){bestScore=score;best={nx,nz,vx,vz}}}
+ if(best){p.x=best.nx;p.z=best.nz;p.heading=angleLerp(p.heading,headingTo(best.vx,best.vz),Math.min(1,dt*8))}
+ p.yaw=p.heading;p.anim='run';p.ph=(p.ph||0)+dt*8;if(p.chase<=0){thezRejoinSidewalk(p);return false}return true;
+};
+
+// Re-route cars through connected intersections instead of teleporting from one road end to another.
+const _thezStepCarsOriginal=stepCars;
+const thezExitWalkers=[];
+function thezSpawnDriverWalker(c){
+ const slot=c.slot>=0?cpool[c.slot]:null;let pool=slot?.drv||null;
+ if(pool&&slot?.g){try{slot.g.remove(pool.ch.root)}catch(e){}slot.drv=null}
+ if(!pool){pool=dpool.find(q=>!q.use);if(!pool)return;pool.use=true}
+ const r=c.r,axis=r?.ax||'x',side=c.parkSide||1,forward=(c.dir||1),nx=axis==='x'?0:side,nz=axis==='x'?side:0,fx=axis==='x'?forward:0,fz=axis==='z'?forward:0;
+ const sx=c.x+nx*1.4,sz=c.z+nz*1.4;
+ const candidates=[1,-1].map(sign=>[
+  {x:sx,z:sz},{x:sx+nx*1.6,z:sz+nz*1.6},{x:sx+nx*2.3+fx*7*sign,z:sz+nz*2.3+fz*7*sign},{x:sx+nx*2.3+fx*16*sign,z:sz+nz*2.3+fz*16*sign}
+ ]);
+ let path=candidates.find(points=>points.every((p,i)=>i===0||!hitPt(p.x,p.z)))||[{x:sx,z:sz},{x:sx+nx*2,z:sz+nz*2},{x:sx+nx*3+fx*5,z:sz+nz*3+fz*5}];
+ root.add(pool.ch.root);pool.ch.root.visible=true;pool.ch.root.scale.setScalar(1);pool.ch.root.position.set(sx,.15,sz);
+ thezExitWalkers.push({pool,ch:pool.ch,path,idx:1,x:sx,z:sz,t:0,life:18,carGroup:slot?.g||null});
+}
+function thezStepExitWalkers(dt){
+ for(let i=thezExitWalkers.length-1;i>=0;i--){const w=thezExitWalkers[i];w.t+=dt;
+  if(w.carGroup?.door&&w.t<1.2)w.carGroup.door.rotation.y=-.95*(w.t<.75?Math.min(1,w.t/.35):Math.max(0,1-(w.t-.75)/.45));
+  if(w.t<.72){w.ch.update(w.t,dt,'exit');continue}
+  const target=w.path[w.idx];if(!target||w.t>w.life){w.ch.root.visible=false;if(w.ch.root.parent)w.ch.root.parent.remove(w.ch.root);w.pool.use=false;thezExitWalkers.splice(i,1);continue}
+  const dx=target.x-w.x,dz=target.z-w.z,d=Math.hypot(dx,dz)||1,move=Math.min(d,1.35*dt),nx=w.x+dx/d*move,nz=w.z+dz/d*move;
+  if(!hitPt(nx,nz)){w.x=nx;w.z=nz}else{w.idx++;continue}
+  if(d<.85)w.idx++;w.ch.root.position.set(w.x,.15,w.z);w.ch.root.rotation.y=Math.atan2(dx,dz);w.ch.update(w.t,dt,'walk');
+ }
+}
+function thezBeginPullOver(c){
+ if(!c.r||c.park||c.wrecked)return false;
+ const r=c.r,off=c.dir*r.w/4,choices=[1,-1];
+ for(const side of choices){
+  const shift=r.ax==='x'?side*(r.w/2+2.3)-off:side*(r.w/2+2.3)+off;
+  const x=c.x+(r.ax==='z'?shift:0),z=c.z+(r.ax==='x'?shift:0);
+  if(!hitPt(x,z)&&!hitPt(x+(r.ax==='x'?0:side*1.0),z+(r.ax==='x'?side*1.0:0))){c.parkSide=side;c.parkTargetShift=shift;c.parkShift=c.parkShift||0;c.parkState='pulling';c.parkElapsed=0;c.exitStarted=false;return true}
+ }
+ return false;
+}
+function thezHandleRoadEnd(c,snap){
+ const r=snap.r,dir=snap.dir,endU=dir>0?r.a1:r.a0;
+ const wrapped=c.r===r&&((dir>0&&c.u<snap.u-25)||(dir<0&&c.u>snap.u+25));
+ if(!wrapped)return;
+ const off=dir*r.w/4,oldX=r.ax==='x'?endU:r.c-off,oldZ=r.ax==='x'?r.c+off:endU,oldYaw=r.ax==='x'?(dir>0?0:Math.PI):(dir>0?-Math.PI/2:Math.PI/2);
+ const next=thezNextRoad(r,endU,dir);c.bx=oldX;c.bz=oldZ;c.bry=oldYaw;c.r=next.r;c.u=next.u;c.dir=next.dir;c.bt=0;c.x=oldX;c.z=oldZ;c.ry=oldYaw;c.parkShift=0;
+}
+stepCars=function(dt){
+ const snapshots=new Map();
+ for(const c of cars){
+  if(c.r&&!c.park&&!c.wrecked)snapshots.set(c,{r:c.r,u:c.u,dir:c.dir});
+  if(!c.park&&!c.wrecked&&c.stopClock===undefined)c.stopClock=Math.random()<.075?ri(38,100):Infinity;
+  if(c.parkState==='pulling'||c.parkState==='parked')c.stun=Math.max(c.stun||0,.14);
+  if(!c.park&&!c.wrecked&&!c.parkState&&Number.isFinite(c.stopClock)){
+   c.stopClock-=dt;
+   const nearPlayer=Math.hypot(c.x-player.x,c.z-player.z)<135;
+   const nearJunction=c.r&&cross(c.r).some(v=>Math.abs(v-c.u)<22);
+   if(c.stopClock<=0&&nearPlayer&&!nearJunction&&!thezBeginPullOver(c))c.stopClock=ri(18,34);
+  }
+ }
+ _thezStepCarsOriginal(dt);
+ for(const c of cars){
+  const s=snapshots.get(c);if(s)thezHandleRoadEnd(c,s);
+  if(c.parkState==='pulling'){
+   c.stun=Math.max(c.stun||0,.14);c.parkElapsed=(c.parkElapsed||0)+dt;
+   c.parkShift=(c.parkShift||0)+(c.parkTargetShift-(c.parkShift||0))*Math.min(1,dt*1.8);
+   if(Math.abs(c.v)<.5&&Math.abs(c.parkShift-c.parkTargetShift)<.65){c.parkState='parked';c.parkElapsed=0;c.parkDuration=ri(8,16);if(!c.exitStarted){c.exitStarted=true;thezSpawnDriverWalker(c)}}
+   if(c.parkElapsed>7&&c.parkState==='pulling'){c.parkState='leaving'}
+  }else if(c.parkState==='parked'){
+   c.stun=Math.max(c.stun||0,.14);c.parkElapsed+=dt;if(c.parkElapsed>c.parkDuration)c.parkState='leaving';
+  }else if(c.parkState==='leaving'){
+   c.parkShift=(c.parkShift||0)+(0-(c.parkShift||0))*Math.min(1,dt*1.5);
+   if(Math.abs(c.parkShift)<.28){c.parkShift=0;c.parkState=null;c.stopClock=Math.random()<.38?ri(140,260):Infinity;c.stun=0}
+  }
+  if(c.parkShift&&c.r&&!c.park){if(c.r.ax==='x')c.z+=c.parkShift;else c.x+=c.parkShift;}
+  if(c.slot>=0&&cpool[c.slot]?.item===c){const s=cpool[c.slot];s.g.position.set(c.x,.15,c.z);s.g.rotation.y=c.ry}
+ }
+ thezStepExitWalkers(dt);
+};
+// Do not respawn a seated driver while the car is pulled over.
+const _thezOldLod=lod;
+lod=function(){
+ _thezOldLod();
+ for(const s of cpool){if(s.item?.parkState==='parked'||s.item?.parkState==='pulling'){if(s.drv){try{s.g.remove(s.drv.ch.root)}catch(e){}s.drv.ch.root.visible=false;s.drv.use=false;s.drv=null}}}
+};
+
+// Keep fleeing people outside every building footprint, including during ragdoll recovery.
+// Building colliders are rebuilt after the final city geometry exists; height is inferred for older footprints.
+if(ragdollPhysicsReady&&ragdollWorld)buildRagdollStaticWorld();
 
 showToast=function(){};let last=performance.now(),acc=0;
 (function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;mX.color.setHex(green('x')?0x2ecc40:0xe03030);mZ.color.setHex(green('z')?0x2ecc40:0xe03030);stepCars(dt);stepPeds(dt);fxStep(dt);carVsPlayer();acc+=dt;if(acc>.25){acc=0;lod()}findNear()})(last);
